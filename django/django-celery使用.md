@@ -72,6 +72,7 @@ def add(x, y):
 def mul(x, y):
     return x * y
 
+
 ```
 ### 项目同名__init__中导入app
 ```python
@@ -92,28 +93,60 @@ celery worker -A djangoCeleryDemo -l info
 
 ### 编写视图函数
 >   delay直接执行
->   apply_asyn（）则指定时间执行，其中的eta参数用来接收时间，一定要utc时间
+>   apply_async（）则指定时间执行，其中的eta参数用来接收时间，一定要utc时间
 
 ```python
+import datetime
+
 from django.shortcuts import HttpResponse
-from api.tasks import x1
+from .tasks import add, mul
+from celery.result import AsyncResult
+from djangoCeleryDemo import celery_app
+
 
 def create_task(request):
     print('请求来了')
-    result = x1.delay(2,2)
+    result = add.delay(2, 2)
     print('执行完毕')
     return HttpResponse(result.id)
 
+def create_async_task(request):
+    """创建定时任务"""
+    # ETA一定要是utc时间
+
+    ctime = datetime.datetime.now()
+    utc_ctime = datetime.datetime.utcfromtimestamp(ctime.timestamp())
+
+    s10 = datetime.timedelta(seconds=5)
+    ctime_x = utc_ctime + s10
+    print('async tasks')
+    result = add.apply_async(args=(1,2),eta=ctime_x)
+    return HttpResponse(result.id)
 
 def get_result(request):
     nid = request.GET.get('nid')
     from celery.result import AsyncResult
     # from demos.celery import app
-    from demos import celery_app
+    from djangoCeleryDemo import celery_app
     # 取完数据仍在backends中，如果不需要执行result_object.forget()
-    result_object = AsyncResult(id=nid, app=celery_app) 
+    result_object = AsyncResult(id=nid, app=celery_app)
     # result_objcet.revoke() 取消任务，如果任务已经在执行，强制取消result_object.revoke(terminate=True)
     # get可能夯住，所以应该先判断status
     data = result_object.get()
     return HttpResponse(data)
+
+def get_async_result(request):
+    nid = request.GET.get('nid')
+    result_object = AsyncResult(id=nid, app=celery_app)
+    data = result_object.get()
+    return  HttpResponse(data)
+
+
+```
+
+当在不同文件中存在同名task时，使用下面这种方式
+```python
+result1=app1.tasks.get("s1.add").delay(1,2)
+result2=app2.tasks.get("s1.mul").delay(3,2)
+
 ```
