@@ -43,7 +43,7 @@ def book_list(request):
 ref： https://www.cnblogs.com/clschao/articles/10409764.html
 
 
-## 自定义标签过滤器
+## 自定义标签过,滤器
 
 #### 在app中新建一个templatetags包
 
@@ -174,3 +174,24 @@ class AuctionModelForm(BootstrapModelForm):
         </div>
     </div>
 {% endfor %}
+```
+
+## 事务
+
+```python
+from django.db import transaction
+def perform_create(self, serializer):
+    with transaction.atomic():
+        coupon_obj = Coupon.objects.filter(id=serializer.validated_data['coupon'].id).select_for_update().first()
+        if coupon_obj.left_count<= 0:
+            raise exceptions.ValidationError('优惠券已领完')
+        serializer.save(user=self.request.user)
+
+        # 优惠分发数量加1
+        coupon_obj.dispatch_count+= 1
+        coupon_obj.save()
+
+```
+
+
+
