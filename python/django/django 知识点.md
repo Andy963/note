@@ -91,7 +91,7 @@ def show_results(n): #参数可以传多个进来
 ` {% simple_tag_multi 1 2 %}`
 
 
-## 表单批量添加样式
+## 表单批量添加bootstrap样式
 ```python
 
 from django import forms
@@ -195,3 +195,57 @@ def perform_create(self, serializer):
 
 
 
+## 缓存
+
+python提供了六种缓存方式：
+经常使用的有文件缓存和Mencache缓存
+
+> 开发调试缓存
+内存缓存
+文件缓存
+数据库缓存
+Memcache缓存(使用python-memcached模块)
+Memcache缓存(使用pylibmc模块)
+
+### 内存缓存
+```python
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',     # 指定缓存使用的引擎
+        'LOCATION': 'unique-snowflake',                                 # 写在内存中的变量的唯一值 
+        'TIMEOUT':300,     # 缓存超时时间(默认为300秒,None表示永不过期)
+        'OPTIONS':{
+            'MAX_ENTRIES': 300,   # 最大缓存记录的数量（默认300）
+            'CULL_FREQUENCY': 3,# 缓存到达最大个数之后,剔除缓存个数的比例，即1/CULL_FREQUENCY（默认3）
+        }
+    }
+}
+```
+
+### memcache缓存
+```python
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',   # 指定缓存使用的引擎
+        'LOCATION': '192.168.10.100:11211',   # 指定Memcache缓存服务器的IP地址和端口
+        'OPTIONS':{
+            'MAX_ENTRIES': 300,
+            'CULL_FREQUENCY': 3,
+        }
+    }
+}
+#location也可以这样配置
+'LOCATION': 'unix:/tmp/memcached.sock',  # 指定局域网内的主机名加socket套接字为Memcache缓存服务器
+'LOCATION': [                            # 指定一台或多台其他主机ip地址加端口为Memcache缓存服务器
+    '192.168.10.100:11211',
+    '192.168.10.101:11211',
+    '192.168.10.102:11211',
+]
+```
+
+### 其它缓存的引擎：
+```python
+'BACKEND': 'django.core.cache.backends.db.DatabaseCache', # 数据库
+'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache', # 文件缓存
+#使用数据库缓存时需要创建缓存数据库表：python manage.py createcachetable
+```

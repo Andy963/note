@@ -335,3 +335,97 @@ install_done
 # uninstall
 # rm -rf ~/.oh-my-zsh
 ```
+
+
+## ssh config
+
+```shell
+Host github.com
+    HostName www.github.com
+    User Andy963
+    IdentityFile ~/.ssh/git_id_rsa
+    PreferredAuthentications publickey
+
+Host gitee.com
+    HostName www.gitee.com
+    User Andy963
+    IdentityFile ~/.ssh/git_id_rsa
+    PreferredAuthentications publickey
+
+
+Host centos
+    HostName 192.168.16.8
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+
+ Host gtw
+    HostName 35.185.130.100
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+
+ Host england
+    HostName 89.107.59.180
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+
+ Host vm
+    HostName 198.23.200.188
+    Port 5188
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+
+
+ Host vm_site
+    HostName 107.175.197.137
+    Port 5188
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+
+ Host vm_small
+    HostName 107.174.101.162
+    Port 22
+    User root
+    IdentityFile ~/.ssh/id_rsa
+    PreferredAuthentications publickey
+```
+
+## linux 内核管理
+
+### 查看当前使用内核
+```shell
+uname -r 
+uname -a 
+# ~  uname -a
+Linux Andy 5.3.0-28-generic #30~18.04.1-Ubuntu SMP Fri Jan 17 06:14:09 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+### 查看系统中有哪些内核
+```shell
+dpkg --get-selections | grep linux
+# 或者 dpkg --list |grep linux
+```
+
+### 删除不必要的内核版本
+
+内核映像文件主要包括以下类型：
+
+linux-image-版本号：内核映像文件
+
+linux-headers-版本号：内核头文件
+
+linux-image-extra-版本号：内核扩展文件
+```shell
+sudo apt-get purge linux-image-<版本号>
+```
+### 更新grub文件
+```shell
+sudo update-grub
+```

@@ -1,6 +1,6 @@
-# django中使用celery
+## django中使用celery
 
-## 准备工作
+### 准备工作
 
 目录结构：
 ```python
@@ -150,3 +150,120 @@ result1=app1.tasks.get("s1.add").delay(1,2)
 result2=app2.tasks.get("s1.mul").delay(3,2)
 
 ```
+
+
+## Flask中应用Celery
+
+### 文件结构 
+```python
+pro_flask_celery/
+├── app.py
+├── celery_tasks
+    ├── celery.py
+    └── tasks.py
+```
+
+### app.py
+
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+from flask import Flask
+from celery.result import AsyncResult
+
+from celery_tasks import tasks
+from celery_tasks.celery import celery
+
+app = Flask(__name__)
+
+TASK_ID = None
+
+
+@app.route('/')
+def index():
+    global TASK_ID
+    result = tasks.xxxxx.delay()
+    # result = tasks.task.apply_async(args=[1, 3], eta=datetime(2018, 5, 19, 1, 24, 0))
+    TASK_ID = result.id
+
+    return "任务已经提交"
+
+
+@app.route('/result')
+def result():
+    global TASK_ID
+    result = AsyncResult(id=TASK_ID, app=celery)
+    if result.ready():
+        return result.get()
+    return "xxxx"
+
+
+if __name__ == '__main__':
+    app.run()
+
+```
+
+### celery.py
+
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from celery import Celery
+from celery.schedules import crontab
+
+celery = Celery('xxxxxx',
+                broker='redis://192.168.10.48:6379',
+                backend='redis://192.168.10.48:6379',
+                include=['celery_tasks.tasks'])
+
+# 时区
+celery.conf.timezone = 'Asia/Shanghai'
+# 是否使用UTC
+celery.conf.enable_utc = False
+
+celery_tasks/celery.py
+```
+
+### task.py
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import time
+from .celery import celery
+
+
+@celery.task
+def hello(*args, **kwargs):
+    print('执行hello')
+    return "hello"
+
+
+@celery.task
+def xxxxx(*args, **kwargs):
+    print('执行xxxxx')
+    return "xxxxx"
+
+
+@celery.task
+def hhhhhh(*args, **kwargs):
+    time.sleep(5)
+    return "任务结果"
+
+```
+
+## 周期任务的创建
+```python
+from celery.schedules import crontab
+
+app.conf.beat_schedule = {
+    # Executes every Monday morning at 7:30 a.m.
+    'test_task': {
+        'task': 'blog.tasks.download_data',
+        'schedule': crontab(),
+        'args': (),
+    },
+}
+```
+注意：其中的task一定要写 appName.moduleName.taskName,只写tasks.download_data会报错：unregistered 

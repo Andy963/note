@@ -30,19 +30,18 @@
             "name": "pip源.md",
             "tags": [
             ]
-        },
-        {
-            "attachment_folder": "",
-            "attachments": [
-            ],
-            "created_time": "2020-02-09T05:33:40Z",
-            "modified_time": "2020-02-16T04:28:12Z",
-            "name": "wechat .md",
-            "tags": [
-            ]
         }
     ],
     "sub_directories": [
+        {
+            "name": "django"
+        },
+        {
+            "name": "wechat"
+        },
+        {
+            "name": "celery"
+        }
     ],
     "version": "1"
 }

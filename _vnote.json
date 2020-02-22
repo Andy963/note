@@ -10,14 +10,7 @@
             "name": "python"
         },
         {
-            "name": "git"
-        },
-        {
             "name": "linux"
-        }
-        ,
-        {
-            "name": "django"
         }
     ],
     "tags": [

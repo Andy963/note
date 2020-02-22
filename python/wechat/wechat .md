@@ -107,9 +107,75 @@ methods: {
           })(targetIndex)
 ```
 
+## wechat绑定数据的获取
 
-## 支付功能的设计
+input框：bindinput: `e.detail.value`
+radio: radioChange: `e.detail.value`
+data-id: 传参数: `e.currentTarget.dataset.id`
 
-* 付款时可以选择使用优惠券
-    * 使用优惠券，扣款时判断优惠券是否可用，扣对应的金额，更改优惠券状态为已已使用
-    * 不使用
+
+## get_queryset与filterbackends
+通常情况下如果在serializer中需要过滤，有两种做法：重写get_queryset方法，或者写filterbackends
+
+这里的主要目的是过滤当前用户：
+
+### filterbackends的方式：
+```python
+class OrderFilterBackends(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        return models.Order.objects.filter(user=request.user)
+
+
+class Order(ListAPIView):
+    authentication_classes = [UserAuthentication, ]
+    serializer_class = ser_order.OrderModelSerializer
+    queryset = models.Order.objects.all().order_by('-id')
+    filter_backends = [ser_order.OrderFilterBackends, ]
+
+    def list(self, *args, **kwargs):
+        response = super(Order, self).list(*args, **kwargs)
+        if response.status_code != status.HTTP_200_OK:
+            return response
+
+        order_dict = OrderedDict()
+
+        # 将订单的状态码，状态描述文字组成字典
+        for item in models.Order.status_choices:
+            order_dict[item[0]] = {'text': item[1], 'child': []}
+
+        # 将每个状态对应的订单信息放到child列表中，即根据状态码进行了分类
+        for row in response.data:
+            order_dict[row['status']]['child'].append(row)
+
+        response.data = order_dict
+        return response
+```
+
+### 重写get_queryset的方式
+```python
+def get_queryset(self):
+    return models.Order.objects.filter(user=self.request.user).order_by('id')
+```
+
+
+## 自定义ModelForm的钩子上传文件
+
+```python
+class AuctionItemEditModelForm(BootStrapModelForm):
+    exclude_bootstrap_class = ['cover']
+
+    class Meta:
+        model = models.AuctionItem
+        exclude = ['auction', 'uid', 'deal_price', 'video', 'bid_count', 'look_count']
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        # 上传文件
+        cover_file_object = cleaned_data.get('cover')
+        if not cover_file_object or isinstance(cover_file_object, FieldFile):
+            return cleaned_data
+        ext = cover_file_object.name.rsplit('.', maxsplit=1)[-1]
+        file_name = "{0}.{1}".format(str(uuid.uuid4()), ext)
+        cleaned_data['cover'] = upload_file(cover_file_object, file_name)
+        return cleaned_data
+```
