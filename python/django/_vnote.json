@@ -70,6 +70,16 @@
             "name": "DRF  view.md",
             "tags": [
             ]
+        },
+        {
+            "attachment_folder": "",
+            "attachments": [
+            ],
+            "created_time": "2020-02-23T06:52:02Z",
+            "modified_time": "2020-02-23T09:53:49Z",
+            "name": "DRF serializer.md",
+            "tags": [
+            ]
         }
     ],
     "sub_directories": [

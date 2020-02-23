@@ -77,7 +77,68 @@ methods: {
 
 ## 闭包的使用
 
-自执行函数
+### 使用闭包前
+```js
+for (var i = 0, arr = []; i <= 3; i++) {
+    arr.push(function () {
+        return i;
+    });
+}
+
+console.log(arr);
+console.log(arr[0]());
+console.log(arr[1]());
+/*
+[ [Function], [Function], [Function], [Function] ]
+4
+4
+*/
+```
+函数在定义时，作用域就确定了，即全局作用域，最后console.log调用时就会去全局找i,此时i为4
+
+
+### 使用自执行函数
+使用闭包(自执行函数)，即push括号的内部是一个自执行函数，而由于函数在定义时作用域已经确定，每次执行时都会去取i，而每次循环时i都不同。
+```js
+for(var i=0,arr=[];i<=3;i++) {
+    arr.push(
+        (function(x){
+            return x;
+        })(i)
+    );
+}
+
+console.log(arr);
+/*
+[ 0, 1, 2, 3 ]
+*/
+```
+当然我们也可以以function(x){}函数体中再写一个函数，并返回这个函数,看下面：
+
+```js
+for (var i = 0, arr = []; i <= 3; i++) {
+    arr.push(
+        (function (x) {
+            return function () {
+                return x;
+            };
+        })(i)
+    );
+}
+
+console.log(arr);
+console.log(arr[0]());
+console.log(arr[1]());
+/*
+[ [Function], [Function], [Function], [Function] ]
+0
+1
+*/
+```
+最后在console.log执行arr内部的函数时，需要去取x的值，它的作用域即外部自执行函数，每次循环一次，它产生一个函数，对应的函数作用域也确定了，第一次，x(传到内部为i) 为0，所以可以正常输出值 。
+
+### 自执行函数在上传图片时应用
+自执行函数在wechat项目中的应用，因为存在多张图片，所以要循环图片上传。如果不使用闭包将导致出错。
 
 ```javascript
 #先写两个人括号， 第一个括号中function的参数arg即 后面括号中的taget
@@ -179,3 +240,8 @@ class AuctionItemEditModelForm(BootStrapModelForm):
         cleaned_data['cover'] = upload_file(cover_file_object, file_name)
         return cleaned_data
 ```
+
+## wechat支付：
+
+申请商户号
+商户平台账号  与微信小程序平台账号关联

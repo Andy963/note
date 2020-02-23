@@ -25,6 +25,9 @@
     "sub_directories": [
         {
             "name": "git"
+        },
+        {
+            "name": "mysql"
         }
     ],
     "version": "1"
