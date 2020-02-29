@@ -28,6 +28,9 @@
         },
         {
             "name": "mysql"
+        },
+        {
+            "name": "nginx"
         }
     ],
     "version": "1"

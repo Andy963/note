@@ -700,3 +700,27 @@ class ArticleSerializer(seriliazers.Serializer):
 可以看到这两种方法与form表单也保持了一致，都是通过get_status_display来实现的。其中第二种obj指的是当前article对象。
 
 
+### 日期序列化
+
+```py
+import json
+from datetime import datetime
+from datetime import date
+
+#对含有日期格式数据的json数据进行转换
+class JsonCustomEncoder(json.JSONEncoder):
+    def default(self, field):
+        if isinstance(field,datetime):
+            return field.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(field,date):
+            return field.strftime('%Y-%m-%d')
+        else:
+            return json.JSONEncoder.default(self,field)
+
+
+d1 = datetime.now()
+
+dd = json.dumps(d1,cls=JsonCustomEncoder)
+print(dd)
+```
+
