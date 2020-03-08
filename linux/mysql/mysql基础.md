@@ -1,5 +1,16 @@
 # mysql
 
+## 数据库设计三范式
+第一范式：
+要有主键，并且每个字段原子性不可再分
+
+第二范式：
+要求所有主键字段完全依赖主键，不能产生部分依赖
+部分依赖指的能根据一个主键就确定一个数据，比如联合主键，那么就可能只是部分依赖。
+
+第三范式：
+所有非主键字段与主键字段之间不能产生传递依赖
+
 ## 设置
 
 ### 存储引擎
@@ -44,6 +55,30 @@ show variables like '%lower_case_table_names%';
 ```
 win一般默认值为1，表示是大小写不敏感，而linux环境的mysql是0
 
+### 权限管理
+
+#### 创建用户
+```sql
+create user 'andy'@'1.1.1.1' identified by 'password';
+create user 'andy'@'1.1.1.%' identified by 'password';
+create user 'andy'@'%' identified by 'password';
+```
+#### 授权：
+对文件夹，对文件，对文件某一字段的权限。all可以代表除了grant之外的所有权限
+
+```sql
+#针对所有库的授权:*.*
+grant select on *.* to 'andy'@'localhost' identified by 'password'; 
+
+#针对某一数据库：db1.*
+grant select on db1.* to 'andy'@'localhost' identified by 'password';
+
+#针对某一个表：db1.t1
+grant select on db1.t1 to 'andy'@'localhost' identified by 'password';
+
+#删除权限
+revoke select on db1.* from 'andy'@'%';  #  删除查的权限
+```
 
 ## MySQL库和表的操作
 
@@ -161,4 +196,36 @@ CREATE TABLE t1 (id int auto increatment constaraint fk_t1_publish foreign key(p
 ```
 
 ### 行操作
+行操作主要就是我们通常说的增删改查
+
+
+#### 增（插入）
+```sql
+INSERT INTO 表名(字段1,字段2,字段3…字段n) VALUES(值1,值2,值3…值n); #指定字段来插入数据，插入的值要和你前面的字段相匹配
+
+INSERT INTO 表名 VALUES (值1,值2,值3…值n); #不指定字段的话，就按照默认的几个字段来插入数据
+
+INSERT INTO 表名 VALUES
+        (值1,值2,值3…值n),
+        (值1,值2,值3…值n),
+        (值1,值2,值3…值n);
+
+INSERT INTO 表名(字段1,字段2,字段3…字段n) 
+                    SELECT (字段1,字段2,字段3…字段n) FROM 表2
+                    WHERE …;
+```
+
+#### 删
+
+```sql
+DELETE FROM 表名  WHERE CONITION; #删除符合条件的一些记录
+```
+#### 改（更新）
+
+```sql
+UPDATE 表名 SET 
+        字段1=值1,  #注意语法，可以同时来修改多个值，用逗号分隔
+        字段2=值2,
+        WHERE CONDITION; #更改哪些数据，通过where条件来定位到符合条件的数据
+```
 
