@@ -429,3 +429,17 @@ sudo apt-get purge linux-image-<版本号>
 ```shell
 sudo update-grub
 ```
+
+
+## 禁止cron pam写入日志
+
+```
+vim /etc/pam.d/common-session-noninteractive
+文件结尾附件找到
+session required        pam_unix.so
+前面加上：
+session     [success=1 default=ignore] pam_succeed_if.so service in cron quiet use_uid
+保存。
+
+service cron restart
+```

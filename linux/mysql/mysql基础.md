@@ -1,5 +1,6 @@
 # mysql
-
+ structured query language
+ 
 ## 数据库设计三范式
 第一范式：
 要有主键，并且每个字段原子性不可再分
@@ -13,6 +14,59 @@
 
 ## 设置
 
+### 为root用户设置密码
+在Linux 命令行，非mysql命令行中
+```
+mysqladmin -u root password'passwd'
+mysqladmin -u -p'passwd' password 'passwd2' -S /data/3306/mysql.sock # 适合多实例
+
+#修改密码
+必须使用password函数，必须使用条件，必须
+#方法一
+mysqladmin -uroot -p'oldpassword' password 'newpassword'
+mysqladmin -u root -p'passwd' password 'passwd2' -S /data/3306/mysql.sock # 适合多实例
+
+# 方法二
+# 在mysql中，下面这样设置的为明文密码，会导致无法登陆
+# update msyql.user set password='passwd' where user='root' and host='localhost'
+# 正确的应该使用password函数，然后刷新权限 priveleges;
+# update msyql.user set password=password('passwd') where user='root' and host='localhost'
+flush privileges;
+当密码无法找回时，可以使用--skip-grant-talbes 然后通过上面的命令来修改密码
+
+# 方法三
+# 在mysql中
+mysql> set password password('passwd'); # 不需要刷新权限 即可。
+```
+忘记密码
+步骤：
+* 停止mysql: /etc/init.d/mysql stop
+* 忽略授权表登陆，修改密码，刷新权限表 --skip-grant-tables, flush privileges
+* 停止mysql /etc/init.d/mysql stop
+* 启动mysql
+```
+/etc/init.d/mysql stop
+mysql_safe --skip-grant-tables --user=mysql
+update mysql.user set password=password("admin123") where user="root" and host="localhost";
+flush privileges;
+quit;
+mysqladmin -uroot -padmin123 shutdown
+/etc/init.d/mysql start
+```
+
+优雅关闭mysql数据库的方法：
+```
+#方式一：
+mysqladmin -uroot password shutdown 
+
+#方式二：
+/etc/init.d/mysql stop
+
+#方式三：
+systemctl stop mysql
+
+kill -USR2 `cat path/pid'
+```
 ### 存储引擎
 
 常用的存储引擎为：MyISAM和InnoDB

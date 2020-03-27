@@ -15,11 +15,14 @@ DB_URI = "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8"
 然后使用`create_engine`创建一个引擎`engine`，然后再调用这个引擎的`connect`方法，就可以得到这个对象，然后就可以通过这个对象对数据库进行操作了：
 ```python
 engine = create_engine(DB_URI)
-
+#创建engine时可以指定echo=True查看语句：create_engine(DB_URI,echo=True)
 # 判断是否连接成功
 conn = engine.connect()
 result = conn.execute('select 1')
 print(result.fetchone())
+
+#输出：
+(1,)
 ```
 
 ```py
@@ -191,9 +194,15 @@ conn.close()
 ### query可用参数：
 1. 模型对象。指定查找这个模型中所有的对象。
 2. 模型中的属性。可以指定只查找某个模型的其中几个属性。
-```py
+
+```python
+from sqlalchemy import func
+
 articles = session.query(Article.title,Article.price).all()
+res = session.query(func.max(Article.price)).first()
+print(res)
 ```
+
 3. 聚合函数。
     * func.count：统计行的数量。
     * func.avg：求平均值。
@@ -204,6 +213,13 @@ articles = session.query(Article.title,Article.price).all()
 
 ### filter过滤条件：
 过滤是数据提取的一个很重要的功能，以下对一些常用的过滤条件进行解释，并且这些过滤条件都是只能通过filter方法实现的：
+```py
+res = session.query(Article).filter(Article.id==5).all() 支持>,<
+res = session.query(Article).filter_by(id=5).all() 不支持>,<
+print(res)
+
+```
+
 1. equals：
 
     ```python
@@ -282,7 +298,7 @@ class Article(Base):
     title = Column(String(50),nullable=False)
     content = Column(Text,nullable=False)
 
-    uid = Column(Integer,ForeignKey("user.id"))
+    uid = Column(Integer,ForeignKey("user.id", on_delete="RESTRICT"))
 ```
 外键约束有以下几项： 
 1. RESTRICT：父表数据被删除，会阻止删除。默认就是这一项。 
@@ -292,6 +308,7 @@ class Article(Base):
 
 ### 一对一：
 在sqlalchemy中，如果想要将两个模型映射成一对一的关系，那么应该在父模型中，指定引用的时候，要传递一个`uselist=False`这个参数进去。就是告诉父模型，以后引用这个从模型的时候，不再是一个列表了，而是一个对象了，即一对一。示例代码如下：
+relation可以在两个存在外键的model中都定义，但这样比较麻烦，推荐使用relationship中的backref
 ```python
 class User(Base):
     __tablename__ = 'user'
@@ -312,6 +329,7 @@ class UserExtend(Base):
     user = relationship("User",backref="extend")
 ```
 当然，也可以借助`sqlalchemy.orm.backref`来简化代码：
+下面的代码中backref()函数与上面User类中注释的代码的作用相同，但如果User类中定义了extend则UserExtend不能写backref因为重复了，uselist=False限制了添加数据，达到一对一的目的
 ```python
 class User(Base):
     __tablename__ = 'user'
@@ -353,6 +371,17 @@ class Article(Base):
     uid = Column(Integer,ForeignKey("user.id"))
 
     author = relationship("User",backref="articles")
+
+user = User(username='andy')
+
+article = Article(title='this is article one', uid=1)
+article2 = Article(title='this is article t2o' )
+user.articles.append(article)
+user.articles.append(article2)
+#article.user = user 这种方式更常见
+#session.add(article)
+session.add(user)
+session.commit()
 ```
 另外，可以通过`backref`来指定反向访问的属性名称。articles是有多个。他们之间的关系是一个一对多的关系。
 总结为：正向查找是relationship, 反向查找为relations中的backref指定。
@@ -391,6 +420,7 @@ Base = declarative_base(engine)
 
 session = sessionmaker(engine)()
 
+#第三张表
 article_tag = Table(
     "article_tag",
     Base.metadata,
@@ -464,8 +494,8 @@ ORM层面删除数据，会无视mysql级别的外键约束。直接会将对应
 ### 排序：
 1. order_by：可以指定根据这个表中的某个字段进行排序，如果在前面加了一个-，代表的是降序排序。
 2. 在模型定义的时候指定默认排序：有些时候，不想每次在查询的时候都指定排序的方式，可以在定义模型的时候就指定排序的方式。有以下两种方式：
-    * relationship的order_by参数：在指定relationship的时候，传递order_by参数来指定排序的字段。
-    * 在模型定义中，添加以下代码：
+    * relationship的order_by参数：在指定relationship的时候，传递order_by参数到（backref中，因为如果不指定多的一方指定order_by没有意义）来指定排序的字段。
+    * 在模型定义中，添加以下代码：类似于django中的class meta
 
      __mapper_args__ = {
          "order_by": title
@@ -479,4 +509,46 @@ ORM层面删除数据，会无视mysql级别的外键约束。直接会将对应
 3. 切片：可以对Query对象使用切片操作，来获取想要的数据。可以使用`slice(start,stop)`方法来做切片操作。也可以使用`[start:stop]`的方式来进行切片操作。一般在实际开发中，中括号的形式是用得比较多的。希望大家一定要掌握。示例代码如下：
 ```python
 articles = session.query(Article).order_by(Article.id.desc())[0:10]
+```
+
+
+### 懒加载：
+在一对多，或者多对多的时候，如果想要获取多的这一部分的数据的时候，往往能通过一个属性就可以全部获取了。比如有一个作者，想要或者这个作者的所有文章，那么可以通过user.articles就可以获取所有的。但有时候我们不想获取所有的数据，比如只想获取这个作者今天发表的文章，那么这时候我们可以给relationship传递一个lazy='dynamic'，以后通过user.articles获取到的就不是一个列表，而是一个AppenderQuery对象了。这样就可以对这个对象再进行一层过滤和排序等操作。
+通过`lazy='dynamic'`，获取出来的多的那一部分的数据，就是一个`AppenderQuery`对象了。这种对象既可以添加新数据，也可以跟`Query`一样，可以再进行一层过滤。
+总而言之一句话：如果你在获取数据的时候，想要对多的那一边的数据再进行一层过滤，那么这时候就可以考虑使用`lazy='dynamic'`。
+lazy可用的选项：
+1. `select`：这个是默认选项。还是拿`user.articles`的例子来讲。如果你没有访问`user.articles`这个属性，那么sqlalchemy就不会从数据库中查找文章。一旦你访问了这个属性，那么sqlalchemy就会立马从数据库中查找所有的文章，并把查找出来的数据组装成一个列表返回。这也是懒加载。
+2. `dynamic`：这个就是我们刚刚讲的。就是在访问`user.articles`的时候返回回来的不是一个列表，而是`AppenderQuery`对象。
+
+### group_by：
+根据某个字段进行分组。比如想要根据性别进行分组，来统计每个分组分别有多少人，那么可以使用以下代码来完成：
+```python
+session.query(User.gender,func.count(User.id)).group_by(User.gender).all()
+```
+
+### having：
+having是对查找结果进一步过滤。比如只想要看未成年人的数量，那么可以首先对年龄进行分组统计人数，然后再对分组进行having过滤。示例代码如下：
+```python
+result = session.query(User.age,func.count(User.id)).group_by(User.age).having(User.age >= 18).all()
+```
+
+### join：
+1. join分为left join（左外连接）和right join（右外连接）以及内连接（等值连接）。
+2. 参考的网页：http://www.jb51.net/article/15386.htm
+3. 在sqlalchemy中，使用join来完成内连接。在写join的时候，如果不写join的条件，那么默认将使用外键来作为条件连接。
+4. query查找出来什么值，不会取决于join后面的东西，而是取决于query方法中传了什么参数。就跟原生sql中的select 后面那一个一样。
+比如现在要实现一个功能，要查找所有用户，按照发表文章的数量来进行排序。示例代码如下：
+```python
+result = session.query(User,func.count(Article.id)).join(Article).group_by(User.id).order_by(func.count(Article.id).desc()).all()
+```
+
+### subquery：
+子查询可以让多个查询变成一个查询，只要查找一次数据库，性能相对来讲更加高效一点。不用写多个sql语句就可以实现一些复杂的查询。那么在sqlalchemy中，要实现一个子查询，应该使用以下几个步骤：
+1. 将子查询按照传统的方式写好查询代码，然后在`query`对象后面执行`subquery`方法，将这个查询变成一个子查询。
+2. 在子查询中，将以后需要用到的字段通过`label`方法，取个别名。
+3. 在父查询中，如果想要使用子查询的字段，那么可以通过子查询的返回值上的`c`属性拿到。
+整体的示例代码如下：
+```python
+stmt = session.query(User.city.label("city"),User.age.label("age")).filter(User.username=='李A').subquery()
+result = session.query(User).filter(User.city==stmt.c.city,User.age==stmt.c.age).all()
 ```

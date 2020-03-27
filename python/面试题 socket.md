@@ -495,8 +495,8 @@ ICMP
 
 A. 屏蔽192.168.1.5 访问本机dns 服务端口
 B. 允许10.1.1.0/24 访问本机的udp 8888 9999 端口
-iptables -A INPUT -p tcp --dport 53 -j DROP
-iptables -A INPUT -p tcp --dport 
+iptables -A INPUT -p tcp --dport 53 -s 192.168.1.5 -j DROP
+iptables -A INPUT -p udp --dport 8888 9999 -s 10.1.1.0/24 -j ACCEPT
 
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
@@ -509,3 +509,221 @@ iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
 反之 数据从服务器出去 则为数据源端口 使用 --sport
 -j 就是指定是 ACCEPT 接收 或者 DROP 不接收
 ```
+
+### 业务服务器192.168.1.2 访问192.168.1.3 数据接口, 无法正常返回数据, 请根据以上信息写出排查思路
+```
+
+```
+### 请实现一个简单的socket 编程, 要求
+```
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('', 8888))
+server.listen(5)
+
+#等待客户端连接
+while True:
+    (client, address) = server.accept()
+    data = client.recv(4096)
+    print data
+    client.send("hello")                                                    
+    client.close()
+
+
+# 客户端
+import socket                
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('127.0.0.1', 8888))
+client.send("My name is client")
+message = client.recv(4096)                                                      
+print message                
+client.close()
+```
+
+### 谈一下对于多线程编程的理解, 对于CPU 密集型怎样使用多线程, 说说线程池, 线程锁的用法, 有没有用过multiprocessing 或concurrent.future？
+```
+CPU密集型使用多进程
+IO密集型使用多线程
+加锁
+锁定
+释放
+```
+
+### 关于守护线程的说法, 正确的是 c
+A. 所有非守护线程终止, 即使存在守护线程, 进程运行终止
+B. 所有守护线程终止, 即使存在非守护线程, 进程运行终止
+C. 只要有守护线程或者非守护线程其中之一存在, 进程就不会终止
+D. 只要所有的守护线程和非守护线程中终止运行之后, 进程才会终止
+
+### 描述多进程开发中join 与deamon 的区别
+```
+p.join([timeout]):主线程等待p终止（强调：是主线程处于等的状态，而p是处于运行的状态）
+p.daemon：默认值为False，如果设为True，代表p为后台运行的守护进程，当p的父进程终止时，p也随之终止，并且设定为True后，p不能创建自己的新进程，必须在p.start之前设置
+```
+
+### 请简述GIL 对Python 性能的影响
+```
+GIL：全局解释器锁。每个线程在执行的过程都需要先获取GIL，保证同一时刻只有一个线程可以执行字节码。
+线程释放GIL锁的情况：
+在IO操作等可能会引起阻塞的system call之前,可以暂时释放GIL,但在执行完毕后,必须重新获取GIL
+Python 3.x使用计时器（执行时间达到阈值后，当前线程释放GIL）或Python 2.x，tickets计数达到100
+Python使用多进程是可以利用多核的CPU资源的。
+多线程爬取比单线程性能有提升，因为遇到IO阻塞会自动释放GIL锁
+```
+
+### 曾经在哪里使用过：线程、进程、协程？
+```
+在写高并发的服务端代码时
+在写高性能爬虫的时候。
+```
+
+### 请使用yield 实现一个协程？
+```
+import time
+
+import queue
+def consumer(name):
+    print("--->starting eating baozi...")
+    while True:
+        new_baozi = yield
+        print("[%s] is eating baozi %s" % (name,new_baozi))
+        #time.sleep(1)
+ 
+def producer():
+ 
+    r = con.__next__()
+    r = con2.__next__()
+    n = 0
+    while n < 5:
+        n +=1
+        con.send(n)
+        con2.send(n)
+        print("\033[32;1m[producer]\033[0m is making baozi %s" %n )
+
+if __name__ == '__main__':
+    con = consumer("c1")
+    con2 = consumer("c2")
+    p = producer()
+```
+
+### 请使用python 内置async 语法实现一个协程？
+```
+from datetime import datetime
+import asyncio
+
+async def add(n):
+    print(datetime.now().strftime('%H:%M:%S.%f'))
+    count = 0
+    for i in range(n):
+        count += i
+    print(datetime.now().strftime('%H:%M:%S.%f'))
+    return count
+
+async def fun(n):
+    res = await add(n)
+    print(f'res = {res}')
+
+loop = asyncio.get_event_loop()
+tasks = [fun(20000000), fun(30000000)]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+```
+
+### 简述线程死锁是如何造成的？如何避免？
+```
+若干子线程在系统资源竞争时，都在等待对方对某部分资源解除占用状态，结果是谁也不愿先解锁，互相干等着，程序无法执行下去，这就是死锁。
+GIL锁（有时候，面试官不问，你自己要主动说，增加b格，尽量别一问一答的尬聊，不然最后等到的一句话就是：你还有什么想问的么？）
+GIL锁 全局解释器锁（只在cpython里才有）
+作用：限制多线程同时执行，保证同一时间只有一个线程执行，所以cpython里的多线程其实是伪多线程!
+所以Python里常常使用协程技术来代替多线程，协程是一种更轻量级的线程，
+进程和线程的切换时由系统决定，而协程由我们程序员自己决定，而模块gevent下切换是遇到了耗时操作才会切换。
+三者的关系：进程里有线程，线程里有协程。
+```
+
+### asynio 是什么？
+```
+python高并发模块
+```
+
+### gevent 模块是什么？
+```
+from gevent import monkey;monkey.patch_all()  # 由于该模块经常被使用 所以建议写成一行
+from gevent import spawn
+实现协程
+gevent是第三方库，通过greenlet实现协程，其基本思想是：
+
+当一个greenlet遇到IO操作时，比如访问网络，就自动切换到其他的greenlet，等到IO操作完成，再在适当的时候切换回来继续执行。由于IO操作非常耗时，经常使程序处于等待状态，有了gevent为我们自动切换协程，就保证总有greenlet在运行，而不是等待IO。
+```
+
+### 什么是twisted 框架？
+```
+twisted是异步非阻塞框架。爬虫框架Scrapy依赖twisted。
+```
+
+### 什么是LVS
+```
+LVS ：Linux虚拟服务器
+作用：LVS主要用于多服务器的负载均衡。
+它工作在网络层，可以实现高性能，高可用的服务器集群技术。
+它廉价，可把许多低性能的服务器组合在一起形成一个超级服务器。
+它易用，配置非常简单，且有多种负载均衡的方法。
+它稳定可靠，即使在集群的服务器中某台服务器无法正常工作，也不影响整体效果。另外可扩展性也非常好。
+```
+
+### 什么是Nginx？
+```
+Nginx是一款自由的、开源的、高性能的HTTP服务器和反向代理服务器，同时也是一个IMAP、POP3、SMTP代理服务器。可以用作HTTP服务器、方向代理服务器、负载均衡。
+```
+
+### 什么是keepalived?
+```
+Keepalived起初是为LVS设计的，专门用来监控集群系统中各个服务节点的状态，它根据TCP/IP参考模型的第三、第四层、第五层交换机制检测每个服务节点的状态，如果某个服务器节点出现异常，或者工作出现故障，Keepalived将检测到，并将出现的故障的服务器节点从集群系统中剔除，这些工作全部是自动完成的，不需要人工干涉，需要人工完成的只是修复出现故障的服务节点。
+
+后来Keepalived又加入了VRRP的功能，VRRP（Vritrual Router Redundancy Protocol,虚拟路由冗余协议)出现的目的是解决静态路由出现的单点故障问题，通过VRRP可以实现网络不间断稳定运行，因此Keepalvied 一方面具有服务器状态检测和故障隔离功能，另外一方面也有HA cluster功能，下面介绍一下VRRP协议实现的过程。
+```
+
+### 什么是haproxy
+```
+- TCP 代理：可从监听 socket 接受 TCP 连接，然后自己连接到 server，HAProxy 将这些 sockets attach 到一起，使通信流量可双向流动。
+
+- HTTP 反向代理（在 HTTP 专用术语中，称为 gateway）：HAProxy 自身表现得就像一个 server，通过监听 socket 接受 HTTP 请求，然后与后端服务器建立连接，通过连接将请求转发给后端服务器。
+
+- SSL terminator / initiator / offloader: 客户端 -> HAProxy 的连接，以及 HAProxy -> server 端的连接都可以使用 SSL/TLS
+
+- TCP normalizer: 因为连接在本地操作系统处终结，client 和 server 端没有关联，所以不正常的 traffic 如 invalid packets, flag combinations, window advertisements, sequence numbers, incomplete connections(SYN floods) 不会传递给 server 端。这种机制可以保护脆弱的 TCP stacks 免遭协议上的攻击，也使得我们不必修改 server 端的 TCP 协议栈设置就可以优化与 client 的连接参数。
+
+
+- HTTP normalizer: HAProxy 配置为 HTTP 模式时，只允许有效的完整的请求转发给后端。这样可以使得后端免遭 protocol-based 攻击。一些不规范的定义也被修改，以免在 server 端造成问题（eg: multiple-line headers，会被合并为一行）
+
+- HTTP 修正工具：HAProxy 可以 modify / fix / add / remove / rewrite URL 及任何 request or response header。
+
+- a content-based switch: 可基于内容进行转发。可基于请求中的任何元素转发请求或连接。因此可基于一个端口处理多种协议（http,https, ssh）
+
+- a server load balancer: 可对 TCP 连接 和 HTTP 请求进行负载均衡调度。工作于 TCP 模式时，可对整个连接进行负载均衡调度；工作于 HTTP 模式时，可对 HTTP 请求进行调度。
+
+- a traffic regulator: 可在不同的方面对流量进行限制，保护 server ，使其不超负荷，基于内容调整 traffic 优先级，甚至可以通过 marking packets 将这些信息传递给下层以及网络组件。
+
+- 防御 DDos 攻击及 service abuse: HAProxy 可为每个 IP地址，URL，cookie 等维护大量的统计信息，并对其进行检测，当发生服务滥用的情况，采取一定的措施如：slow down the offenders, block them, send them to outdated contents, etc
+
+- 是 network 的诊断的一个观察节点：根据精确记录细节丰富的日志，对网络诊断很有帮助
+
+- an HTTP compression offloader：可自行对响应进行压缩，而不是让 server 进行压缩，因此对于连接性能较差的 client，或使用高延迟移动网络的 client，可减少页面加载时间
+```
+
+### 什么是负载均衡？
+```
+系统的扩展可分为纵向（垂直）扩展和横向（水平）扩展。纵向扩展，是从单机的角度通过增加硬件处理能力，比如CPU处理能力，内存容量，磁盘等方面，实现服务器处理能力的提升，不能满足大型分布式系统（网站），大流量，高并发，海量数据的问题。因此需要采用横向扩展的方式，通过添加机器来满足大型网站服务的处理能力。比如：一台机器不能满足，则增加两台或者多台机器，共同承担访问压力。这就是典型的集群和负载均衡架构
+```
+
+### 什么是rpc 及应用场景？
+```
+RPC主要用于公司内部的服务调用，性能消耗低，传输效率高，服务治理方便。HTTP主要用于对外的异构环境，浏览器接口调用，APP接口调用，第三方接口调用等...
+```
+
+### 什么是反向代理？
+```
+反向代理：加速网络，保护真实服务器
+这个词相信搞网络的朋友都很熟悉的，但是具体是什么意思呢？说实话，复杂的我也不懂，就我个人理解而言，反向代理有很多用途，比如说保护真实服务器不被外界攻击，加速网络等等。今天我们要介绍的就是加速网络的一种。
+```
+

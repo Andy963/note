@@ -11,7 +11,7 @@ User-Agent，Referer，Host，Content-Type，Cookie，connection,accept,Accept-L
 ```
 ### 列举常见的请求方法。
 ```
-get,post, head,put,delect,option,trace,connect
+get,post, head,put,delete,option,trace,connect
 ```
 ### 列举常见的状态码。
 ```
@@ -559,69 +559,3 @@ if __name__ == '__main__':
     app.run()
 ```
 
-Flask 框架的优势？
-轻巧，灵活，可扩展性强
-
-Flask 框架依赖组件？
-werkzeug
-jinjia2
-#第三方：flask-session, flask-sqlachemy, flask-script, flask-migrate
-
-Flask 蓝图的作用？
-做结构可拆分的目录结构，将功能解耦
-
-简述Flask 上下文管理流程?
-
-Linux
-1. 下面的linux 命令中, 那个不能显示出文件的内容 D
-A. tac
-B. more
-C. head
-D. man
-
-2. 默认情况下管理员创建了一个用户, 就会在()目录下创建一个用户主目录 B
-A. /usr
-B. /home
-C. /root
-D. /etc
-
-3. 你使用命令"vi /etc/inittab"查看该文件的内容, 你不小心改动了一些内容,
-为了防止系统出问题, 你不想保存所修改的内容, 你应该如何操作 A
-A. 在末行模式下, 键入:q!
-B. 在末行模式下, 键入:x!
-C. 在末行模式下, 键入:wq
-D. 在末行模式下, 键入"ESC"键直接退出vi
-
-4. 用"rm -i", 系统会􁨀示什么来让你确认 B
-A. 命令行的每个选择
-B. 是否真的删除
-C. 是否有写的权限
-D. 文件的位置
-
-5. 在CentOS7.2 中, 用一句话将所有的test.py 进程全部杀死
-6. 
-6. 在CentOS7.2 中, 如何查看程序执行所消耗的CPU, 内存等硬件资源
-7. 写一个Bash Shell 脚本来得到当前的日期,时间, 用户名和当前的工作目录
-8. 如何查看当前登录用户
-9. 如何定位占用端口8080 的服务
-10. 如何切换用户
-11. 查找/tmp/path 下的以A 开头的文件
-12. 如有两台机器a/b, a 的ip 地址包括45.32.12.222, 10.10.121.22 b 的ip 地
-址包括45.32.12.226,10.10.121.69,两台机器的ssh 监听端口为11111
-请写出远程登录机器a 的命令
-
-
-## 数据库
-1. 列举常见的关系型数据库和非关系型都有那些？
-关系型： mysql， oracle, db2,MSSQL
-非关系型： mangodb, redis,
-2. MySQL 常见数据库引擎及区别？
- innodb, mysiam, 
-3. 简述事务及其特性？
-4. 简述触发器、函数、视图、存储过程？
-5. MySQL 索引种类
-6. 索引在什么情况下遵循最左前缀的规则？
-7. MySQL 常见的函数？
-8. 列举 创建索引但是无法命中索引的情况。
-9. 数据库导入导出命令（结构+数据）？
-10. 你了解那些数据库优化方案？

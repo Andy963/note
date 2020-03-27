@@ -25,7 +25,7 @@ Python的方法解析顺序(Method Resoluthion Order, 或MRO)。
 
 ### 什么是c3 算法？
 ```
-多重继承时计算继承顺序的看法
+多重继承时计算继承顺序的算法
 ```
 
 ### 列举面向对象中带双下划线的特殊方法
@@ -48,7 +48,7 @@ __enter__ __exit__
 变量名类似__xxx__的，也就是以双下划线开头，并且以双下划线结尾的，是特殊变量，特殊变量是可以直接访问的，不是private变量，所以，不能用__name__、__score__这样的变量名
 
 2、前面双下划线-私有变量
-在Python中，实例的变量名如果以__开头，就变成了一个私有变量（private），只有内部可以访问，外部不能访问。
+在Python中，实例的变量名如果以__开头，就变成了一个私有变量（private），只有内部可以访问，外部不能访问，子类也不行。
 双下划线开头的实例变量是不是一定不能从外部访问呢？其实也不是。不能直接访问__name是因为Python解释器对外把__name变量改成了_${classname}__name，所以，仍然可以通过_${classname}__name来访问__name变量。但是强烈建议你不要这么干，因为不同版本的Python解释器可能会把__name改成不同的变量名
 
 3、前面单下划线-口头私有变量
@@ -86,7 +86,7 @@ with语句的作用是通过某种方式简化异常处理，它是所谓的上�
 比如文件操作时能在操作结束 后自动关闭文件处理
 ```
 
-### 请􁧿述with 的用法, 如果自己的类需要支持with 语句, 应该如何书写?
+### 请简述with 的用法, 如果自己的类需要支持with 语句, 应该如何书写?
 
 ```
 通过类型去判断python对象是否可调用，需要同时判断的是函数还是方法，或者类是否实现__call__方法，如果一个类实现了__call__方法，那么其实例也会成为一个可调用对象
@@ -95,7 +95,26 @@ with语句的作用是通过某种方式简化异常处理，它是所谓的上�
 
 ### 请用两个队列来实现一个栈(给出伪代码即可)
 ```
+import queue
+class Stack:
+    def __init__(self):
+        self.master_queue = queue.Queue()
+        self.minor_queue = queue.Queue()
 
+    def push(self, value):
+        self.master_queue.put(value)
+
+    def pop(self):
+        if self.master_queue.qsize() == 0:
+            return None
+
+        while True:
+            if self.master_queue.qsize() == 1:
+                value = self.master_queue.get()
+                break
+            self.minor_queue.put(self.master_queue.get())
+        self.master_queue, sefl.minor_queue = self.minor_queue,self.master_queue
+        return value
 ```
 
 ### 已知如下链表类, 请实现单链表逆置
