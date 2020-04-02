@@ -18,7 +18,7 @@ q --quit 只显示容器编号
 ### docker exec
 ```
 #直接在容器内执行命令
-
+docker exec -it mymongo:mongo
 ```
 
 ### docker rm

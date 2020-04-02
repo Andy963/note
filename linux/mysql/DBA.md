@@ -1247,6 +1247,153 @@ MariaDB [oldboy]> drop procedure if exists age_from_test;
 Query OK, 0 rows affected (0.00 sec)
 ```
 
+在说到存储函数前， 查看存储过程或者存储函数都可以通过show procedure  status like 'get_name' ;
+
+#### 存储函数
+存储过程中的语句在存储函数中都可以用，但不能指定in,out,inout,且必须有返回return,当return语句中包含select时，返回结果只能有一行
+
+##### 创建存储函数
+```mysql
+delimiter //
+create function get_name(_id int)
+returns char(6)
+begin
+    return (select name from test where id=_id);
+end//
+delimiter ;
+
+# 当添加in,out 等关键字时会报错，但mysql5.7从入门到精通书里竟然可以加，我实践后报错，然后help create function udf 提示的也没有这个参数。
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'in _id int)
+```
+
+##### 调用存储函数
+```mysql
+select get_name(1);
+
+MariaDB [oldboy]> select get_name(1);
++-------------+
+| get_name(1) |
++-------------+
+| jack        |
++-------------+
+1 row in set (0.00 sec)
+```
+
+##### 查看存储函数
+```mysql
+MariaDB [oldboy]> show function status like 'get_name' \G
+*************************** 1. row ***************************
+                  Db: oldboy
+                Name: get_name
+                Type: FUNCTION
+             Definer: root@%
+            Modified: 2020-03-27 17:40:12
+             Created: 2020-03-27 17:40:12
+       Security_type: DEFINER
+             Comment:
+character_set_client: utf8
+collation_connection: utf8_general_ci
+  Database Collation: latin1_swedish_ci
+1 row in set (0.00 sec)
+```
+
+##### 修改存储函数
+```mysql
+alter function get_name from oldboy
+reads sql data
+comment  'get name';
+```
+
+##### 删除存储函数
+```mysql
+drop function function_name;
+```
+
+#### 触发器
+触发器可以理解为一种回调。主要关键词有insert, update,delete，before, after等
+
+##### 创建触发器
+```mysql
+create trigger aft_insert_data after insert
+   on test for each row set @msg='insert one row data';
+```
+执行过程
+```mysql
+MariaDB [oldboy]> create trigger aft_insert_data after insert
+    ->    on test for each row set @msg='insert one row data';
+Query OK, 0 rows affected (0.01 sec)
+
+MariaDB [oldboy]> select @msg;
++------+
+| @msg |
++------+
+| NULL |
++------+
+1 row in set (0.00 sec)
+# 插入数据
+MariaDB [oldboy]> insert into test values(7,30,'saul', 'male');
+Query OK, 1 row affected (0.01 sec)
+
+MariaDB [oldboy]> select @msg;
++---------------------+
+| @msg                |
++---------------------+
+| insert one row data |
++---------------------+
+1 row in set (0.00 sec)
+```
+
+##### 查看触发器
+```mysql
+MariaDB [oldboy]> show triggers \G
+*************************** 1. row ***************************
+             Trigger: aft_insert_data
+               Event: INSERT
+               Table: test
+           Statement: set @msg='insert one row data'
+              Timing: AFTER
+             Created: 2020-03-27 17:50:50.86
+            sql_mode: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+             Definer: root@%
+character_set_client: utf8
+collation_connection: utf8_general_ci
+  Database Collation: latin1_swedish_ci
+1 row in set (0.00 sec)
+
+#第二种方式
+MariaDB [oldboy]> select * from information_schema.triggers where trigger_name='aft_insert_data' \G
+*************************** 1. row ***************************
+           TRIGGER_CATALOG: def
+            TRIGGER_SCHEMA: oldboy
+              TRIGGER_NAME: aft_insert_data
+        EVENT_MANIPULATION: INSERT
+      EVENT_OBJECT_CATALOG: def
+       EVENT_OBJECT_SCHEMA: oldboy
+        EVENT_OBJECT_TABLE: test
+              ACTION_ORDER: 1
+          ACTION_CONDITION: NULL
+          ACTION_STATEMENT: set @msg='insert one row data'
+        ACTION_ORIENTATION: ROW
+             ACTION_TIMING: AFTER
+ACTION_REFERENCE_OLD_TABLE: NULL
+ACTION_REFERENCE_NEW_TABLE: NULL
+  ACTION_REFERENCE_OLD_ROW: OLD
+  ACTION_REFERENCE_NEW_ROW: NEW
+                   CREATED: 2020-03-27 17:50:50.86
+                  SQL_MODE: STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+                   DEFINER: root@%
+      CHARACTER_SET_CLIENT: utf8
+      COLLATION_CONNECTION: utf8_general_ci
+        DATABASE_COLLATION: latin1_swedish_ci
+1 row in set (0.01 sec)
+```
+
+##### 删除触发器
+database_name.trigger_name
+```mysql
+drop trigger oldboy.aft_insert_data;
+```
+
 #### 防止乱码
 
 思想：linux, client, server database, table 字符集一致

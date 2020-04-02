@@ -54,6 +54,12 @@
         },
         {
             "name": "docker"
+        },
+        {
+            "name": "mongo"
+        },
+        {
+            "name": "redis"
         }
     ],
     "version": "1"
