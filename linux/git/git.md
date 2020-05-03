@@ -69,7 +69,10 @@ emote "bravo"]
 ## git pull
 将远程分支拉取到本地，当前分支有没有 commit 的变动，也可以使用git pull从远程拉取分支。
 它是两个命令的简写：`git fetch` `git merge FETCH_HEAD`
-
+```git
+git pull origin master --allow-urelated-histories
+git push --set-upstream origin dev
+```
 
 ## git clone
 git clone命令用于克隆远程分支。
