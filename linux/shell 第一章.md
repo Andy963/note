@@ -106,6 +106,9 @@ array[4]=4
 [0,1,2,3,4]
 #获取长度：
 echo {#array[*]}
+ ~  array=(0 1 2 3 4)
+ ~  echo ${#array[*]}
+5
 ```
 
 ### alias
