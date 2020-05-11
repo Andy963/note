@@ -168,3 +168,46 @@ t$  把当前行复制到文本结尾
 '<,'> 把高亮选区复制到文件开头
 ```
 重复上次的命令行命令@：
+
+## 32 自动补全命令行
+ctrl d 会让vim显示可用的实例列表
+wildmode 可以定义自动实例行为
+
+bash shell:
+```vim
+set wildmode=longest,list
+```
+zsh
+```vim
+set wildmenu
+set wildmode=full
+```
+
+## 33 把当前单词插入到命令行中
+当光标在某个单词上时，ctrl r ctrl w 会复制当前单词并插入到命令行中。
+当我们要修改比如this 改为that
+```vim
+this
+is this
+a this
+test this
+```
+可以这么操作，先将光标移到this上 * 会选中所有的this, 但光标会移到到第二个this, cwthat esc
+%s//ctrl r ctrl w/g 就可以替换所有的this 为that
+
+
+## 34 回溯命令历史 
+按：即切换到命令行模式，然后up/down即可浏览历史
+```vim
+q/ 打开查找命令历史的命令行窗口
+q: 打开ex命令历史的命令行窗口
+ctrl f 命令行模式切换到命令行窗口
+```
+
+## 35 执行shell命令
+：！ 执行外部命令
+：shell 命令进入vim提供的shell
+在vim中ctrl z可以挂起vim,让它在后台，在必要时通过fg返回，可以通过$jobs查看当前作业列表
+
+：read！ {cmd} 把cmd这条命令的输出重定向到缓冲区
+：write!{cmd} 把缓冲区内容作为cmd这条命令的输入
