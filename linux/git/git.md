@@ -299,6 +299,8 @@ git log remote/branch
 #查找log，即搜索commit信息
 git log --author=Andy
 $ git log -i --grep="Something in the message"
+
+git shortlog -sn 查看当前用户提交次数
 ```
 ### 美化输出
 ```

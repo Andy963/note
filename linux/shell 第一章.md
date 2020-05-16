@@ -116,3 +116,35 @@ echo {#array[*]}
 ```sh
 alias ll='ls -al'
 ```
+
+echo 'alias cmd="command seq"' >> ~/.bashrc
+
+### 将命令输出读入变量
+```sh
+cmd_output = $(ls |cat -n)
+cmd_output = `ls |cat -n `
+
+# ()可以定义子shell,如下，子进程的行为不会影响当前shell,所以最后打印出来的pwd相同
+pwd;
+(cd /bin; ls);
+pwd;
+```
+
+### 文件测试表达式
+常见
+```
+-f  file    文件存在且为普通文件 file
+-d  file    文件存在且为目录 directory
+-s  file    文件存在且大小不为0 size
+-e  file    文件存在则为真，只要有文件就行 exists
+-r  file    文件存在且可读 read
+-w  file    文件存在且可写 write
+-x  file    文件存在且可执行 execute
+-L  file    文件存在且为链接 link
+f1 -nt f2   f1比f2新  newer than
+f1 -ot f2   f1比f2旧  older than
+```
+```sh
+如果vimrc 文件存在则返回1否则返回0
+[ -f /etc/vim/vimrc ]&& echo 1|| echo 0
+```
