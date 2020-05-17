@@ -119,6 +119,44 @@ alias ll='ls -al'
 
 echo 'alias cmd="command seq"' >> ~/.bashrc
 
+### tee 
+tee 命令将标准输入发送到标准输出或者写入文件
+```sh
+ /mnt/d/code/vim_learn  tee tee_example.sh
+teee command send stdin to stdout or save to fileteee command send stdin to stdout or save to file%                                                              /mnt/d/code/vim_learn  cat tee_example.sh
+teee command send stdin to stdout or save to file%  
+```
+这里有个问题，像上面这样直接写内容的话在ctrl d 终止输入时会将内容重新输入一遍，但实际内容并没有写入这个文件，即只有前面一部分我输入的写入文件了，不知道这是不是和ctrl d 这个shell命令有关
+
+在shell中管道符可以将前面命令的标准输出转为后面命令的输入，此时可以通过tee命令，同时将它保存到文件，又作为输出
+```sh
+ /mnt/d/code/vim_learn  ls |tee ls_tee.txt
+total 0
+drwxrwxrwx 1 andy andy 4096 May 17 17:32 .
+drwxrwxrwx 1 andy andy 4096 May 12 22:21 ..
+-rwxrwxrwx 1 andy andy    7 May 12 22:47 a.txt
+-rwxrwxrwx 1 andy andy    0 May 12 22:21 b.txt
+-rwxrwxrwx 1 andy andy  454 May 17 16:15 c1.sh
+-rwxrwxrwx 1 andy andy  518 May 17 16:23 c2.sh
+-rwxrwxrwx 1 andy andy   25 May 16 18:13 shell.sh
+-rwxrwxrwx 1 andy andy  128 May 16 17:58 success_test.sh
+-rwxrwxrwx 1 andy andy   49 May 17 18:58 tee_example.sh
+drwxrwxrwx 1 andy andy 4096 May 16 08:23 temp
+ /mnt/d/code/vim_learn  cat ls_tee.txt
+total 0
+drwxrwxrwx 1 andy andy 4096 May 17 17:32 .
+drwxrwxrwx 1 andy andy 4096 May 12 22:21 ..
+-rwxrwxrwx 1 andy andy    7 May 12 22:47 a.txt
+-rwxrwxrwx 1 andy andy    0 May 12 22:21 b.txt
+-rwxrwxrwx 1 andy andy  454 May 17 16:15 c1.sh
+-rwxrwxrwx 1 andy andy  518 May 17 16:23 c2.sh
+-rwxrwxrwx 1 andy andy   25 May 16 18:13 shell.sh
+-rwxrwxrwx 1 andy andy  128 May 16 17:58 success_test.sh
+-rwxrwxrwx 1 andy andy   49 May 17 18:58 tee_example.sh
+drwxrwxrwx 1 andy andy 4096 May 16 08:23 temp
+```
+可以看到ls命令输出了，同时也定稿ls_tee.txt中了
+
 ### 将命令输出读入变量
 ```sh
 cmd_output = $(ls |cat -n)
@@ -146,5 +184,139 @@ f1 -ot f2   f1比f2旧  older than
 ```
 ```sh
 如果vimrc 文件存在则返回1否则返回0
+test -f /etc/vim/vimrc &&echo 1 || echo 0
 [ -f /etc/vim/vimrc ]&& echo 1|| echo 0
+[[ -f /etc/vim/vimrc ]]&& echo 1|| echo 0
+```
+
+### 字符串操作符
+特别注意：
+> 表格中的字符串测试操作符号一定要用双引号“”括起来
+> 比较符号两边有空格
+```
+-z "str"   若长度为0则为真 zero
+-n "str"   若长度不为则为真  nonzero
+"str1" = "str2" 若str1与str2相等则为真，可以用＝＝代替＝
+"str1" != "str2" 若str1与str2不相等则为真 可用！==代替
+```
+
+```sh
+ ~  [ "abc" = "1" ] &&echo 1||echo 0
+0
+ ~  [ "abc"="1" ] &&echo 1||echo 0  #等号两边没空格导致出错 
+1
+ ~  [ "abc" = 1 ] &&echo 1||echo 0
+0
+```
+
+### 整数比较
+
+```
+[] test中使用      （（）） [[]]中使用       说明
+-eq                == 或者=             equal
+-ne                !=                   not equal
+-gt                >                    greater than
+-ge                >=                   greate equal
+-lt                <                    less than
+-le                <=                   less equal
+
+```
+"=" "!=" 在[]中不老板娘转义，而>,<在符号中需要转义，对数字不转义结果可能不会报错，但结果可能不对，同时也注意有无括号的区别
+```sh
+[ 2 > 1 ] && echo 1 || echo 0
+[ 2 < 1 ] && echo 1 || echo 0
+ ~  [ 2>1 ]&& echo 1||echo 0
+0
+ ~  [ 2<1 ]&& echo 1||echo 0
+0
+ ~  [ 2 < 1 ]&& echo 1||echo 0
+1
+ ~  [ 2 > 1 ]&& echo 1||echo 0
+1
+```
+
+推荐[] -eq这种写法
+
+### 逻辑连接符
+
+```
+[] test中使用    [[]]中使用      说明
+-a               &&             and 两者都为真才为真
+-o               ||             or 两者有一个为真即为真
+！               ！             not 相反为真
+```
+如果使用[]但又想使用&&可以通过[] && [] 这种形式
+
+#### 练习
+```sh
+#!/bin/bash
+
+#判断参数个数
+[ $# -ne 2 ] && {
+    echo "USAGE: num1 num2"
+    exit 1
+}
+
+#判断整数
+[ "`echo "$1"|sed -r 's#[^0-9]##g'`" = "$1" ]||{
+    echo "first arg must be int."
+    exit 2
+}
+[ "`echo "$2"|sed -r 's#[^0-9]##g'`" = "$2" ]||{
+    echo "seconde arg must be int."
+    exit 2
+}
+
+#比较
+[ $1 -lt $2 ]&& {
+    echo "$1<$2"
+    exit 0
+}
+[ $1 -eq $2 ]&& {
+    echo "$1=$2"
+    exit 0
+}
+[ $1 -gt $2 ]&& {
+    echo "$1>$2"
+    exit 0
+}
+```
+
+read 方式
+```sh
+#!/bin/bash
+
+read -p "pls input 2 num:" num1 num2
+a=$num1
+b=$num2
+
+#判断参数个数
+[ -z "$a" -o -z "$b" ] && {
+    echo "USAGE: num1 num2"
+    exit 1
+}
+
+#判断整数
+[ "`echo "$a"|sed -r 's#[^0-9]##g'`" = "$a" ]||{
+    echo "first arg must be int."
+    exit 2
+}
+[ "`echo "$b"|sed -r 's#[^0-9]##g'`" = "$b" ]||{
+    echo "seconde arg must be int."
+    exit 2
+}
+
+#比较
+[ $a -lt $b ]&& {
+    echo "$a<$b"
+    exit 0
+}
+[ $a -eq $b ]&& {
+    echo "$a=$b"
+    exit 0
+}
+[ $a -gt $b ]&& {
+    echo "$a>$b"
+    exit 0
+}
 ```
