@@ -320,3 +320,25 @@ b=$num2
     exit 0
 }
 ```
+
+### if语句
+if [条件]
+  then
+    指令
+fi
+if [条件] ;then
+  指令
+fi
+练习：
+开发shell 脚本判断系统剩余内存的大小，如果低于100m就邮件报警给管理员，并且加入系统定时任务每三分钟执行一次检查。
+```sh
+#!/usr/bin/env bash
+
+cur_free = `free -m|awk '(NR==2){print $4}'`
+chars = "current memory is $cur_free"
+
+if [[ $cur_free -lt 100 ]]
+  then
+    echo $chars|mail -s "$chars" 459314922@qq.com
+fi
+```
