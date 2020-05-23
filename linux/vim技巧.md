@@ -370,3 +370,6 @@ set suffixesadd += .py,.rb,.sh
 大写字母为全局位置标记m{Char} 制作标记，然后在另外的文件中通过`{Cahr}即可跳转回来
 在代码中查找 所有出现 foobar()函数的地方，可以用:
 ：vimgrep /fooBar/ ** 
+
+
+
