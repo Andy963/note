@@ -13,6 +13,8 @@ notebook 快捷键：
 * 切换模式 y,m
 * 打开帮助文档shift + tab
 
+### numpy
+
 #### 创建数组
 ```python
 import numpy as np
