@@ -1,3 +1,6 @@
+
+### Wsl jupyter notebook vim
+
 ```shell
 # 安装jupyter
 pip install jupyter
@@ -20,7 +23,7 @@ pip install --upgrade jupyterthemes
 jt -l
 
 # 设置主题样式
-jt -t onedork -f roboto -fs 14 -nfs 14 -tfs 14 -ofs 11
+jt -t onedork -f roboto -fs 12 -nfs 12 -tfs 12 -ofs 11
 
 # 安装扩展插件
 pip install jupyter_contrib_nbextensions

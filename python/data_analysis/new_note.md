@@ -56,3 +56,5 @@ time
 ```python
 df.drop(labels='time',axis=1)
 ```
+
+### 股票案例：

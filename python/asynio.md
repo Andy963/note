@@ -1,0 +1,265 @@
+
+
+### 事件循环
+
+伪代码：
+```
+任务列表 = [任务1，任务2，任务3]
+
+while True:
+    可执行任务列表，已完成任务列表 = 去任务列表中检查所有任务，将可执行/已完成的返回
+
+    for 就绪任务 in 可执行任务列表：
+        执行已经就绪任务
+
+    for 已经完成任务 in 已经完成任务列表
+        在任务列表中移除已经完成任务
+
+    如果 任务列表 中的任务都已经完成  终止循环
+```
+import asyncio
+#去生成或者获取一个事件循环
+loop = asyncio.get_evnet_loop()
+
+#将任务添加到 '任务列表'
+loop.run_until_complete(任务)
+
+### 使用流程
+- 定义协程函数
+- 得到协程对象
+- 执行
+
+```python
+import asyncio
+
+async def func():  # 使用async def 来定义协程函数
+    print('来了，来了')
+
+result = func()  # 返回是一个协程对象
+
+# 执行
+loop = asyncio.get_event_loop()
+loop.run_until_complete(result)
+
+# asyncio.run(result) python3.7才有
+```
+
+### await
+
+**示例1**
+```python
+await + 可等待对象 (协程对象，Future对象,Task对象 -> IO等待)
+
+import asyncio
+
+async def func():
+    print('hello')
+    result = await asyncio.sleep(2)
+    print('finish', result)
+
+asyncio.run(func())
+
+执行流程： 
+func添加到列表中后，先执行print, 此时遇到IO,如果有其他任务，就会切换到其他任务，当其他任务完成或者也遇到IO,切换回来，如果有返回值，交给result,再执行
+print语句
+```
+
+**示例2**
+```python
+import asyncio
+
+async def others():
+    print('start')
+    await asyncio.sleep(2)
+    print('end')
+    return '返回值'
+
+async def func():
+    print('执行协程函数内部代码')
+    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
+    # 当前协程挂起时，事件循环就会去执行其他协程任务
+
+    result = await others()
+
+    print('IO操作完成，结果为：',result)
+# asyncio.run(func())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(func())
+```
+**执行结果**
+执行协程函数内部代码
+start
+end
+IO操作完成，结果为： 返回值
+
+**示例3**
+多个await对象
+```python
+import asyncio
+
+async def others():
+    print('start')
+    await asyncio.sleep(2)
+    print('end')
+    return '返回值'
+
+async def func():
+    print('执行协程函数内部代码')
+    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
+    # 当前协程挂起时，事件循环就会去执行其他协程任务
+
+    result = await others()
+
+    print('IO操作完成，结果为：',result)
+
+    result1 = await others()
+
+    print('IO操作完成，结果为：',result1)
+# asyncio.run(func())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(func())
+
+```
+
+### Task对象
+task对象在事件循环中添加多个任务，用于并发调度协程，通过asyncio.create_task(协程对象)的方式创建task对象，这样可以让协程加入事件循环中等待被调度执行，除了使用asyncio.create_task(),函数以外，还可以用低层级的loop.create_task(),ensure_future()函数，不建议手动实例化Task对象。
+**示例1**
+```python
+import asyncio
+
+async def fun():
+    print('start')
+    await asyncio.sleep(2)
+    print('end')
+    return '返回值'
+
+async def main():
+    print('执行协程函数内部代码')
+    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
+    # 当前协程挂起时，事件循环就会去执行其他协程任务
+
+    # task1 = asyncio.create_task(fun())
+    # task2 = asyncio.create_task(fun())
+    task1 = asyncio.ensure_future(fun())
+    task2 = asyncio.ensure_future(fun())
+
+    print('main finish')
+
+    result1 = await task1
+    result2 = await task2
+
+    print('IO操作完成，结果为：',result1,result2)
+# asyncio.run(main())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+
+```
+**结果**
+执行协程函数内部代码
+main finish
+start
+start
+end
+end
+IO操作完成，结果为： 返回值 返回值
+
+**示例2**
+```python
+import asyncio
+
+async def fun():
+    print('start')
+    await asyncio.sleep(2)
+    print('end')
+    return '返回值'
+
+async def main():
+    print('执行协程函数内部代码')
+    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
+    # 当前协程挂起时，事件循环就会去执行其他协程任务
+
+    # task1 = asyncio.create_task(fun()) create_task可以添加name参数指定名字
+    # task2 = asyncio.create_task(fun())
+    task1 = asyncio.ensure_future(fun())
+    task2 = asyncio.ensure_future(fun())
+
+    task_list = [task1,task2] # 定义一个task对象列表
+
+    print('main finish')
+
+    done,pending = await asyncio.wait(task_list,timeout=2) #timeout参数为可选，如果超出时间那么就没执行完，此时done为空，pending为未执行完的对象
+
+
+    print('IO操作完成，结果为：',done)
+# asyncio.run(main())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+```
+
+**结果**
+执行协程函数内部代码
+main finish
+start
+start
+IO操作完成，结果为： set()
+end
+
+可以看到done为一个集合。
+
+**示例3**
+```python
+import asyncio
+
+async def fun():
+    print('start')
+    await asyncio.sleep(2)
+    print('end')
+    return '返回值'
+
+task_list = [fun(),fun()] # 定义一个task对象列表
+
+done,pending = asyncio.run(asyncio.wait(task_list,timeout=2))
+print(done)
+```
+
+### future对象
+Task继承Future,Task对象内部await 结果的处理基于Future对象来的
+**示例1**
+```python
+import asyncio
+
+async def main():
+    # 获取当前事件循环
+    loop = asyncio.get_running_loop()
+
+    # 创建一个任务（future对象） 这个任务什么也不干
+    fut = loop.create_future()
+
+    # 等待任务最终结果（Future对象）没有结果会一直等下去
+    await fut
+
+asyncio.run(main())
+```
+
+**示例2**
+```python
+import asyncio
+
+async def set_after(fut):
+    await asyncio.sleep(2)
+    fut.set_result('0')
+
+async def main():
+    # 获取当前事件循环
+    loop = asyncio.get_running_loop()
+
+    # 创建一个任务（future对象） 没绑定任何行为，则这个任务永远不知道什么时候结束 
+    fut = loop.create_future()
+
+    # 创建一个任务（Task对象）绑定了set after函数，函数内部在2s后给fut赋值
+    # 即手动设置future任务的结果，那么fut就结束了
+    await loop.create_task(set_after(fut))
+    data = await fut
+    
+asyncio.run(main())
+```
