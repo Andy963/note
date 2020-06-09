@@ -263,3 +263,164 @@ async def main():
     
 asyncio.run(main())
 ```
+
+### concurrent.futures.Future对象
+
+```python
+import time
+from concurrent.futures import future 
+from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures.process import processPoolExecutor
+
+
+def func(value):
+    time.sleep(1)
+    print(value)
+    return
+pool = ThreadPoolExecutor(max_workers=5)
+
+# pool = processPoolExecutor(max_workers=5)
+
+for i in range(10):
+    fut = pool.submit(func,i)
+    print(fut)
+    
+```
+线程池一次只能创建5个连接，但实际它创建了10个，后面的一个只是在等待前面的执行完成。
+可能会存在交叉使用的情况：如异步编程+mysql(不支持异步）这时就可能使用Concurrent.futures
+
+```python
+import time
+from concurrent.futures import future 
+from concurrent.futures.thread import ThreadPoolExecutor
+from concurrent.futures.process import processPoolExecutor
+
+
+def func1(value):
+    time.sleep(1)
+    print(value)
+    return
+
+
+async def main():
+    loop = asyncio.get_runing_loop()
+
+    # run in the deafult executor(ThreadPoolExecutor)
+    # 第一步先调用ThreadPoolExecutor的submit方法去线程池中申请一个线程 执行func1函数 
+    # 并返回一个concurrent.futures.Future对象
+    # 第二步 调用asyncio.wrap_future将concurrent.futures.Future对象包装成asyncio.Future对象
+    # 因为concurrent.futures.Future对象不支持await语法，所以需要包装为asyncio.Future对象才能使用
+    fut = loop.run_in_executor(None,func1)
+    result = await fut
+    print('default thread pool', result)
+
+    # 2 run in custom thread pool
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        result = await loop.run_in_executor(pool, func1)
+        print('custom thread pool',result)
+    # 3 run in a custom process pool
+    with concurrent.futures.processPoolExecutor() as pool:
+        result = await loop.run_in_executor(pool, func1)
+        print('custom process pool',result)
+
+asyncio.run(main())
+```
+
+**实例**
+```python
+import asyncio
+import requests
+
+async def download_images(url):
+    # 发送网络请求，下载图片，遇到网络IO,自动切换到其它任务
+    print('开始下载', url)
+    loop = asyncio.get_event_loop()
+
+    # requests 默认不支持异步操作，所以使用线程池来配合实现
+    future = loop.run_in_executor(None, requests.get, url)
+
+    response = await future
+    print('下载完成')
+    file_name = url.rsplit('-')[-1]
+
+    with open(file_name, mode='wb') as file_obj:
+        file_obj.write(response.content)
+
+
+if __name__ == '__main__':
+    url_list = []
+    tasks = [download_images(url) for url in url_list]
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.wait(tasks))
+```
+
+### 异步迭代器
+```python
+import asyncio
+
+
+class Reader:
+    def __init__(self):
+        self.count = 0
+
+    async def read_count(self):
+        # await asyncio.sleep(1)
+        self.count += 1
+        if self.count == 100:
+            return None
+        return self.count
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        val = await self.read_count()
+        if val == None:
+            raise StopAsyncIteration
+        return val
+
+
+async def func():
+    obj = Reader()
+    # async for 必须写在一个协程函数中
+    async for item in obj:
+        print(item)
+
+
+asyncio.run(func())
+
+```
+
+### 异步上下文管理器
+```python
+import asyncio
+
+
+class AsyncContextManager:
+    def __int__(self):
+        self.conn = conn
+
+    async def do_something(self):
+        # 异步操作
+        return
+
+    async def __aenter__(self):
+        # 异步
+        self.conn = await asyncio.sleep(1)
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        # 异步关闭
+        await asyncio.sleep(1)
+
+
+obj = AsyncContextManager()
+
+
+async def func():
+    # async with 必须放在协程函数中
+    async with obj as f:
+        result = await f.do_something()
+        pass
+
+```
