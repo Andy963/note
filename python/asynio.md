@@ -422,5 +422,76 @@ async def func():
     async with obj as f:
         result = await f.do_something()
         pass
+```
+
+### 异步redis
+pip install aioredis
+```python
+import asyncio
+import aioredis
+
+async def execute(address,password):
+    print('开始执行',address)
+    # 网络io操作，创建redis连接
+    redis=await aioredis.create_redis(address,password=password)
+    # 网络IO操作，在redis中设置哈希值
+    await = redis.hmset_dict('car',key=1,key2=2,key3=3)
+    # 网络IO操作，去redis中获取值
+    result = await redis.hgetall('car',encoding='utf-8')
+
+    print(result)
+    # 网络IO操作，关闭redis连接
+    redis.close()
+    print('结束')
+
+asyncio.run(func)
+```
+
+### 异步mysql
+```python
+import asyncio
+import aiomysql
+
+async def execute():  
+    conn = await aiomysql.connct(host='127.0.0.1',port=3306,usr='root',password='123',db='mysql')
+
+    # 网络IO 创建cursor
+    cur = await conn.cursor
+    # 网络IO 执行sql
+    await cur.execute('Select * from user')
+    # 网络IO 获取结果 
+    result = await cur.fetchall()
+    print(result)
+    # 网络IO 关闭连接
+    await cur.close()
+    conn.close()
+
+asyncio.run(execute)
+
+```
+
+**多个连接**
+```python
+import asyncio
+import aiomysql
+
+async def execute():  
+    conn = await aiomysql.connct(host='127.0.0.1',port=3306,usr='root',password='123',db='mysql')
+
+    # 网络IO 创建cursor
+    cur = await conn.cursor
+    # 网络IO 执行sql
+    await cur.execute('Select * from user')
+    # 网络IO 获取结果 
+    result = await cur.fetchall()
+    print(result)
+    # 网络IO 关闭连接
+    await cur.close()
+    conn.close()
+task_list = [
+ execute('1.1.1.1','password1'),
+ execute('1.2.3.4','password2')
+]
+asyncio.run(asyncio.wait(task_list))
 
 ```
