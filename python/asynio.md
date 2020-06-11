@@ -495,3 +495,77 @@ task_list = [
 asyncio.run(asyncio.wait(task_list))
 
 ```
+
+### FastAPi
+```shell
+pip install fastapi
+pip install uvicorn
+```
+
+**示例**
+```python
+import asyncio
+
+import uvicorn
+from fastapi import FastAPI 
+
+app = FastAPI()
+
+REDIS_POOL = aioredis.ConnectionsPool('redis://ip:port',password='password',minsize=1,maxsize=10)
+
+@app.get('/')
+def index():
+    # 普通接口
+    return {"msg":'hello world'}
+
+async def read():
+    # 异步接口
+    print('请求来了')
+    await asyncio.sleep(3)
+    # 连接
+    conn = await REDIS_POOL.acquire()
+    redis = redis(conn)
+
+    # 设置值
+    await redis.hmset_dict('car',key1=1,key2=2)
+
+    # 取值
+    result = await redis.hgetall('car',encoding='utf-8')
+
+    # REDIS_POOL.release(conn)
+    return result
+
+if __name__ == '__main__':
+    uvicorn.run('code:app',host='127.0.0.1',port=5000,log_level='info')
+
+```
+
+### 爬虫
+```shell
+pip install aiohttp
+```
+
+```python
+import aiohttp
+import asyncio
+
+
+async def fetch(session,url):
+    print('发送请求',url)
+    async with session.get(url, verify_ssl=False) as response:
+        text = await response.text
+        print('得到结果',url,len(text))
+
+async def main():
+    async with aiohttp.ClientSession() as session:
+        url_list = [
+        'https://python.org',
+        'https://www.baidu.com'
+        ]
+        tasks = [asyncio.create_task(fetch(session,url) for url in url_list)]
+
+        await asyncio.wait(tasks)
+
+if __name__ == '__main__':
+    asyncio.run(main())
+```
