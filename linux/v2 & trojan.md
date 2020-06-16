@@ -284,3 +284,4 @@ EOF
 docker run -d --network host --name tg --restart=always -v /etc/trojan-go:/etc/trojan-go teddysun/trojan-go
 ```
 
+return 301 https://www.jingang.gq$request_uri;
