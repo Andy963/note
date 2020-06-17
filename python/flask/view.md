@@ -1,4 +1,8 @@
 ## route
+
+对于app.route('/hello/')这种url,如果不带反斜线，浏览器会重定向到带反斜线的url.为了唯一url，两个url对应同一资源。
+
+app.run(debug=True) 添加 debug=True之后代码作了更改后会自动重新启动。
 ### add_url_rule
 add_url_rule(rule,endpoint=None,view_func=None)
 这个方法用来添加url与视图函数的映射。如果没有填写`endpoint`，那么默认会使用`view_func`的名字作为`endpoint`。以后在使用`url_for`的时候，就要看在映射的时候有没有传递`endpoint`参数，如果传递了，那么就应该使用`endpoint`指定的字符串，如果没有传递，那么就应该使用`view_func`的名字。
@@ -6,8 +10,30 @@ add_url_rule(rule,endpoint=None,view_func=None)
 ### app.route装饰器：
 app.route(rule,**options)
 这个装饰器底层，其实也是使用`add_url_rule`来实现url与视图函数映射的。
+```python
+@app.route('/hello/')
+def hello():
+    return 'Hello world'
+    
+app.add_url_rule('/hello/',view_func=hello)  # 对于类视图只能使用这种方式 
+```
+app.config.from_object('config') 如果使用from_object,必须全部大写，否则是读取不到的。在Flask中debug的默认值为False.
 
 ## view
+
+### response对象
+```python
+@app.route('/hello/')
+def hello():
+    headers = {
+        'content-type': 'text/plain',
+        'location': 'www.baidu.com'
+    }
+    response = make_response('<html></html>', 301)
+    response.headers = headers
+    return response
+    # return '<html></html>',301,header 与上面构建的response对象效果相同。
+```
 
 ### 标准类视图：
 1. 标准类视图，必须继承自`flask.views.View`.
