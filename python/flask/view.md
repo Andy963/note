@@ -34,7 +34,13 @@ def hello():
     return response
     # return '<html></html>',301,header 与上面构建的response对象效果相同。
 ```
-
+**代码原则××
+```python
+if '-' in q and  len(short_q)==10 and short_q.isdigit():
+    pass
+优先将可能为假的放在前面，这样后面的就可能不会运算
+优先将比较耗时的判断放在后面，同样耗时的操作也可能不会执行
+```
 ### 标准类视图：
 1. 标准类视图，必须继承自`flask.views.View`.
 2. 必须实现`dipatch_request`方法，以后请求过来后，都会执行这个方法。这个方法的返回值就相当于是之前的函数视图一样。也必须返回`Response`或者子类的对象，或者是字符串，或者是元组。
