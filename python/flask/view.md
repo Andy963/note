@@ -196,3 +196,16 @@ news_bp = Blueprint('news',__name__,url_prefix='/news',template_folder='zhiliao'
     127.0.0.1   cms.jd.com
     ```
     域名和子域名都需要做映射。
+
+## 手动将flask对象入栈
+```python
+from flask import flask,current_app
+
+app = Flask(__name__)
+
+
+ctx = app.app_context()
+ctx.push()  # 入栈
+a = current_app
+d = current_app.config['DEBUG']
+```
