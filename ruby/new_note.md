@@ -72,6 +72,15 @@ sub(source,to) # 替换
 size
 to_sym
 ```
+
+#### 正则表达式
+**创建**
+- /ruby/
+- %r{ruby}
+- Regexp.new
+
+www.rubular.com
+
 ### 符号
 
 ### 数组
@@ -316,6 +325,85 @@ end
 p arr +4
 ```
 ### 类
+
+```ruby
+class Point
+  def initialize(x, y)
+    #@x 实例变量
+    # @@x 类变量
+    # $x 全局变量
+    # x 局部变量
+    @x, @y = x, y
+  end
+end
+
+p = Point.new(1,2)
+p.x # 这样会出错，需要通过getter,setter来获取：attr_getter,attr_setter,attr_accessor
+```
+
+#### self
+```ruby
+class Point
+  attr_accessor : x, :y
+
+  def initialize(x, y)
+    @x, @y = x, y
+  end
+
+  def first_quadrant?
+    x > 0 && y > 0 # 等同于self.x或者@a
+    # 但如果赋值则需要self.x=3,否则ruby不知道是局部变量还是实例变量
+  end
+
+  def self.second_quadrant?(x, y) # 定义类方法，self指class,如果在first_quadrant方法内使用self,指实例，在second_quadrant方法内指类
+    x < 0 && y > 0
+  end
+  class <<self
+    def foo # 赞同于self.foo
+    end
+    def bar
+    end
+  end
+end
+
+p = Point.new(1, 2)
+puts p.y
+```
+
+#### 类变量
+```ruby
+class Person
+  @@age = 1
+  GENDRE = 'male'
+
+  def talk
+    p 'talk'
+  end
+
+end
+
+p1 = Person.new
+p p1.age #这样是获取不到的
+需要作下面的修改
+class Person
+  @@age = 1
+  GENDRE = 'male'
+
+  def talk
+    p 'talk'
+  end
+
+  def get_age
+    @@age
+  end
+end
+
+p1 = Person.new
+p p1.get_age
+#而对于GENDER 则可以通过Person::GENDER来获取 
+```
+#### 类方法
+public,private,protected
 ```ruby
 class Person
   def self.say_hello
@@ -327,6 +415,41 @@ end
 #p.say_hello
 Person.say_hello  类方法
 ```
+```ruby
+class BaseFoo
+  def foo
+    private_method
+  end
+
+  def private_method
+    puts 'come to baseclass'
+  end
+
+  private :private_method
+end
+
+class Foo < BaseFoo
+  def bar
+    result = foo
+    private_method(result)
+  end
+
+  def private_method(result = nil)
+    puts 'come to subclass'
+  end
+
+  private :private_method
+end
+
+foo = Foo.new
+foo.bar
+#执行结果：
+come to subclass
+come to subclass
+# 理论上是先执行BaseFoo的private_method,但因为子类重写了private_method，所以最终结果是子类的private_method执行了两次。在ruby中public,private,protected的类方法都可以被子类继承。
+```
+
+
 
 **扩充一个类的功能**
 将类重新写一次，添加新的功能
@@ -404,24 +527,149 @@ a = Vector.new(1,2)
 b = Vector.new(2,3)
 p a +b
 ```
+
+### block
+block能获取当前环境下的所有变量，block中的return是指从包含当前block的方法中退出。
+```ruby
+def foo(&block)
+  a = 2
+  block.call(a)
+end
+
+foo { |a| puts a }  # 注意这里不能加括号
+```
+
+```ruby
+def bar
+  puts 'start of bar'
+  x = 3
+  yield x
+  puts 'end of bar'
+end
+
+def foo
+  puts 'start of foo'
+  bar { |x| return if x > 0 }
+  puts 'end of foo'
+end
+
+foo
+#输出
+start of foo
+start of bar
+```
+### proc && lambda
+proce 的行为更像block, lambda更像方法
+```ruby
+irb(main):075:0> p = Proc.new { |x,y| p x,y }
+=> #<Proc:0x00007ffff26c0058@(irb):75>
+irb(main):076:0> p.call(1)
+1
+nil
+=> [1, nil]
+irb(main):077:0> p.call(1,2)
+1
+2
+=> [1, 2]
+irb(main):078:0> p.call(1,2,3)
+1
+2
+=> [1, 2]
+
+irb(main):079:0> l = lambda { |x,y| p x,y }
+=> #<Proc:0x00007ffff26633f8@(irb):79 (lambda)>
+irb(main):080:0> l.call(1)
+Traceback (most recent call last):
+        3: from /usr/bin/irb:11:in `<main>'
+        2: from (irb):80
+        1: from (irb):79:in `block in irb_binding'
+ArgumentError (wrong number of arguments (given 1, expected 2))
+irb(main):081:0> l.call(1,2)
+1
+2
+=> [1, 2]
+irb(main):082:0> l.call(1,2,3)
+Traceback (most recent call last):
+        3: from /usr/bin/irb:11:in `<main>'
+        2: from (irb):82
+        1: from (irb):79:in `block in irb_binding'
+ArgumentError (wrong number of arguments (given 3, expected 2))
+```
+
 ### 文件操作
-File.rename(oldname,newname)
-File.delete()
+
 require FileUtils
 FileUtils.cp()
 
-Dir.open()
+```ruby
+File.open('file.rb', 'r') do |f|
+  while line = f.gets # f.getc 获取一个字符
+    puts line
+  end
+end
 
-dir = Dir.open()
-while filename = dir.read
-p filename
+File.open('test.rb','r') do |f|
+  lines = f.readlines
+end
 
-Dir.mkdir('temp')
-Dir.delete()
+File.readlines('file_util.rb') # 读取所有行
+File.read('file_util.rb')  # 读取所有内容
 
-require "date"
-Date.new
+File.open('test','w') do |f|
+  f << 'hello'  # 追加
+  f << 'world'
+  f.puts 'hello'
+  f.puts 'world'
+end
+```
 
+#### File && Dir
+**File**
+```ruby
+irb(main):053:0> full_name="/mnt/d/code/ruby/r1.rb"
+=> "/mnt/d/code/ruby/r1.rb"
+irb(main):054:0> File.basename(full_name) # 文件名
+=> "r1.rb"
+irb(main):055:0> File.basename(full_name,'.rb')  # 去年后缀的文件名
+=> "r1"
+irb(main):056:0> File.dirname(full_name)  # 文件夹路径
+=> "/mnt/d/code/ruby"
+irb(main):057:0> File.extname(full_name)  # 后缀名
+=> ".rb"
+irb(main):058:0> File.join('/mnt/d','code')  # 拼接
+=> "/mnt/d/code"
+irb(main):059:0> File.expand_path("~/ruyb")  # 
+=> "/home/andy/ruyb"
+irb(main):064:0> File.exist?('.zshrc') # 是否存在
+=> true
+irb(main):066:0> File.directory?('/home/andy')  # 是否是文件夹
+=> true
+irb(main):067:0> File.file?('.bashrc')  # 是否文件
+=> true
+irb(main):068:0> File.size('.bashrc')  # 文件大小
+=> 3772
+File.rename('oldname','newname')  # 重命名
+File.delete('test.rb')  # 删除
+File.symlink('test','old_test')
+
+```
+**Dir**
+```ruby
+irb(main):060:0> Dir.pwd  # 打印路径
+=> "/home/andy"
+irb(main):061:0> Dir.chdir('./')  # 切换目录
+=> 0
+irb(main):062:0> Dir.pwd
+=> "/home/andy"
+irb(main):063:0> Dir.entries('./')  # 遍历文件
+=> [".", "..", ".bash_history", ".bash_logout", ".bashrc", ".cache", ".config", ".gem", ".gitconfig", ".ipython", ".jupyter", ".local", ".oh-my-zsh", ".pip", ".profile", ".python_history", ".shell.pre-oh-my-zsh", ".ssh", ".sudo_as_admin_successful", ".vim", ".viminfo", ".wget-hsts", ".zcompdump", ".zcompdump-Andy963-5.4.2", ".zsh_history", ".zshrc", "config", "proxychains-ng"]
+irb(main):073:0> Dir['*config']  # 过滤文件
+=> ["config"]
+Dir.glob('/mnt/d/code/ruby/*.rb){|f| load f}
+Dir.mkdir('tmp')  # 创建目录
+Dir.rmdir('tmp')  # 删除目录
+
+```
 
 ### 迭代器
 
@@ -463,3 +711,192 @@ p.greet
 People.smile
 ```
 当使用`include First`时，只能使用p.greet,而如果使用extend则只能通过`Person.greet`调用,而对于module Second中的smile方法，是无法混入的
+
+### exception
+**raise**
+raise 'some error message'
+raise ArgumentError, 'error msg',caller
+
+```ruby
+irb(main):001:0> def foo
+irb(main):002:1>   begin
+irb(main):003:2>     raise TypeError, 'boom in foo', caller
+irb(main):004:2>   rescue => e
+irb(main):005:2>     puts e.send(:caller)
+irb(main):006:2>   end
+irb(main):007:1> end
+=> :foo
+irb(main):008:0> foo
+(irb):1:in `foo'
+(irb):8:in `irb_binding'
+/usr/lib/ruby/2.5.0/irb/workspace.rb:85:in `eval'
+/usr/lib/ruby/2.5.0/irb/workspace.rb:85:in `evaluate'
+/usr/lib/ruby/2.5.0/irb/context.rb:380:in `evaluate'
+/usr/lib/ruby/2.5.0/irb.rb:491:in `block (2 levels) in eval_input'
+/usr/lib/ruby/2.5.0/irb.rb:623:in `signal_status'
+/usr/lib/ruby/2.5.0/irb.rb:488:in `block in eval_input'
+/usr/lib/ruby/2.5.0/irb/ruby-lex.rb:246:in `block (2 levels) in each_top_level_statement'
+/usr/lib/ruby/2.5.0/irb/ruby-lex.rb:232:in `loop'
+/usr/lib/ruby/2.5.0/irb/ruby-lex.rb:232:in `block in each_top_level_statement'
+/usr/lib/ruby/2.5.0/irb/ruby-lex.rb:231:in `catch'
+/usr/lib/ruby/2.5.0/irb/ruby-lex.rb:231:in `each_top_level_statement'
+/usr/lib/ruby/2.5.0/irb.rb:487:in `eval_input'
+/usr/lib/ruby/2.5.0/irb.rb:428:in `block in run'
+/usr/lib/ruby/2.5.0/irb.rb:427:in `catch'
+/usr/lib/ruby/2.5.0/irb.rb:427:in `run'
+/usr/lib/ruby/2.5.0/irb.rb:383:in `start'
+/usr/bin/irb:11:in `<main>'
+=> nil
+```
+**实例**
+```ruby
+def factorial(n)
+  raise TypeError unless n.is_a? Integer
+  raise ArgumentError if n < 1
+  return 1 if n == 1
+  n * factorial(n - 1)
+end
+
+begin
+  x = factorial(1)
+rescue ArgumentError => e
+  puts 'Try again with a value >=1'
+rescue TypeError => e
+  puts "Try again with an integer"
+else
+  puts x
+ensure
+  puts 'The process of factorial calculation is completeed'
+end
+```
+### 日期与时间
+DateTime < Date
+Time
+
+**Date**
+```ruby
+irb(main):010:0> require 'date'
+irb(main):014:0> date = Date.today
+=> #<Date: 2020-06-26 ((2459027j,0s,0n),+0s,2299161j)>
+irb(main):015:0> date.year
+=> 2020
+irb(main):016:0> date.month
+=> 6
+irb(main):017:0> date.day
+=> 26
+irb(main):018:0> date.wday
+=> 5
+irb(main):019:0> date.prev_day
+=> #<Date: 2020-06-25 ((2459026j,0s,0n),+0s,2299161j)>
+irb(main):020:0> date.next_day
+=> #<Date: 2020-06-27 ((2459028j,0s,0n),+0s,2299161j)>
+irb(main):021:0> date.next_day.wday
+=> 6
+```
+**DateTime**
+```ruby
+irb(main):034:0> DateTime.now.new_offset(Rational(-7,24))
+=> #<DateTime: 2020-06-25T20:10:49-07:00 ((2459027j,11449s,310850000n),-25200s,2299161j)>
+```
+
+**Time**
+```ruby
+irb(main):024:0> time = Time.now
+=> 2020-06-26 11:02:20 +0800
+irb(main):025:0> time.year
+=> 2020
+irb(main):026:0> time.month
+=> 6
+irb(main):027:0> time.day
+=> 26
+irb(main):028:0> time.hour
+=> 11
+irb(main):029:0> time.min
+=> 2
+irb(main):030:0> time.sec
+=> 20
+irb(main):031:0> time.zone
+=> "CST"
+```
+
+### Thread
+
+```ruby
+def foo
+  10.times { puts "call foo at #{Time.now}" }
+  sleep(0.5)
+end
+
+def bar
+  10.times { puts "call bar at #{Time.now}" }
+  sleep(0.5)
+end
+
+p '*' * 10 + 'start' + '*' * 10
+t1 = Thread.new { foo() }
+t2 = Thread.new { bar() }
+t1.join
+t2.join
+p '*' * 10 + 'end' + '*' * 10
+```
+
+```ruby
+count = 0
+arr = []
+
+10.times do |i|
+  arr[i] = Thread.new {
+    sleep(rand(0) / 10)
+    Thread.current['count'] = count
+    count += 1
+  }
+end
+
+arr.each { |t| t.join; print t['count'], ',' }
+puts "count=#{count}"
+```
+指定priority 使得分配的时间不同
+```ruby
+count1 = count2 = 0
+a = Thread.new do
+  loop { count1 += 1}
+end
+a.priority =1
+
+b = Thread.new do
+  loop { count2 += 1}
+end
+
+b.priority = -1
+sleep(1)
+puts count1,count2
+```
+
+**加锁**
+```ruby
+mutex = Mutex.new
+count1 = count2 = 0
+difference = 0
+counter = Thread.new do
+  loop do
+    mutex.synchronize do
+      count1 += 1
+      count2 += 1
+    end
+  end
+end
+
+spy = Thread.new do
+  loop do
+    mutex.synchronize do
+      difference += (count1 - count2).abs
+    end
+  end
+end
+sleep(1)
+mutex.lock
+puts "count1: #{count1}"
+puts "count2: #{count2}"
+puts "difference: #{difference}"
+
+```
