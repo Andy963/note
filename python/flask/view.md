@@ -209,3 +209,37 @@ ctx.push()  # 入栈
 a = current_app
 d = current_app.config['DEBUG']
 ```
+
+### With
+
+```python
+class A:
+	def __enter__(self):
+		a = 1
+
+	def __exit__(self,exe_type,exe_value,tb):
+		b = 2
+
+with A() as obj:
+	print(obj) # 此情况下，为None ,因为as 后面的结果为__enter__的返回值，因为Enter什么也没返回 
+
+
+class MyResource:
+	def __enter__(self):
+		print('connect to resource')
+		return self
+
+	def __exit__(self, exc_type,exc_value,tb):
+		if tb:
+			print('process exception')
+		else:
+			print('no exception')
+		print('close resource connection')
+
+		# return True or False
+		# 如果__exit__返回False,在它的外层代码仍会抛出异常，而如果返回True
+		# 则不会再抛出异常，表示在with内部已经处理了异常
+
+	def query(self):
+		print('query data')
+```
