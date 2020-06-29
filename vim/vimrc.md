@@ -10,8 +10,6 @@ call vundle#begin()
 
 " 可以在此次安装插件
 Plugin 'gmarik/Vundle.vim'
-" python自动缩进
-Plugin 'vim-scripts/indentpython.vim'
 
 "语法高亮
 Plugin 'scrooloose/syntastic'
@@ -23,8 +21,6 @@ Plugin 'kien/ctrlp.vim'
 
 "树形结构文件夹
 Bundle 'scrooloose/nerdtree'
-" tab 键显示文件结构
-Plugin 'jistr/vim-nerdtree-tabs'
 
 "前端用的emmet
 Bundle 'mattn/emmet-vim'
@@ -48,8 +44,6 @@ Plugin 'jlanzarotta/bufexplorer'
 "monokai主题
 Plugin 'sickill/vim-monokai'
 
-"自动补全
-Plugin 'Valloric/YouCompleteMe'
 
 call vundle#end()
 filetype plugin indent on
