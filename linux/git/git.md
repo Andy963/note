@@ -66,13 +66,30 @@ git remote add bravo ../bravo
 emote "bravo"]
     url = ../bravo/
 ```
+**建立追踪关系**
+```git
+git remote add origin git@github.com:Andy963/fisher.git
+```
+
+## git fetch
+git fetch将远程仓库的代码拉下来，但不合并,这点与git pull不同。可以指定分支.
+```git
+git fetch url branch_name # 拉下来，如果不指定branch会拉取所有分支
+git branch -r # 查看远程分支
+origin/dev
+origin/master
+# 如果需要合并
+git merge origin/dev
+```
+
 ## git pull
-将远程分支拉取到本地，当前分支有没有 commit 的变动，也可以使用git pull从远程拉取分支。
-它是两个命令的简写：`git fetch` `git merge FETCH_HEAD`
+将远程分支拉取到本地，并合并到当前分支。当前分支有没有 commit 的变动，也可以使用git pull从远程拉取分支。
+它是两个命令的简写：`git fetch`  `git merge FETCH_HEAD`
 ```git
 git pull origin master --allow-urelated-histories
 git push --set-upstream origin dev
 ```
+`git pull origin master` 取回远程的orgin 再与master合并，如果本地master分支与远程origin建立了追踪关系，可以省略master, `git pull origin`
 
 ## git clone
 git clone命令用于克隆远程分支。
