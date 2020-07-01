@@ -243,3 +243,10 @@ class MyResource:
 	def query(self):
 		print('query data')
 ```
+
+### filter
+在对字符进行拼接时 如author,publisher,price之间用/拼接，如果中间某一项为空，会导致出现//的情况
+```python
+intro = filter(lambda x: True if x else False, [author, publisher,price])
+'/'.join(intro)
+```

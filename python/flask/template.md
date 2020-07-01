@@ -349,3 +349,18 @@ list.html
     {% endfor %}
 {% endblock %}
 ```
+
+### flash
+flash 即flask中的闪现
+使用：
+在视图函数中调用 flash(message, category)
+在模板中使用get_flashed_messages()
+```jinjia2
+{% set message = get_flash_message() %} # 此时message变量的范围是当前block,如果又定义了另一个block，则无法使用
+
+{% with message = get_flash_message() %}
+  message 的有效范围为with语句内部
+{% endwith %}
+```
+
+```
