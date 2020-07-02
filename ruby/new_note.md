@@ -51,27 +51,7 @@ end
 ```
 
 
-### 字符串
-**定义字符串**
-```ruby
-单引号 a ='a'
-双引号 b ="a的值是#{a}"
-%q()  %q(不会转义）
-%Q()  %Q(双引号会自动转义）
-#多行：
-<<-text
-this is mutil line text
-text
-```
-**方法**
-```ruby
-reverse
-include？
-index
-sub(source,to) # 替换
-size
-to_sym
-```
+
 
 #### 正则表达式
 **创建**
@@ -325,6 +305,47 @@ end
 p arr +4
 ```
 ### 类
+
+**attr_accessor**
+```ruby
+class Test
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+  def say
+    p name
+  end
+end
+
+test = Test.new('andy')
+test.name= 'jack'
+test.say # "jack"
+
+# attr_accessor等同于创造了两个方法
+class Test
+  def initialize(name)
+    @name = name
+  end
+
+  def name
+    @name
+  end
+
+  def name=(name)
+    @name = name
+  end
+
+  def say
+    p name
+  end
+end
+
+test = Test.new('andy')
+test.name = 'jack'
+test.say # 'jack'
+```
 
 ```ruby
 class Point
@@ -899,4 +920,35 @@ puts "count1: #{count1}"
 puts "count2: #{count2}"
 puts "difference: #{difference}"
 
+```
+
+### module
+module没有实例，我们使用时把module混合到类中使用。可以简单理解为把module的内容拷贝一份到类里面，成为类的一部分
+```ruby
+module FirstModule
+  def say
+    puts 'hello'
+  end
+end
+
+class ModuleTest
+  include FirstModule
+end
+
+test = ModuleTest.new
+test.say
+```
+
+**相互嵌套**
+```ruby
+module Human
+  class Boy
+    def say
+      puts 'Hey guys'
+    end
+  end
+end
+
+test = Human::Boy.new
+test.say
 ```
