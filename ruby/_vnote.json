@@ -23,6 +23,9 @@
         }
     ],
     "sub_directories": [
+        {
+            "name": "selenium"
+        }
     ],
     "version": "1"
 }
