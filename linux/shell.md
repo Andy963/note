@@ -443,3 +443,22 @@ session     [success=1 default=ignore] pam_succeed_if.so service in cron quiet u
 
 service cron restart
 ```
+
+## 设置服务器支持中文
+### 检查本机语言包
+```shell
+locale -a
+```
+### 安装语言包
+```shell
+sudo vim /etc/locale.gen
+#将zh_CN.GBK GBK zh_CN.UTF8 UTF8的注释去掉，或者直接添加这两行内容
+
+#下载语言包
+sudo locale-gen
+```
+
+### 修改默认语言
+```shell
+sudo dpkg-reconfigure locales
+```

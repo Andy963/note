@@ -125,6 +125,9 @@ server {
     "rules": [
       {
         "type": "field",
+        "domain": [
+        "googleapis.cn"
+        ],
         "inboundTag": [
           "vmess-in"
         ],
