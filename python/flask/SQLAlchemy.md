@@ -552,3 +552,14 @@ result = session.query(User,func.count(Article.id)).join(Article).group_by(User.
 stmt = session.query(User.city.label("city"),User.age.label("age")).filter(User.username=='李A').subquery()
 result = session.query(User).filter(User.city==stmt.c.city,User.age==stmt.c.age).all()
 ```
+
+### 重写flask_sqlalchemy中的filter_by
+```python
+class Query(BaseQuery):
+    def filtery_by(self, **kwargs):
+        if 'status' not in kwargs.keys():
+            kwargs['status'] =1
+        return super(Query,self).filtery_by(**kwargs)
+
+db = SQLAlchemy(query_class=Query)
+```

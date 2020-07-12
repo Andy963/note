@@ -48,7 +48,7 @@ server {
     location /youku/
     {
       proxy_redirect off;
-      proxy_pass http://127.0.0.1:41161;
+      proxy_pass http://127.0.0.1:9000;
       proxy_http_version 1.1;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -75,7 +75,7 @@ server {
   "inbounds": [
     {
     "port":9000,
-      "listen": "127.0.0.1",
+      "listen": "127.0.0.1", #docker中这里应该是0.0.0.0
       "tag": "vmess-in",
       "protocol": "vmess",
       "settings": {
