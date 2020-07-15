@@ -250,3 +250,32 @@ class MyResource:
 intro = filter(lambda x: True if x else False, [author, publisher,price])
 '/'.join(intro)
 ```
+
+## 统一处理404错误
+监听所有的404错误，当遇到404时就会通过下面的not_found方法来处理
+```python
+# web可以是蓝图，也可以是app核心对象
+# 在程序的任何地方监听到404错误码就会执行
+@ web.app_errorhandler(404)
+def not_found(e):
+    # 这里写自定义的处理
+    return render_template('404.html'), 404
+```
+## 生成token
+使用内置的方法，并放入用户的id
+```python
+from flask import current_app
+from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import TimedJSONWebSignatureSerializer as Ser
+
+db = SQLAlchemy()
+
+
+class User(db.Model):
+    pass
+
+    def generate_token(self, expiration=600):
+        s = Ser(secret_key=current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('utf-8')
+```
+
