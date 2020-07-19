@@ -1,8 +1,6 @@
 ## route
-
-对于app.route('/hello/')这种url,如果不带反斜线，浏览器会重定向到带反斜线的url.为了唯一url，两个url对应同一资源。
-
 app.run(debug=True) 添加 debug=True之后代码作了更改后会自动重新启动。
+
 ### add_url_rule
 add_url_rule(rule,endpoint=None,view_func=None)
 这个方法用来添加url与视图函数的映射。如果没有填写`endpoint`，那么默认会使用`view_func`的名字作为`endpoint`。以后在使用`url_for`的时候，就要看在映射的时候有没有传递`endpoint`参数，如果传递了，那么就应该使用`endpoint`指定的字符串，如果没有传递，那么就应该使用`view_func`的名字。
@@ -22,6 +20,7 @@ app.config.from_object('config') 如果使用from_object,必须全部大写，�
 ## view
 
 ### response对象
+视图函数中的return默认会带很多其它信息，比如：content-type: text/plain. return 后面跟着：内容 ，状态码，headers
 ```python
 @app.route('/hello/')
 def hello():
@@ -197,6 +196,8 @@ news_bp = Blueprint('news',__name__,url_prefix='/news',template_folder='zhiliao'
     ```
     域名和子域名都需要做映射。
 
+蓝图中注册的视图函数的endpoint是有蓝图名的前缀的如：web.search
+
 ## 手动将flask对象入栈
 ```python
 from flask import flask,current_app
@@ -279,3 +280,17 @@ class User(db.Model):
         return s.dumps({'id': self.id}).decode('utf-8')
 ```
 
+### jsonify
+```python
+jsonify(result) ==> json.dumps(result), 200, {'content_type':'application/json'}
+```
+
+### request.args
+request.args是不一个不可变字典，要将它转换成可变字典：`request.args.to_dict()`
+
+其它参数
+request.args: the key/value pairs in the URL query string
+request.form: the key/value pairs in the body, from a HTML post form, or JavaScript request that isn't JSON encoded
+request.files: the files in the body, which Flask keeps separate from form. HTML forms must use enctype=multipart/form-data or files will not be uploaded.
+request.values: combined args and form, preferring args if keys overlap
+request.json: parsed JSON data. The request must have the application/json content type, or use request.get_json(force=True) to ignore the content type.
