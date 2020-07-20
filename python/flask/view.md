@@ -209,6 +209,11 @@ ctx = app.app_context()
 ctx.push()  # 入栈
 a = current_app
 d = current_app.config['DEBUG']
+
+
+with app.app_context():
+	a = current_app
+	debug = current_app.config['DEBUG']
 ```
 
 ### With

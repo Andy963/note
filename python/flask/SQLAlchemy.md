@@ -1,4 +1,5 @@
 ## 连接数据库
+`pip install flask-sqlalchemy`
 
 ### 使用SQLAlchemy去连接数据库：
 使用SQLALchemy去连接数据库，需要使用一些配置信息，然后将他们组合成满足条件的字符串：
