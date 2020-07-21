@@ -249,6 +249,7 @@ class MyResource:
 	def query(self):
 		print('query data')
 ```
+## 其他
 
 ### filter
 在对字符进行拼接时 如author,publisher,price之间用/拼接，如果中间某一项为空，会导致出现//的情况
@@ -257,7 +258,7 @@ intro = filter(lambda x: True if x else False, [author, publisher,price])
 '/'.join(intro)
 ```
 
-## 统一处理404错误
+### 统一处理404错误
 监听所有的404错误，当遇到404时就会通过下面的not_found方法来处理
 ```python
 # web可以是蓝图，也可以是app核心对象
@@ -267,7 +268,7 @@ def not_found(e):
     # 这里写自定义的处理
     return render_template('404.html'), 404
 ```
-## 生成token
+### 生成token
 使用内置的方法，并放入用户的id
 ```python
 from flask import current_app
@@ -299,3 +300,27 @@ request.form: the key/value pairs in the body, from a HTML post form, or JavaScr
 request.files: the files in the body, which Flask keeps separate from form. HTML forms must use enctype=multipart/form-data or files will not be uploaded.
 request.values: combined args and form, preferring args if keys overlap
 request.json: parsed JSON data. The request must have the application/json content type, or use request.get_json(force=True) to ignore the content type.
+
+
+### login_required
+自定义login_required装饰器
+```python
+    from functools import wraps
+
+    def login_required(fun):
+        @wraps(fun)
+        def decorated_view(*args, **kwargs):
+            if session.get('user_id',None):
+                return fun(*args, **kwargs)
+            else:
+                return redirect('/login/')
+        return decorated_view
+```
+
+### 502
+这个当请求头过长时，nginx buffer过小会导致502且静态文件加载过慢
+```nginx
+proxy_buffer_size 64k
+proxy_buffers 32 32k
+proxy_busy_buffers_size 128k
+```
