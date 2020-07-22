@@ -2,6 +2,8 @@
 `pip install flask-sqlalchemy`
 
 ### 使用SQLAlchemy去连接数据库：
+这里连接数据库与flask没有任何关系
+
 使用SQLALchemy去连接数据库，需要使用一些配置信息，然后将他们组合成满足条件的字符串：
 ```python
 HOSTNAME = '127.0.0.1'
