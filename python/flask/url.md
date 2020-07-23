@@ -210,3 +210,9 @@ def list3():
 if __name__ == '__main__':
     app.run(debug=True,port=5000)
 ```
+
+### 获取所有url
+flask中所有的url都保存在url_map中，`app.url_map`即可查看所有路由
+
+### 前端显示flash信息
+在前端显示flash信息，`get_flashed_messages()`
