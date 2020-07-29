@@ -142,7 +142,7 @@ revoke select on db1.* from 'andy'@'%';  #  删除查的权限
 
 ```sql
 CREATE DATABASE 数据库名 charset utf8;
-
+create database test charset utf8 collate utf8_general_cli;
   可以由字母、数字、下划线、＠、＃、＄
 
   区分大小写
