@@ -140,3 +140,12 @@ class SqlHelper(object):
 db = SqlHelper() 
 
 ```
+
+## mysql注入
+对于sql语句，不要自己拼接。
+mysql connector使用%s作为占位符，而pymysql使用？作为占位符，所以两种都可以。
+```python
+args = (id, name)
+sql = "select id, name from test where id=%s and name=%s"
+cursor.execute(sql, args)
+```
