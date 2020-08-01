@@ -57,3 +57,18 @@ def create_app(object_name):
         flask_admin.add_view(
             CustomModelView(model, db.session, category='Models'))  
 ```
+
+### ModelView
+**常见参数**
+```python
+can_create
+can_edit
+can_delete
+column_list
+column_labels
+form_columns
+form_excluded_columns
+form_args,可以指定对某个字段进行过滤
+form_args=dict(
+status=dict(label='状态',filters=(filter_status))) # filter_status为自定义函数，self即值。
+```
