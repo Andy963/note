@@ -430,3 +430,248 @@ GET a1/doc/_search
 # 加样式
 
 ```
+
+### 分页
+```
+GET a1/doc/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from":0,
+  "size":2
+}
+```
+
+### must should
+**准备数据**
+```
+PUT ms/doc/1
+{
+  "name":"andy",
+  "age":30,
+  "from": "hb",
+  "desc": "皮肤黑、性格直",
+  "tags": ["黑", "长", "直"]
+}
+
+PUT ms/doc/2
+{
+  "name":"Amy",
+  "age":18,
+  "from":"hn",
+  "desc":"肤白貌美，娇憨可爱",
+  "tags":["白", "富","美"]
+}
+
+PUT ms/doc/3
+{
+  "name":"jack",
+  "age":22,
+  "from":"hb",
+  "desc":"mmp，没怎么看，不知道怎么形容",
+  "tags":["造数据", "真","难"]
+}
+
+PUT ms/doc/4
+{
+  "name":"lili",
+  "age":29,
+  "from":"bj",
+  "desc":"健美 运行",
+  "tags":["苗条", "美"]
+}
+
+PUT ms/doc/5
+{
+  "name":"Andrew",
+  "age":25,
+  "from":"hebei",
+  "desc":"强壮 跑酷",
+  "tags":["高大","威猛"]
+}
+```
+**查询所有湖北（hb)的人
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "from": "hb"
+          }
+        }
+      ]
+    }
+  }
+}
+
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 2,
+    "max_score" : 0.2876821,
+    "hits" : [
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "1",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "andy",
+          "age" : 30,
+          "from" : "hb",
+          "desc" : "皮肤黑、性格直",
+          "tags" : [
+            "黑",
+            "长",
+            "直"
+          ]
+        }
+      },
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "3",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "jack",
+          "age" : 22,
+          "from" : "hb",
+          "desc" : "mmp，没怎么看，不知道怎么形容",
+          "tags" : [
+            "造数据",
+            "真",
+            "难"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+**来自hb,并且年龄为30岁的
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "from": "hb"
+          }
+        },
+        {
+            "match":{
+              "age":30
+            }
+          }
+      ]
+    }
+  }
+}
+```
+
+** 来自湖北的或者北京的 should**
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "from": "hb"
+          }
+        },
+        {
+          "match": {
+            "from": "bj"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+**不是湖北的，年龄也不是30岁的
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "match":{
+            "from":"hb"
+          }
+        },
+        {
+          "match":{
+            "age":30
+          }
+        }
+      ]
+    }
+  }
+}
+```
+**filter**
+前面一直是某个条件等于，那么要大于/小于怎么办呢？
+来自湖北，且年龄在20-30之间。
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "from": "hb"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "age": {
+            "gte": 20,
+            "lte": 30
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### _source
+默认情况下，会把所有字段都查出来，但如果我们只需要其中几个字段呢？指定_source
+```
+GET ms/doc/_search
+{
+  "query": {
+    "bool":{
+      "must": [
+        {
+          "match": {
+            "from": "hb"
+          }
+        }
+      ]
+    }
+  }
+  , "_source": ["name","age"]
+}
+
+```
