@@ -190,7 +190,9 @@ PUT a1/doc/4
   "name":"Amy",
   "desc":["可爱","乖巧","阳光"]
 }
-
+```
+#### match
+```
 #查询
 GET a1/doc/_search
 {
@@ -244,7 +246,19 @@ GET a1/doc/_search
     ]
   }
 }
-
+```
+#### match_all
+```
+GET a1/doc/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+# match_all后面的条件为空，相当于select * from table;
+```
+#### match_phrase
+```
 # 查某个具体的词
 GET a1/doc/_search
 {
@@ -319,6 +333,332 @@ GET a1/doc/_search
 
 ```
 
+#### match_phrase_prefix
+最左前缀查询
+```python
+GET a1/doc/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "name": "M"
+    }
+  }
+}
+#output
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1,
+    "max_score" : 0.2876821,
+    "hits" : [
+      {
+        "_index" : "a1",
+        "_type" : "doc",
+        "_id" : "3",
+        "_score" : 0.2876821,
+        "_source" : {
+          "name" : "Mary",
+          "desc" : [
+            "可爱",
+            "漂亮"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+结果就是将M开头的名字选出来了，但使用前缀查询会非常消耗性能，最好对结果进行限制：max_expansions
+```python
+GET a1/doc/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "name": {
+        "query": "A",
+        "max_expansions": 1
+      }
+    }
+  }
+}
+```
+#### multi_match
+多字段查询：
+我们可以通过must来限定多个字段,但如果字段太多，这样就比较麻烦
+```python
+GET a1/doc/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "name": "Amy"
+          }
+        },
+        {
+          "match": {
+            "desc": "可爱"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+使用multi_match
+```python
+PUT a1/doc/4 
+{
+  "name":"Amy",
+  "desc":[
+    "Amy",
+    "可爱",
+    "乖巧",
+    "阳光"
+    ]
+}
+GET a1/doc/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Amy",
+      "fields": ["name","desc"]
+    }
+  }
+}
+```
+mutil_match还可以当做match_phrase和match_phrase_prefix使用，只需要指定type类型即可
+```python
+GET a1/doc/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Am",
+      "fields": ["name","desc"],
+      "type": "phrase_prefix" # 或者phrase
+    }
+  }
+}
+```
+
+### term /terms
+通常我们用math是在es经过分词之后解析之后的查询，如果我需要的是没经过分词
+```
+PUT b
+{
+  "mappings": {
+    "doc":{
+      "properties":{
+        "t1":{
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+
+PUT b/doc/1
+{
+  "t1": "Beautiful girl!"
+}
+PUT b/doc/2
+{
+  "t1": "sexy girl!"
+}
+
+GET b/doc/_search
+{
+  "query": {
+    "match": {
+      "t1": "Beautiful girl!"
+    }
+  }
+}
+# 这样是查不到结果的，因为t1是text类型，es会对它的内容进行分析，分析之后就没有：Beautiful girl了，它存的是小写的，所以**不要用term对text类型的数据查询**。
+GET b/doc/_search
+{
+  "query": {
+    "term": {
+      "t1": "Beautiful girl!"
+    }
+  }
+}
+
+#使用小写就能查询出结果：
+GET b/doc/_search
+{
+  "query": {
+    "term": {
+      "t1": "beautiful"
+    }
+  }
+}
+# 查询多个值：
+GET b/doc/_search
+{
+  "query": {
+    "terms": {
+      "t1": ["beautiful","sexy"]
+    }
+  }
+}
+```
+
+### suggest
+准备数据
+```
+PUT s1
+{
+  "mappings": {
+    "doc": {
+      "properties": {
+        "title": {
+          "type": "text",
+          "analyzer": "standard"
+        }
+      }
+    }
+  }
+}
+
+PUT s1/doc/1
+{
+  "title": "Lucene is cool"
+}
+
+PUT s1/doc/2
+{
+  "title":"Elasticsearch builds on top of lucene"
+}
+
+GET s1/doc/_search
+{
+  "query": {
+    "match": {
+      "title": "Lucene"
+    }
+  },
+  "suggest": {
+    "my_suggest": {
+      "text": "Elasticsear lucen",
+      "term": {
+        "field": "title"
+      }
+    }
+  }
+}
+```
+
+让我们注意suggest，每个建议器都有自己名称my-suggestion，es根据text字段返回建议结果。建议类型是term。从field字段生成建议。正如结果所示。对于输入的每个词条的建议结果，es都会放在options中，如果没有建议结果，options将会为空。
+如果我们仅需要建议而不需要查询功能，我们可以忽略query而直接使用suggest对象返回建议
+```
+
+GET s1/doc/_search
+{
+  "suggest": {
+    "my_suggest": {
+      "text": "Elasticsear lucen",
+      "term": {
+        "field": "title"
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 8,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 0,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_suggest" : [
+      {
+        "text" : "elasticsear",
+        "offset" : 0,
+        "length" : 11,
+        "options" : [
+          {
+            "text" : "elasticsearch",
+            "score" : 0.8181818,
+            "freq" : 1
+          }
+        ]
+      },
+      {
+        "text" : "lucen",
+        "offset" : 12,
+        "length" : 5,
+        "options" : [
+          {
+            "text" : "lucene",
+            "score" : 0.8,
+            "freq" : 2
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+哪颗需要多组建议器：
+```
+GET s1/doc/_search
+{
+  "suggest": {
+    "my_suggest1": {
+      "text": "Elasticsear",
+      "term": {
+        "field": "title"
+      }
+    },
+    "my_suggest2": {
+      "text": "lucen",
+      "term": {
+        "field": "title"
+      }
+    }
+  }
+}
+# 当text字段一致时，还可以提取出来
+GET s1/doc/_search
+{
+  "suggest": {
+    "text": "Elasticsear lucen",
+    "my_sugget1": {
+      "term": {
+        "field": "title"
+      }
+    },
+    "my_suggest2": {
+      "term": {
+        "field": "title"
+      }
+    }
+  }
+}
+```
+suggester也有多种：
+- 词条建议器（term suggester）：对于给定文本的每个词条，该键议器从索引中抽取要建议的关键词，这对于短字段（如分类标签）很有效。
+- 词组建议器（phrase suggester）：我们可以认为它是词条建议器的扩展，为整个文本（而不是单个词条）提供了替代方案，它考虑了各词条彼此临近出现的频率，使得该建议器更适合较长的字段，比如商品的描述。
+- 完成建议器（completion suggester）：该建议器根据词条的前缀，提供自动完成的功能（智能提示，有点最左前缀查询的意思），为了实现这种实时的建议功能，它得到了优化，工作在内存中。所以，速度要比之前说的match_phrase_prefix快的多！
+- 上下文建议器（context suggester）：它是完成建议器的扩展，允许我们根据词条或分类亦或是地理位置对结果进行过滤。
 ### 排序
 ```
 # 查desc中含有"可爱"的，然后近id倒序排列
