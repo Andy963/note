@@ -699,6 +699,45 @@ class ArticleSerializer(seriliazers.Serializer):
 
 可以看到这两种方法与form表单也保持了一致，都是通过get_status_display来实现的。其中第二种obj指的是当前article对象。
 
+### to_internal_value
+to_internal_value是在外部数据传进来时进行处理的函数，通常情况下，状态码在数据库中只保存一个数字即可，在查看时我们要看后面对应的文字。对于传入的数据，我们可以 在此验证。如果是数字类型，那么它必须只能是0,1,如果是文字，那么对它进行转换，最后存入数据库的仍为数字。最后返回 data，它的处理在validate之前。
+```python
+STATES_CODE = (
+	(0,'失败'),
+	(1,'成功'),
+	)
+
+def to_internal_value(self,data):
+	"""
+	传入的data是个字典类型
+	最后一定要返回data
+	"""
+
+	states = data.get('states')
+	if states not in [i[1] for i in STATES_CODE]:
+		raise ValueError('states的选项不正确')
+		
+	if not isinstance(states,int):
+		for item in STATES_CODE:
+			if item[1] == states:
+				data['states'] = item[0]
+	return data
+
+```
+### to_representation
+to_presentation控制数据的输出时的形式，比如，字段如果设置为blank=True,null=True,最后数据可能为Null,这样就会导致输出的数据为Null,此时我们可以对它进行处理。
+指定这种情况下显示的值。
+
+```python
+def to_presentation(self,instance):
+	if not data['ver']:
+		data['ver'] = ''
+
+	if not data['status']:
+		data['status'] = '状态未知'
+
+	return data
+```
 
 ### 日期序列化
 
