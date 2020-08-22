@@ -1,311 +1,3 @@
-
-## 基本操作：
-
-### index
-
-#### PUT/GET/DELETE
-```
-PUT /my_index
-
-GET /my_index
-{
-  "my_index" : {
-    "aliases" : { },
-    "mappings" : {
-      "properties" : {
-        "email" : {
-          "type" : "keyword"
-        }
-      }
-    },
-    "settings" : {
-      "index" : {
-        "creation_date" : "1598067052855",
-        "number_of_shards" : "1",
-        "number_of_replicas" : "1",
-        "uuid" : "zND6rQGKSh-CwcLQTyn9ew",
-        "version" : {
-          "created" : "7090099"
-        },
-        "provided_name" : "my_index"
-      }
-    }
-  }
-}
-
-DELETE /my_index
-```
-
-#### setting
-修改index setting,当要创建的index不存在时，下面代码才能成功
-```
-PUT /my_index
-{
-  "settings": {
-    "index": {
-      "number_of_shards": 2,  
-      "number_of_replicas": 2 
-    }
-  }
-}
-# 可以不指定index
-PUT /my-index-000001
-{
-  "settings": {
-    "number_of_shards": 3,
-    "number_of_replicas": 2
-  }
-}
-```
-create index with setting and mapping
-```
-PUT /test
-{
-  "settings": {
-    "number_of_shards": 1
-  },
-  "mappings": {
-    "properties": {
-      "field1": { "type": "text" }
-    }
-  }
-}
-```
-create index with alias
-```
-PUT /test
-{
-  "aliases": {
-    "alias_1": {},
-    "alias_2": {
-      "filter": {
-        "term": { "user.id": "kimchy" }
-      },
-      "routing": "shard-1"
-    }
-  }
-}
-```
-### mapping
-
-#### PUT/GET/DELETE
-```
-PUT /publications # 这样创建的索引不带mapping
-
-PUT /publications/_mapping  # 必须先有索引才能这样操作
-{
-  "properties": {
-    "title":  { "type": "text"}
-  }
-}
-
-# 作用在多个index上
-PUT /my-index-000001
-PUT /my-index-000002
-PUT /my-index-000001,my-index-000002/_mapping
-{
-  "properties": {
-    "user": {
-      "properties": {
-        "name": {
-          "type": "keyword"
-        }
-      }
-    }
-  }
-}
-# 在创建索引时指定mappings, 此情况下，index不能是已经存在的
-PUT /my-index-000001
-{
-  "mappings": {
-    "properties": {
-      "name": {
-        "properties": {
-          "first": {
-            "type": "text"
-          }
-        }
-      }
-    }
-  }
-}
-
-# 为已经存在的mapping添加字段
-PUT /my-index-000001/_mapping
-{
-  "properties": {
-    "name": {
-      "properties": {
-        "last": {
-          "type": "text"
-        }
-      }
-    }
-  }
-}
-
-PUT /my-index-000001
-{
-  "mappings": {
-    "properties": {
-      "city": {
-        "type": "text"
-      }
-    }
-  }
-}
-
-# 这同一字段指定两种不同类型 用raw
-PUT /my-index-000001/_mapping
-{
-  "properties": {
-    "city": {
-      "type": "text",
-      "fields": {
-        "raw": {
-          "type": "keyword"
-        }
-      }
-    }
-  }
-}
-```
-
-
-注意，在新版本中去年了type字段，所以查询时添加时应该写成：PUT a1/_doc/1, 而查询是应该是：GET a1/_search,如果仍然加了doc，可能导致结果不是我们想要的。
-```
-#添加数据
-PUT a1/doc/1
-{
-  "name":"andy",
-  "age":16
-}
-
-# 再次添加,因为用的同一个索引，所以会修改前面插入的数据
-PUT a1/doc/1
-{
-  "name":"andy jack",
-  "age":18
-}
-
-PUT a1/doc/2
-{
-  "name":"andy",
-  "age":16
-}
-
-#获取数据
-GET a1/doc/1
-
-{
-  "_index" : "a1",
-  "_type" : "doc",
-  "_id" : "1",
-  "_version" : 2,
-  "_seq_no" : 1,
-  "_primary_term" : 1,
-  "found" : true,
-  "_source" : {
-    "name" : "andy jack",
-    "age" : 18
-  }
-}
-
-#获取所有数据
-GET a1/doc/_search
-{
-  "took" : 0,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : 2,
-    "max_score" : 1.0,
-    "hits" : [
-      {
-        "_index" : "a1",
-        "_type" : "doc",
-        "_id" : "2",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "andy",
-          "age" : 16
-        }
-      },
-      {
-        "_index" : "a1",
-        "_type" : "doc",
-        "_id" : "1",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "andy jack",
-          "age" : 18
-        }
-      }
-    ]
-  }
-}
-
-#删除数据
-DELETE a1/doc/2
-{
-  "_index" : "a1",
-  "_type" : "doc",
-  "_id" : "2",
-  "_version" : 2,
-  "result" : "deleted",
-  "_shards" : {
-    "total" : 2,
-    "successful" : 1,
-    "failed" : 0
-  },
-  "_seq_no" : 1,
-  "_primary_term" : 1
-}
-
-GET a1/doc/_search
-{
-  "took" : 0,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : 1,
-    "max_score" : 1.0,
-    "hits" : [
-      {
-        "_index" : "a1",
-        "_type" : "doc",
-        "_id" : "1",
-        "_score" : 1.0,
-        "_source" : {
-          "name" : "andy jack",
-          "age" : 18
-        }
-      }
-    ]
-  }
-}
-
-# 查询所有索引
-GET _cat/indices/?v
-health status index                uuid                   pri rep docs.count docs.deleted store.size pri.store.size
-yellow open   a1                   jmrwzYLeQWuxS-YlkF1NqQ   5   1          1            0      4.7kb          4.7kb
-green  open   .kibana_1            AOPzLpBATDaJHLCyGnv9fg   1   0          4            0     17.2kb         17.2kb
-green  open   .kibana_task_manager fqYdzvyaR3OLrSznlSFYCQ   1   0          2            0     12.5kb         12.5kb
-
-#查看索引是否存在，返回状态码
-HEAD a1
-```
-
 ### 两种查询方式
 
 **url**
@@ -1187,4 +879,370 @@ GET ms/doc/_search
   , "_source": ["name","age"]
 }
 
+```
+
+### 数据准备
+```
+PUT ms/doc/1
+{
+  "name":"andy",
+  "age":30,
+  "from": "hb",
+  "desc": "皮肤黑、性格直",
+  "tags": ["黑", "长", "直"]
+}
+
+PUT ms/doc/2
+{
+  "name":"Amy",
+  "age":18,
+  "from":"hn",
+  "desc":"肤白貌美，娇憨可爱",
+  "tags":["白", "富","美"]
+}
+
+PUT ms/doc/3
+{
+  "name":"jack",
+  "age":22,
+  "from":"hb",
+  "desc":"mmp，没怎么看，不知道怎么形容",
+  "tags":["造数据", "真","难"]
+}
+
+PUT ms/doc/4
+{
+  "name":"lili",
+  "age":29,
+  "from":"bj",
+  "desc":"健美 运行",
+  "tags":["苗条", "美"]
+}
+
+PUT ms/doc/5
+{
+  "name":"Andrew",
+  "age":25,
+  "from":"hebei",
+  "desc":"强壮 跑酷",
+  "tags":["高大","威猛"]
+}
+```
+
+### avg/max/min
+** 湖北人的平均年龄**
+```
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {
+    }
+  },
+   "aggs":{
+     "My_avg":{  # My_avg为最后在结果中显示的字段
+       "avg": {
+         "field": "age"
+       }
+     }
+   }
+}
+# 在默认情况下，如果不对结果进行限制，它会将所有内容显示出来，如果只想得到My_avg数据，则需要指定：`size=0`,而如果想看有哪些数据，但又不想看所有字段，那么指定`_source`
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {
+    }
+  },
+   "aggs":{
+     "My_avg":{
+       "avg": {
+         "field": "age"
+       }
+     }
+   },
+   "size": 0
+}
+#output:
+{
+  "took" : 3,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "My_avg" : {
+      "value" : 24.8
+    }
+  }
+}
+
+# max
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {
+    }
+  },
+   "aggs":{
+     "My_max":{
+       "max": {
+         "field": "age"
+       }
+     }
+   },
+   "from":0,
+   "size": 0
+}
+# 指定`"from":0,"size":0`与仅仅指定`"size:0`相同。即从0开始，向后取0个。
+
+#指定`_source`的情况
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {
+    }
+  },
+   "aggs":{
+     "My_max":{
+       "max": {
+         "field": "age"
+       }
+     }
+   },
+"_source": ["name"]
+}
+#output
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "5",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Andrew"
+        }
+      },
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "2",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "Amy"
+        }
+      },
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "4",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "lili"
+        }
+      },
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "andy"
+        }
+      },
+      {
+        "_index" : "ms",
+        "_type" : "doc",
+        "_id" : "3",
+        "_score" : 1.0,
+        "_source" : {
+          "name" : "jack"
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "My_max" : {
+      "value" : 30.0
+    }
+  }
+}
+```
+### group
+```
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "size": 0,
+  "aggs": {
+    "my_group": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "from": 15,
+            "to": 20
+          },
+          {
+            "from": 20,
+            "to": 25
+          },
+           {
+            "from": 25,
+            "to": 30
+          }
+        ]
+      }
+    }
+  }
+}
+
+#output
+{
+  "took" : 5,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "my_group" : {
+      "buckets" : [
+        {
+          "key" : "15.0-20.0",
+          "from" : 15.0,
+          "to" : 20.0,
+          "doc_count" : 1
+        },
+        {
+          "key" : "20.0-25.0",
+          "from" : 20.0,
+          "to" : 25.0,
+          "doc_count" : 1
+        },
+        {
+          "key" : "25.0-30.0",
+          "from" : 25.0,
+          "to" : 30.0,
+          "doc_count" : 2
+        }
+      ]
+    }
+  }
+}
+
+# 在上面的基本上，求每一组的平均年龄
+这里的`my_avg`所对应的aggs是`my_group`的子项，因为是对组求平均
+GET ms/doc/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "size": 0,
+  "aggs": {
+    "my_group": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "from": 15,
+            "to": 20
+          },
+          {
+            "from": 20,
+            "to": 25
+          },
+           {
+            "from": 25,
+            "to": 30
+          }
+        ]
+      },
+    "aggs":{
+      "my_avg":{
+        "avg": {
+          "field": "age"
+        }
+      }
+    }
+    }
+  }
+}
+#output
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "my_group" : {
+      "buckets" : [
+        {
+          "key" : "15.0-20.0",
+          "from" : 15.0,
+          "to" : 20.0,
+          "doc_count" : 1,
+          "my_avg" : {
+            "value" : 18.0
+          }
+        },
+        {
+          "key" : "20.0-25.0",
+          "from" : 20.0,
+          "to" : 25.0,
+          "doc_count" : 1,
+          "my_avg" : {
+            "value" : 22.0
+          }
+        },
+        {
+          "key" : "25.0-30.0",
+          "from" : 25.0,
+          "to" : 30.0,
+          "doc_count" : 2,
+          "my_avg" : {
+            "value" : 27.0
+          }
+        }
+      ]
+    }
+  }
+}
 ```
