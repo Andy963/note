@@ -1,5 +1,177 @@
 
-### 基本操作：
+## 基本操作：
+
+### index
+
+#### PUT/GET/DELETE
+```
+PUT /my_index
+
+GET /my_index
+{
+  "my_index" : {
+    "aliases" : { },
+    "mappings" : {
+      "properties" : {
+        "email" : {
+          "type" : "keyword"
+        }
+      }
+    },
+    "settings" : {
+      "index" : {
+        "creation_date" : "1598067052855",
+        "number_of_shards" : "1",
+        "number_of_replicas" : "1",
+        "uuid" : "zND6rQGKSh-CwcLQTyn9ew",
+        "version" : {
+          "created" : "7090099"
+        },
+        "provided_name" : "my_index"
+      }
+    }
+  }
+}
+
+DELETE /my_index
+```
+
+#### setting
+修改index setting,当要创建的index不存在时，下面代码才能成功
+```
+PUT /my_index
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 2,  
+      "number_of_replicas": 2 
+    }
+  }
+}
+# 可以不指定index
+PUT /my-index-000001
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 2
+  }
+}
+```
+create index with setting and mapping
+```
+PUT /test
+{
+  "settings": {
+    "number_of_shards": 1
+  },
+  "mappings": {
+    "properties": {
+      "field1": { "type": "text" }
+    }
+  }
+}
+```
+create index with alias
+```
+PUT /test
+{
+  "aliases": {
+    "alias_1": {},
+    "alias_2": {
+      "filter": {
+        "term": { "user.id": "kimchy" }
+      },
+      "routing": "shard-1"
+    }
+  }
+}
+```
+### mapping
+
+#### PUT/GET/DELETE
+```
+PUT /publications # 这样创建的索引不带mapping
+
+PUT /publications/_mapping  # 必须先有索引才能这样操作
+{
+  "properties": {
+    "title":  { "type": "text"}
+  }
+}
+
+# 作用在多个index上
+PUT /my-index-000001
+PUT /my-index-000002
+PUT /my-index-000001,my-index-000002/_mapping
+{
+  "properties": {
+    "user": {
+      "properties": {
+        "name": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+# 在创建索引时指定mappings, 此情况下，index不能是已经存在的
+PUT /my-index-000001
+{
+  "mappings": {
+    "properties": {
+      "name": {
+        "properties": {
+          "first": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  }
+}
+
+# 为已经存在的mapping添加字段
+PUT /my-index-000001/_mapping
+{
+  "properties": {
+    "name": {
+      "properties": {
+        "last": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+
+PUT /my-index-000001
+{
+  "mappings": {
+    "properties": {
+      "city": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+# 这同一字段指定两种不同类型 用raw
+PUT /my-index-000001/_mapping
+{
+  "properties": {
+    "city": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+```
+
+
 注意，在新版本中去年了type字段，所以查询时添加时应该写成：PUT a1/_doc/1, 而查询是应该是：GET a1/_search,如果仍然加了doc，可能导致结果不是我们想要的。
 ```
 #添加数据
