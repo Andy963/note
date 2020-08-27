@@ -26,3 +26,18 @@ pip install flask-sqlalchemy
 users = User.query.order_by(User.id.desc()).all()
 print(users)
 ```
+
+### 对choice序列化
+```python
+from flask.json import JSONEncoder
+from sqlalchemy_utils import Choice
+
+class CustomJSONEncoder(JSONEncoder):
+     def default(self, obj):
+        if isinstance(obj, Choice):
+            return obj.code
+
+        return JSONEncoder.default(self, obj)  # aka super()
+
+app.json_encoder = CustomJSONEncoder
+```
