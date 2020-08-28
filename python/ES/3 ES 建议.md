@@ -273,5 +273,360 @@ GET /s2/_search
 #### conclusion
 term suggester首先将输入文本经过分析器（所以，分析结果由于采用的分析器不同而有所不同）分析，处理为单个词条，然后根据单个词条去提供建议，并不会考虑多个词条之间的关系。然后将每个词条的建议结果（有或没有）封装到options列表中。最后由建议器统一返回
 ### phrase suggester
+词组建议器和词条建议器一样，不过它不再为单个词条提供建议，而是为整个文本提供建议。
+```
+PUT s3
+{
+  "mappings": {
+      "properties": {
+        "title": {
+          "type": "text",
+          "analyzer": "standard"
+        }
+      }
+    }
+}
+
+PUT /s3/_doc/1
+{
+  "title": "Lucene is cool"
+}
+
+PUT /s3/_doc/2
+{
+  "title": "Elasticsearch builds on top of lucene"
+}
+
+PUT /s3/_doc/3
+{
+  "title": "Elasticsearch rocks"
+}
+
+PUT /s3/_doc/4
+{
+  "title": "Elastic is the company behind ELK stack"
+}
+
+PUT /s3/_doc/5
+{
+  "title": "elk rocks"
+}
+
+PUT /s3/_doc/6
+{
+  "title": "elasticsearch is rock solid"
+}
+```
+查询
+```
+GET /s3/_search
+{
+  "suggest": {
+    "my_s3": {
+      "text": "lucne and elasticsear rock",
+      "phrase": {
+        "field": "title"
+      }
+    }
+  }
+}
+{
+  "took" : 318,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s3" : [
+      {
+        "text" : "lucne and elasticsear rock",
+        "offset" : 0,
+        "length" : 26,
+        "options" : [
+          {
+            "text" : "lucene and elasticsearch rock",
+            "score" : 0.004993905
+          },
+          {
+            "text" : "lucne and elasticsearch rock",
+            "score" : 0.0033391973
+          },
+          {
+            "text" : "lucene and elasticsear rock",
+            "score" : 0.0029183894
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+可以看到options直接返回了相关短语列表。虽然lucene建议的并不好。但elasticserch和rock很不错。除此之外，我们还可以使用高亮来向用户展示哪些原有的词条被纠正了。
+```
+GET /s3/_search
+{
+  "suggest": {
+    "my_s3": {
+      "text": "lucne and elasticsear rock",
+      "phrase": {
+        "field": "title",
+        "highlight":{
+          "pre_tag":"<em>",
+          "post_tag":"</em>"
+        }
+      }
+    }
+  }
+}
+{
+  "took" : 9,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s3" : [
+      {
+        "text" : "lucne and elasticsear rock",
+        "offset" : 0,
+        "length" : 26,
+        "options" : [
+          {
+            "text" : "lucene and elasticsearch rock",
+            "highlighted" : "<em>lucene</em> and <em>elasticsearch</em> rock",
+            "score" : 0.004993905
+          },
+          {
+            "text" : "lucne and elasticsearch rock",
+            "highlighted" : "lucne and <em>elasticsearch</em> rock",
+            "score" : 0.0033391973
+          },
+          {
+            "text" : "lucene and elasticsear rock",
+            "highlighted" : "<em>lucene</em> and elasticsear rock",
+            "score" : 0.0029183894
+          }
+        ]
+      }
+    ]
+  }
+}
+#除了默认的，还可以自定义高亮显示：
+GET s4/doc/_search
+{
+  "suggest": {
+    "my_s4": {
+      "text": "lucne and elasticsear rock",
+      "phrase": {
+        "field": "title",
+        "highlight":{
+          "pre_tag":"<b id='d1' class='t1' style='color:red;font-size:18px;'>",
+          "post_tag":"</b>"
+        }
+      }
+    }
+  }
+}
+#需要注意的是，建议器结果的高亮显示和查询结果高亮显示有些许区别，比如说，这里的自定义标签是pre_tag和post_tag而不是之前如这样的
+GET /s3/_search
+{
+  "query": {
+    "match": {
+      "title": "rock"
+    }
+  },
+  "highlight": {
+    "pre_tags": "<b style='color:red'>",
+    "post_tags": "</b>",
+    "fields": {
+      "title": {}
+    }
+  }
+}
+{
+  "took" : 57,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1,
+      "relation" : "eq"
+    },
+    "max_score" : 1.540445,
+    "hits" : [
+      {
+        "_index" : "s3",
+        "_type" : "_doc",
+        "_id" : "6",
+        "_score" : 1.540445,
+        "_source" : {
+          "title" : "elasticsearch is rock solid"
+        },
+        "highlight" : {
+          "title" : [
+            "elasticsearch is <b style='color:red'>rock</b> solid"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+phrase suggester在term suggester的基础上，会考虑多个term之间的关系，比如是否同时出现索引的原文中，临近程度，词频等。
+
 ### completion suggester
+为了告诉elasticsearch我们准备将建议存储在自动完成的FST中，需要在映射中定义一个字段并将其type类型设置为completion
+```
+PUT s4
+{
+  "mappings":{
+      "properties": {
+        "title": {
+          "type": "completion",
+          "analyzer": "standard"
+        }
+      }
+    }
+}
+
+PUT /s4/_doc/1
+{
+  "title":"Lucene is cool"
+}
+
+PUT /s4/_doc/2
+{
+  "title":"Elasticsearch builds on top of lucene"
+}
+
+PUT /s4/_doc/3
+{
+  "title":"Elasticsearch rocks"
+}
+
+PUT /s4/_doc/4
+{
+  "title":"Elastic is the company behind ELK stack"
+}
+
+PUT /s4/_doc/5
+{
+  "title":"the elk stack rocks"
+}
+
+PUT /s4/_doc/6
+{
+  "title":"elasticsearch is rock solid"
+}
+
+GET /s4/_search
+{
+  "suggest": {
+    "my_s4": {
+      "text": "elas",
+      "completion": {
+        "field": "title"
+      }
+    }
+  }
+}
+# output
+{
+  "took" : 865,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s4" : [
+      {
+        "text" : "elas",
+        "offset" : 0,
+        "length" : 4,
+        "options" : [
+          {
+            "text" : "Elastic is the company behind ELK stack",
+            "_index" : "s4",
+            "_type" : "_doc",
+            "_id" : "4",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : "Elastic is the company behind ELK stack"
+            }
+          },
+          {
+            "text" : "Elasticsearch builds on top of lucene",
+            "_index" : "s4",
+            "_type" : "_doc",
+            "_id" : "2",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : "Elasticsearch builds on top of lucene"
+            }
+          },
+          {
+            "text" : "Elasticsearch rocks",
+            "_index" : "s4",
+            "_type" : "_doc",
+            "_id" : "3",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : "Elasticsearch rocks"
+            }
+          },
+          {
+            "text" : "elasticsearch is rock solid",
+            "_index" : "s4",
+            "_type" : "_doc",
+            "_id" : "6",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : "elasticsearch is rock solid"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
+```
 ### context suggester
