@@ -43,7 +43,12 @@ add_argument可以指定这个字段的名字，这个字段的数据类型等�
 3. date：将这个字符串转换为datetime.date数据类型。如果转换不成功，则会抛出一个异常。
 
 
-对于一个视图函数，你可以指定好一些字段用于返回。以后可以使用ORM模型或者自定义的模型的时候，他会自动的获取模型中的相应的字段，生成json数据，然后再返回给客户端。这其中需要导入flask_restful.marshal_with装饰器。并且需要写一个字典，来指示需要返回的字段，以及该字段的数据类型。示例代码如下：
+#### 对于定义的字段格式：以格式的字段为主
+- 当格式与model对应的字段一致时，即返回预期的格式化的数据。
+- 当格式比model字段多时，不存在的字段为默认值None
+- 当格式比model字段少，多余的字段不会显示。
+
+对于一个视图函数，你可以指定好一些字段用于返回。以后可以使用ORM模型或者自定义的模型的时候，他会自动的获取模型中的相应的字段，生成json数据，然后再返回给客户端。这其中需要导入flask_restful.marshal_with装饰器,如果函数使用marsha(data,fields)。并且需要写一个字典，来指示需要返回的字段，以及该字段的数据类型。示例代码如下：
 
 ```python
 class ProfileView(Resource):
@@ -59,6 +64,25 @@ class ProfileView(Resource):
         return user
 ```
 
+#### ListField
+```python
+user_fields = {
+    "username":fields.String,
+    "age":fields.Integer,
+    }
+    
+dest_data = {
+    'status':200,
+    'message':'ok',
+    'data':[{'u1':1,'age':18},{'u2':2,'age':19}]
+}
+
+resource_fields = {
+    "status": fields.String,
+    "message":fields.String,
+    "data":fields.List(fields.Nested(user_fields))
+    }
+```
 
 在get方法中，返回user的时候，flask_restful会自动的读取user模型上的username以及age还有school属性。组装成一个json格式的字符串返回给客户端。
 
