@@ -1,3 +1,27 @@
+## docker 安装
+```
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+sudo apt-get update
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+   
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
 ## v2
 
 ### 安装v2
@@ -148,30 +172,7 @@ docker run -d -p 127.0.0.1:9000:9000 --name v2 --restart=always -v /opt/v2:/etc/
 docker run -d --name wt --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock   containrrr/watchtower -c $(cat opt/wt/watchtower.list) --schedule "0 0 3 * * *"
 ```
 
-## docker 安装
-```
-sudo apt-get remove docker docker-engine docker.io containerd runc
 
-sudo apt-get update
-sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo apt-key fingerprint 0EBFCD88
-
-sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-   
-sudo apt-get update
-
-sudo apt-get install docker-ce docker-ce-cli containerd.io
-```
 
 ## trojan
 
