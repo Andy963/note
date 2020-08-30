@@ -1210,3 +1210,286 @@ GET /s8/_search
 }
 ```
 ### context suggester
+虽然完成建议器已经能返回所有和输入文本相匹配的结果，但有些使用案例需要过滤。这就要用到了上下文过滤器，它在完成建议器的基础上加入了过滤功能。
+上下文建议器允许用户使用context上下文来进行过滤，上下文可以是分类（词条）或者地理位置，为了开启上下文，同样在映射中指定，然后在文档和建议中提供上下文。
+完成建议器考虑索引中的所有文档，但通常我们希望提供某些标准过滤或者提升的建议。例如，我们想要推荐某些歌手过滤的歌曲标题，或者我们希望根据其类型推广歌曲标题。
+要实现建议过滤或者提升，我们可以在配置完成字段时添加上下文映射，我们也可以为完成字段定义多个上下文映射，每个上下文映射都有唯一的名称和类型，有两种类型category和geo。上下文映射contexts在字段映射中的参数下配置。
+注意：在索引查询启用上下文的完成字段时，必须提供上下文
+```
+PUT place
+{
+  "mappings": {
+      "properties":{
+        "title":{
+          "type":"completion",
+          "contexts":[
+            {#定义category名为place_type的上下文，其中必须与建议一起发送类别。
+              "name":"place_type", 
+              "type": "category"
+            },
+            {# 定义一个geo名为location的上下文，其中必须使用建议发送类别
+              "name":"location",
+              "type":"geo",
+              "precision": 4
+            }
+          ]
+        }
+      }
+  }
+}
+
+PUT place_path_category
+{
+  "mappings": {
+      "properties":{
+        "title":{
+          "type":"completion",
+          "contexts":[
+            {#定义category名为place_type的上下文，其中必须从cat字段字段中读取类别。
+              "name":"place_type",
+              "type":"category",
+              "path":"cat"
+            },
+            {#定义geo名为location的上下文，其中从loc字段中读取类别。
+              "name":"location",
+              "type":"geo",
+              "precision": 4,
+              "path":"loc"
+            }
+          ]
+        },
+        "loc":{
+          "type":"geo_point"
+        }
+      }
+  }
+}
+```
+添加上下文映射会增加完成字段的索引大小，完成索引完全是堆驻留的，我们可以使用Indices Stats监视完成字段索引的大小
+#### 类别上下文
+在category上下文允许我们将一个或多个类别与索引时间的建议关联，在查询时，建议可以通过其关联的类别进行过滤和提升。
+映射的设置与place_type上面的字段类似，如果path已定义，则从文档中的该路径读取类别，否则必须在建议字段中发送它们，如下示例所示
+```
+PUT /place/_doc/1
+{
+  "title":{
+    "input":["timmy's", "starbucks", "dunkin donuts"],
+    "contexts":{
+       "place_type":["cafe", "food"] # 这些建议将与咖啡馆和食品类别相关联
+    }
+  }
+}
+```
+如果映射有path， 那么以下索引请求就可以添加类别
+```
+PUT /place_path_category/_doc/1
+{
+  "title":["timmy's", "sstarbucks", "dunkin donuts"],
+  "cat":["cafe", "food"] 
+}
+```
+如果上下文映射引用另一个字段并且类别被明确索引，则使用两组类别对建议进行索引
+
+##### 类别查询
+
+```
+POST /place/_search
+{
+  "suggest":{
+    "place_suggestion":{
+      "prefix":"tim",
+      "completion":{
+        "field":"title",
+        "size": 10,
+        "contexts":{
+          "place_type":["cafe", "restaurants"]
+        }
+      }
+    }
+  }
+}
+```
+注意，如果在查询上设置了多个类别或者类别上下文，则将它们合并为分离。这意味着如果建议包含至少一个提供的上下文值，则建议匹配
+某些类别的建议可能会比其他类别高，以下按类别过滤建议，并额外提升与某些类别相关的建议
+```
+POST /place/_search
+{
+  "suggest": {
+    "place_suggestion": {
+      "prefix": "tim",
+      "completion": {
+        "field": "title",
+        "size": 10,
+        "contexts":{
+          "place_type":[ #上下文查询过滤建议与类别咖啡馆和餐馆相关联，并且通过因子增强与餐馆相关联的建议
+            {
+              "context":"cafe"
+            },
+            {
+              "context":"restaurants", "boost":2
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+```
+除了接受类别值之外，上下文查询还可以由多个类别上下文子句组成，category上下文支持以下参数：
+- context，要过滤/提升的类别的值，这是强制性的。
+- boost，应该提高建议分数的因素，通过将boost乘以建议权重来计算分数，默认为1。
+- prefix，是否应该将类别实为前缀，例如，如果设置为true，则可以通过指定类型的类别前缀来过滤type1，type2等类别，默认为false。
+
+注意：如果建议条目与多个上下文匹配，则最终分数被计算为由任何匹配上下文产生的最大分数
+#### 地理位置上下文
+一个geo上下文允许我们将一个或多个地理位置或geohash与在索引时间的建议关联，在查询时，如果建议位于地理位置特定的距离内，则可以过滤和提升建议。
+在内部，地位置被编码为具有指定精度的地理位置
+##### 地理映射
+除了path设置，geo上下文映射还接受以下设置：
+
+- precision，它定义了地理散列的精度要被索引并且可以指定为一个距离值（5km，10km等），或作为原料地理散列精度（1 … 12）。默认为原始geohash精度值6
+索引时间precision设置可以在查询时使用的最大geohash精度
+
+**索引地理上下文**
+geo上下文可以通过参数显式设置或通过path参数从文档中的地理点地段建立索引，类似于category上下文，将多个地理位置上下文与建立相关联，将为每个地理位置索引建议，以下索引具有两个地理位置上下文的建议：
+```
+PUT /place/_doc/2
+{
+  "title":{
+    "input":"timmy's",
+    "contexts":{
+      "location":[
+        {
+          "lat":43.6624803,
+          "lon":-79.3863353
+        },
+        {
+          "lat":43.6624718,
+          "lon":-79.3873327
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 地理位置查询
+```
+POST /place/_search
+{
+  "suggest": {
+    "place_suggestion": {
+      "prefix": "tim",
+      "completion": {
+        "field": "title",
+        "size": 4,
+        "contexts":{
+          "location":{
+            "lat": 43.662,
+            "lon": -79.380
+          }
+        }
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 244,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "place_suggestion" : [
+      {
+        "text" : "tim",
+        "offset" : 0,
+        "length" : 3,
+        "options" : [
+          {
+            "text" : "timmy's",
+            "_index" : "place",
+            "_type" : "_doc",
+            "_id" : "2",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : {
+                "input" : "timmy's",
+                "contexts" : {
+                  "location" : [
+                    {
+                      "lat" : 43.6624803,
+                      "lon" : -79.3863353
+                    },
+                    {
+                      "lat" : 43.6624718,
+                      "lon" : -79.3873327
+                    }
+                  ]
+                }
+              }
+            },
+            "contexts" : {
+              "location" : [
+                "dpz8"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
+```
+注意：当指定查询精度较低的位置时，将考虑属于该区域内的所有建议。如果在查询上设置了多个类别或类别上下文，则将它们合并为分离，这意味着如果建议包含至少一个提供的上下文值，则建议才匹配
+在geohash所代表的区域内的建议也可以比其他建议更高，如下所示
+```
+POST /place/_search
+{
+  "suggest": {
+    "place_suggestion": {
+      "prefix": "tim",
+      "completion": {
+        "field": "title",
+        "size":10,
+        "contexts":{
+          "location":[ 
+            {
+              "lat": 43.6624803,
+              "lon": -79.3863353,
+              "precision": 2
+            },
+            {
+              "context":{
+                "lat": 43.6624803,
+                "lon":-79.3863353
+              },
+              "boost": 2
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+#上下文查询过滤属于geohash（43.662，-79.380）表示的地理位置的建议，精度为2，并提升属于（43.6624803，-79.3863353）geohash表示的建议，默认精度为6，因数为2
+```
+注意：如果建议条目与多个上下文匹配，则最终分数被计算为由任何匹配上下文产生的最大分数。
+除了接受上下文值之外，上下文查询还可以由多个上下文子句组成，category上下文子句支持一下参数：
+- context，地理点对象或地理哈希字符串，用于过滤提升建议，这是强制性的。
+- boost，应该提高建议分数的因素，通过将boost乘以建议权重来计算分数，默认为1。
+- precision，geohash对查询地理点进行编码的精度，这可以被指定为一个距离值（5m，10km等），或作为原料地理散列精度（1 … 12）。默认为索引时间精度级别。
+- neighbours，接受应该考虑相邻地理位置的精度值数组，精度值可以是距离值（5m， 10km等）或一个原始地理散列精度（1 … 12）。默认为索引时间精度级别生成的临近值。
