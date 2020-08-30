@@ -1,6 +1,6 @@
 
 
-## suggest
+## suggester
 准备数据
 ```
 PUT s1
@@ -46,7 +46,6 @@ GET s1/_doc/_search
 让我们注意suggest，每个建议器都有自己名称my-suggestion，es根据text字段返回建议结果。建议类型是term。从field字段生成建议。正如结果所示。对于输入的每个词条的建议结果，es都会放在options中，如果没有建议结果，options将会为空。
 如果我们仅需要建议而不需要查询功能，我们可以忽略query而直接使用suggest对象返回建议
 ```
-
 GET s1/doc/_search
 {
   "suggest": {
@@ -190,7 +189,9 @@ PUT /s2/_doc/6
   "title": "elasticsearch is rock solid"
 }
 ```
+
 查询
+
 ```
 GET /s2/_search
 {
@@ -238,6 +239,7 @@ GET /s2/_search
   }
 }
 ```
+
 在options字段中，建议结果是lucene
 
 #### suggester fields
@@ -274,6 +276,7 @@ GET /s2/_search
 term suggester首先将输入文本经过分析器（所以，分析结果由于采用的分析器不同而有所不同）分析，处理为单个词条，然后根据单个词条去提供建议，并不会考虑多个词条之间的关系。然后将每个词条的建议结果（有或没有）封装到options列表中。最后由建议器统一返回
 ### phrase suggester
 词组建议器和词条建议器一样，不过它不再为单个词条提供建议，而是为整个文本提供建议。
+
 ```
 PUT s3
 {
@@ -317,7 +320,9 @@ PUT /s3/_doc/6
   "title": "elasticsearch is rock solid"
 }
 ```
+
 查询
+
 ```
 GET /s3/_search
 {
@@ -499,10 +504,12 @@ GET /s3/_search
   }
 }
 ```
+
 phrase suggester在term suggester的基础上，会考虑多个term之间的关系，比如是否同时出现索引的原文中，临近程度，词频等。
 
 ### completion suggester
 为了告诉elasticsearch我们准备将建议存储在自动完成的FST中，需要在映射中定义一个字段并将其type类型设置为completion
+
 ```
 PUT s4
 {
@@ -557,7 +564,7 @@ GET /s4/_search
     }
   }
 }
-# output
+#output
 {
   "took" : 865,
   "timed_out" : false,
@@ -627,6 +634,579 @@ GET /s4/_search
     ]
   }
 }
+```
+上例的特殊映射中，支持以下参数：
+- analyzer，要使用的索引分析器，默认为simple。
+- search_analyzer，要使用的搜索分析器，默认值为analyzer。
+- preserve_separators，保留分隔符，默认为true。 如果您禁用，您可以找到以Foo Fighters开头的字段，如果您建议使用foof。
+- preserve_position_increments，启用位置增量，默认为true。如果禁用并使用停用词分析器The Beatles，如果您建议，可以从一个字段开始b。注意：您还可以通过索引两个输入来实现此目的，Beatles并且 The Beatles，如果您能够丰富数据，则无需更改简单的分析器。
+- max_input_length，限制单个输入的长度，默认为50UTF-16代码点。此限制仅在索引时使用，以减少每个输入字符串的字符总数，以防止大量输入膨胀基础数据结构。大多数用例不受默认值的影响，因为前缀完成很少超过前缀长于少数几个字符。
 
+#### 已存在索引字段的多字段
+```
+PUT s6
+{
+  "mappings": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "fields": {
+            "suggest": {
+              "type": "completion"
+            }
+          }
+        }
+      }
+    }
+}
+
+PUT s6/_doc/1
+{
+  "name":"KFC"
+}
+PUT s6/_doc/2
+{
+  "name":"kfc"
+}
+
+GET s6/_search
+{
+  "suggest": {
+    "my_s6": {
+      "text": "K",
+      "completion": {
+        "field": "name.suggest"
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 20,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s6" : [
+      {
+        "text" : "K",
+        "offset" : 0,
+        "length" : 1,
+        "options" : [
+          {
+            "text" : "KFC",
+            "_index" : "s6",
+            "_type" : "_doc",
+            "_id" : "1",
+            "_score" : 1.0,
+            "_source" : {
+              "name" : "KFC"
+            }
+          },
+          {
+            "text" : "kfc",
+            "_index" : "s6",
+            "_type" : "_doc",
+            "_id" : "2",
+            "_score" : 1.0,
+            "_source" : {
+              "name" : "kfc"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+#### 在索引阶段提升相关性
+在进行普通的索引时，输入的文本在索引和搜索阶段都会被分析，这就是为什么上面的示例会将KFC和kfc都返回了。我们也可以通过analyzer和search_analyzer选项来进一步控制分析过程。如上例我们可以只匹配KFC而不匹配kfc.
+
+通过指定　analyzer:keyword
+```
+PUT s7
+{
+  "mappings": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "fields": {
+            "suggest": {
+              "type": "completion",
+              "analyzer":"keyword",
+              "search_analyzer":"keyword"
+            }
+          }
+        }
+      }
+    }
+}
+
+PUT /s7/_doc/1
+{
+  "name":"KFC"
+}
+PUT /s7/_doc/2
+{
+  "name":"kfc"
+}
+GET /s7/_search
+{
+  "suggest": {
+    "my_s7": {
+      "text": "K",
+      "completion": {
+        "field": "name.suggest"
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s7" : [
+      {
+        "text" : "K",
+        "offset" : 0,
+        "length" : 1,
+        "options" : [
+          {
+            "text" : "KFC",
+            "_index" : "s7",
+            "_type" : "_doc",
+            "_id" : "1",
+            "_score" : 1.0,
+            "_source" : {
+              "name" : "KFC"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+##### input/weight
+使用input和可选的weight属性，input是建议查询匹配的预期文本，weight是建议评分方式（也就是权重）。例如
+```
+PUT s8
+{
+  "mappings": {
+      "properties":{
+        "title":{
+          "type": "completion"
+        }
+      }
+    }
+}
+```
+添加数据:分别添加两个建议并设置各自的权重值
+```
+PUT s8/_doc/1
+{
+  "title":{
+    "input":"blow",
+    "weight": 2
+  }
+}
+PUT s8/_doc/2
+{
+  "title":{
+    "input":"block",
+    "weight": 3
+  }
+}
+```
+以列表的形式添加建议，设置不同的权重
+```
+PUT s8/_doc/3
+{
+  "title": [  
+    {
+      "input":"appel",
+      "weight": 2
+    },
+    {
+      "input":"apple",
+      "weight": 3
+    }
+  ]
+}
+```
+为多个建议设置相同的权重
+```
+PUT s8/_doc/4
+{
+  "title": ["apple", "appel", "block", "blow"],
+  "weght": 32
+}
+```
+查询的结果由权重决定
+```
+GET /s8/_search
+{
+  "suggest": {
+    "my_s8": {
+      "text": "app",
+      "completion": {
+        "field": "title"
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 49,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s8" : [
+      {
+        "text" : "app",
+        "offset" : 0,
+        "length" : 3,
+        "options" : [
+          {
+            "text" : "apple",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "3",
+            "_score" : 3.0,
+            "_source" : {
+              "title" : [
+                {
+                  "input" : "appel",
+                  "weight" : 2
+                },
+                {
+                  "input" : "apple",
+                  "weight" : 3
+                }
+              ]
+            }
+          },
+          {
+            "text" : "appel",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "4",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : [
+                "apple",
+                "appel",
+                "block",
+                "blow"
+              ],
+              "weght" : 32
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+#### 在搜索阶段提升相关性
+当在运行建议的请求时，可以决定出现哪些建议，就像其他建议器一样，size参数控制返回多少项建议（默认为5项）；还可以通过fuzzy参数设置模糊建议，以对拼写进行容错。当开启模糊建议之后，可以设置下列参数来完成建议
+
+－　fuzziness，可以指定所允许的最大编辑距离。
+－　min_length，指定什么长度的输入文本可以开启模糊查询。
+－　prefix_length，假设若干开始的字符是正确的（比如block，如果输入blaw，该字段也认为之前输入的是对的），这样可以通过牺牲灵活性提升性能
+这些参数都是在建议的completion对象的下面
+```
+GET /s8/_search
+{
+  "suggest": {
+    "my_s9": {
+      "text": "blaw",
+      "completion": {
+        "field": "title",
+        "size": 2,
+        "fuzzy": {
+          "fuzziness": 2,
+          "min_length": 3,
+          "prefix_length": 2
+        }
+      }
+    }
+  }
+}
+#output
+{
+  "took" : 5,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "my_s9" : [
+      {
+        "text" : "blaw",
+        "offset" : 0,
+        "length" : 4,
+        "options" : [
+          {
+            "text" : "block",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "2",
+            "_score" : 6.0,
+            "_source" : {
+              "title" : {
+                "input" : "block",
+                "weight" : 3
+              }
+            }
+          },
+          {
+            "text" : "blow",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "1",
+            "_score" : 4.0,
+            "_source" : {
+              "title" : {
+                "input" : "blow",
+                "weight" : 2
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+##### _source
+为了减少不必要的响应，我们可以对建议结果做一些过滤，比如加上_source
+```
+GET /s8/_search
+{
+  "suggest": {
+    "completion_suggest": {
+      "text": "appl",
+      "completion": {
+        "field": "title"
+      }
+    }
+  },
+  "_source": "title"
+}
+#output
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "completion_suggest" : [
+      {
+        "text" : "appl",
+        "offset" : 0,
+        "length" : 4,
+        "options" : [
+          {
+            "text" : "apple",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "3",
+            "_score" : 3.0,
+            "_source" : {
+              "title" : [
+                {
+                  "input" : "appel",
+                  "weight" : 2
+                },
+                {
+                  "input" : "apple",
+                  "weight" : 3
+                }
+              ]
+            }
+          },
+          {
+            "text" : "apple",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "4",
+            "_score" : 1.0,
+            "_source" : {
+              "title" : [
+                "apple",
+                "appel",
+                "block",
+                "blow"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+##### size
+size默认为5
+```
+GET /s8/_search
+{
+  "suggest": {
+    "completion_suggest": {
+      "prefix": "app",
+      "completion": {
+        "field": "title",
+        "size": 1
+      }
+    }
+  },
+  "_source": "title"
+}
+#output
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 0,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "suggest" : {
+    "completion_suggest" : [
+      {
+        "text" : "app",
+        "offset" : 0,
+        "length" : 3,
+        "options" : [
+          {
+            "text" : "apple",
+            "_index" : "s8",
+            "_type" : "_doc",
+            "_id" : "3",
+            "_score" : 3.0,
+            "_source" : {
+              "title" : [
+                {
+                  "input" : "appel",
+                  "weight" : 2
+                },
+                {
+                  "input" : "apple",
+                  "weight" : 3
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+##### skip_duplicates
+我们的建议可能是来自不同的文档，这其中就会有一些重复建议项，我们可以通过设置skip_duplicates:true来修改此行为，如果为true则会过滤掉结果中的重复建议文档
+```
+GET /s8/_search
+{
+  "suggest": {
+    "completion_suggest": {
+      "prefix": "app",
+      "completion": {
+        "field": "title",
+        "size": 5,
+        "skip_duplicates":true
+      }
+    }
+  },
+  "_source": "title"
+}
+```
+但需要注意的是，该参数设置为true的话，可能会降低搜索速度，因为需要访问更多的建议结果项，才能过滤出来前N个。
+最后，完成建议器还支持正则表达式查询，这意味着我们可以将前缀表示为正则表达式
+```
+GET /s8/_search
+{
+  "suggest": {
+    "completion_suggest": {
+      "regex": "e[l|e]a",
+      "completion": {
+        "field": "title"
+      }
+    }
+  }
+}
 ```
 ### context suggester
