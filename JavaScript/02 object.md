@@ -245,7 +245,75 @@ sqrt(x)    返回数的平方根。
 tan(x)    返回角的正切。 
 
 ### Function
+#### define
+```js
+function 函数名 (参数){  
+    //函数体; 
+    return 返回值; 
+} 
 
+var 函数名 = new Function("参数1","参数n","function_body"); 
+// 虽然由于字符串的关系，第二种形式写起来有些困难，但有助于理解函数只不过是一种引用类型，它们的行为与用 Function 类明确创建的函数行为是相同的
+```
+注意：js的函数加载执行与python不同，它是整体加载完才会执行，所以执行函数放在函数声明上面或下面都可以：即当函数的调用在函数声明前时并不会报错
+
+#### attr
+##### length
+ECMAScript 定义的属性 length 声明了函数期望的参数个数。 alert(func1.length) 
+
+##### arguments
+```js
+function add(a,b){ 
+
+        console.log(a+b);//3 
+        console.log(arguments.length);//2 
+        console.log(arguments);//[1,2] 
+
+} 
+    add(1,2) 
+
+arguments指参数 
+
+------------------arguments的用处1 ------------------ 
+    function nxAdd(){ 
+        var result=0; 
+        for (var num in arguments){ 
+            result+=arguments[num] 
+        } 
+        alert(result) 
+
+} 
+
+nxAdd(1,2,3,4,5) 
+
+//     ------------------arguments的用处2 ------------------ 
+
+function f(a,b,c){ 
+        if (arguments.length!=3){ 
+            throw new Error("function f called with "+arguments.length+" arguments,but it just need 3 arguments") 
+        } 
+        else { 
+            alert("success!") 
+        } 
+    } 
+
+f(1,2,3,4,5) 
+```
+##### anonymous function
+```js
+   var func = function(arg){ 
+        return "tony"; 
+    } 
+
+// 匿名函数的应用 
+    (function(){ 
+        alert("tony"); 
+    } )() 
+
+(function(arg){ 
+        console.log(arg); 
+    })('123') 
+```
 BOM
 
 DOM
