@@ -1,3 +1,104 @@
+### left Menu
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .left {
+        width: 20%;
+        height: 500px;
+        float: left;
+        background-color: wheat;
+    }
+
+    .right {
+        float: left;
+        width: 80%;
+        height: 500px;
+        background-color: lightgray;
+
+    }
+
+    .title {
+        text-align: center;
+        line-height: 40px;
+        background-color: #0e90d2;
+        color: white;
+    }
+
+    .item {
+        padding: 10px;
+    }
+
+    .hide {
+        display: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="outer">
+        <div class="left">
+            <div class="item">
+                <div class="title">菜单一</div>
+                <ul class="con">
+                    <li>111</li>
+                    <li>111</li>
+                    <li>111</li>
+                </ul>
+            </div>
+            <div class="item">
+                <div class="title">菜单二</div>
+                <ul class="con hide">
+                    <li>222</li>
+                    <li>222</li>
+                    <li>222</li>
+                </ul>
+            </div>
+            <div class="item">
+                <div class="title">菜单三</div>
+                <ul class="con hide">
+                    <li>333</li>
+                    <li>333</li>
+                    <li>333</li>
+                </ul>
+            </div>
+        </div>
+        <div class="right"></div>
+    </div>
+    <script>
+    var eles_title = document.getElementsByClassName("title");
+
+    for (var i = 0; i < eles_title.length; i++) {
+        eles_title[i].onclick = function() {
+            // 当前菜单隐藏或者展示
+            this.nextElementSibling.classList.contains("hide") ? this.nextElementSibling.classList.remove("hide") : this.nextElementSibling.classList.add("hide");
+
+            for (var j = 0; j < eles_title.length; j++) {
+                // 其它（非当前点击的菜单）都加隐藏
+                if (eles_title[j] != this) {
+                    eles_title[j].nextElementSibling.classList.add("hide")
+                }
+
+            }
+
+        }
+
+    }
+    </script>
+</body>
+
+</html>
+```
+
 ### 向模态框传入值
 
 data-target 指定的是目标，即将数据传输给谁
