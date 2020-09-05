@@ -131,6 +131,102 @@ x.unshift(value,...) x.shift()
 value可以为字符串、数字、数组等任何值 unshift是将value值插入到数组x的开始位置 shift是将数组x的第一个元素删除
 
 ### Date
+#### create
+```js
+//方法1：不指定参数 
+var nowd1=new Date(); 
+alert(nowd1.toLocaleString( )); 
+
+//方法2：参数为日期字符串 
+var nowd2=new Date("2004/3/20 11:12"); 
+alert(nowd2.toLocaleString( )); 
+var nowd3=new Date("04/03/20 11:12"); 
+alert(nowd3.toLocaleString( )); 
+
+//方法3：参数为毫秒数 
+var nowd3=new Date(5000); 
+alert(nowd3.toLocaleString( )); 
+alert(nowd3.toUTCString()); 
+
+//方法4：参数为年月日小时分钟秒毫秒 
+var nowd4=new Date(2004,2,20,11,12,0,300); 
+alert(nowd4.toLocaleString( ));//毫秒并不直接显示 
+```
+#### method
+getDate()                 获取日 
+getDay ()                 获取星期 
+getMonth ()               获取月（0-11） 
+getFullYear ()            获取完整年份 
+getYear ()                获取年 
+getHours ()               获取小时 
+getMinutes ()             获取分钟 
+getSeconds ()             获取秒 
+getMilliseconds ()        获取毫秒 
+getTime ()                返回累计毫秒数(从1970/1/1午夜)
+
+example
+```js
+function getCurrentDate(){ 
+        //1. 创建Date对象 
+        var date = new Date(); //没有填入任何参数那么就是当前时间 
+        //2. 获得当前年份 
+        var year = date.getFullYear(); 
+        //3. 获得当前月份 js中月份是从0到11. 
+        var month = date.getMonth()+1; 
+        //4. 获得当前日 
+        var day = date.getDate(); 
+        //5. 获得当前小时 
+        var hour = date.getHours(); 
+        //6. 获得当前分钟 
+        var min = date.getMinutes(); 
+        //7. 获得当前秒 
+        var sec = date.getSeconds(); 
+        //8. 获得当前星期 
+        var week = date.getDay(); //没有getWeek 
+        // 2014年06月18日 15:40:30 星期三 
+        return year+"年"+changeNum(month)+"月"+day+"日 "+hour+":"+min+":"+sec+" "+parseWeek(week); 
+    } 
+//解决 自动补齐成两位数字的方法 
+    function changeNum(num){ 
+    if(num < 10){ 
+        return "0"+num; 
+    }else{ 
+        return num; 
+    } 
+
+} 
+//将数字 0~6 转换成 星期日到星期六 
+    function parseWeek(week){ 
+    var arr = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]; 
+    //             0      1      2      3 ............. 
+    return arr[week]; 
+} 
+
+ alert(getCurrentDate()); 
+```
+#### set 
+设置日期和时间 
+setDate(day_of_month)       设置日 
+setMonth (month)                 设置月 
+setFullYear (year)               设置年 
+setHours (hour)         设置小时 
+setMinutes (minute)     设置分钟 
+setSeconds (second)     设置秒 
+setMillliseconds (ms)       设置毫秒(0-999) 
+setTime (allms)     设置累计毫秒(从1970/1/1午夜)
+
+#### transfer
+日期和时间的转换: 
+getTimezoneOffset():8个时区×15度×4分/度=480; 
+返回本地时间与GMT的时间差，以分钟为单位 
+toUTCString() 
+返回国际标准时间字符串 
+toLocalString() 
+返回本地格式时间字符串 
+Date.parse(x) 
+返回累计毫秒数(从1970/1/1午夜到本地时间) 
+Date.UTC(x) 
+返回累计毫秒数(从1970/1/1午夜到国际时间) 
 
 ### Math
 
