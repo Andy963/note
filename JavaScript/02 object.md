@@ -229,6 +229,20 @@ Date.UTC(x)
 返回累计毫秒数(从1970/1/1午夜到国际时间) 
 
 ### Math
+Math对象的方法在使用时需要带上Math.方法名 
+
+abs(x)    返回数的绝对值。 
+exp(x)    返回 e 的指数。 
+floor(x)  对数进行下舍入。 
+log(x)    返回数的自然对数（底为e）。 
+max(x,y)    返回 x 和 y 中的最高值。 
+min(x,y)    返回 x 和 y 中的最低值。 
+pow(x,y)    返回 x 的 y 次幂。 
+random()    返回 0 ~ 1 之间的随机数。 
+round(x)    把数四舍五入为最接近的整数。 
+sin(x)    返回数的正弦。 
+sqrt(x)    返回数的平方根。 
+tan(x)    返回角的正切。 
 
 ### Function
 
