@@ -256,6 +256,9 @@ ele.onkeydown = function(e) {
 ```
 
 #### propagate
+stopPropagation: 阻止冒泡, 阻止传播到父节点. 
+event.cancelBubble: 传播到此就停了 
+event.stopImmediatePropagation: 阻止在我之后的事件 
 ```
 <div id="abc_1" style="border:1px solid red;width:300px;height:300px;"> 
         <div id="abc_2" style="border:1px solid red;width:200px;height:200px;"> 
