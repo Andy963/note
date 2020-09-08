@@ -246,3 +246,56 @@ if you loop a object, it return (value, key)
 </script>
 </html>
 ```
+
+#### carousel
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <img :src="images[curIndex].imgSrc" alt="">
+    <br>
+    <button @click="prev">上一张</button>
+    <button @click="next">下一张</button>
+</div>
+
+</body>
+<script src="../Vue.js"></script>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                images: [
+                    {id: 1, imgSrc: '../images/1.jpg'},
+                    {id: 2, imgSrc: '../images/2.jpg'},
+                    {id: 3, imgSrc: '../images/3.jpg'},
+                ],
+                curIndex: 0
+            }
+        },
+        methods: {
+            prev() {
+                if (this.curIndex === 0) {
+                    this.curIndex = 2;
+                } else {
+                    this.curIndex--;
+                }
+            }
+            ,
+            next() {
+                if (this.curIndex === 2) {
+                    this.curIndex = 0;
+                } else {
+                    this.curIndex++;
+                }
+            }
+        }
+    })
+</script>
+</html>
+```
