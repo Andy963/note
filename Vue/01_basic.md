@@ -367,3 +367,84 @@ if you loop a object, it return (value, key)
 </script>
 </html>
 ```
+
+#### watch
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <p>{{ msg }}</p>
+    <button @click="change"> change</button>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: "andy"
+            }
+        },
+        methods: {
+            change() {
+                this.msg = 'mike';
+            }
+        },
+        watch: {
+            'msg': function (val) {
+                console.log(val);
+                if (val === "mike") {
+                    // 如果属性修改会触发此片
+                    alert("修改");
+                    this.msg = 'change mike';
+                }
+            }
+        }
+    })
+</script>
+</html>
+```
+#### computed
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <p>{{ msg }}</p>
+    <!--    use the computed method name-->
+    <p>{{ upperName }}</p>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: "andy"
+            }
+        },
+        methods: {
+            change() {
+                this.msg = 'mike';
+            }
+        },
+        computed: {
+            upperName() {
+                return this.msg.toUpperCase()
+            }
+        }
+    })
+</script>
+</html>
+```
