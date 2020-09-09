@@ -294,6 +294,74 @@ if you loop a object, it return (value, key)
                     this.curIndex++;
                 }
             }
+        },
+        // 钩子函数
+        // 定时更换图片
+        created() {
+            setInterval(() => {
+                // 箭头函数会改变this，指代vue对象
+                if (this.curIndex === 2) {
+                    this.curIndex = 0
+                } else {
+                    this.curIndex++
+                }
+            }, 1000)
+            // 将外部的this保存起来，外部this为vue对象
+            // let _this = this;
+            // setInterval( function () {
+            //     console.log(_this);
+            // })
+        }
+    })
+</script>
+</html>
+```
+
+#### ajax for data
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <span v-for="(category,index) in categoryList" :key="category.id">
+        {{ category.name }}
+    </span>
+</div>
+
+</body>
+<script src="../Vue.js"></script>
+<script src="../jquery.min.js"></script>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {}
+        },
+        // 钩子函数
+        created() {
+            $.ajax({
+                url: "/categoryList/",
+                type: "get",
+                success: (data) => {
+                    if (data.error_no === 0) {
+                        let data = data.data;
+                        let obj = {
+                            id: 0,
+                            name: "全部",
+                            category: 0
+                        }
+                        this.categoryList = data;
+                        this.categoryList.unshift(obj);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
         }
     })
 </script>
