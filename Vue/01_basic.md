@@ -448,3 +448,32 @@ if you loop a object, it return (value, key)
 </script>
 </html>
 ```
+
+#### v-model
+v-model只能用于 input, textarea, select等。
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="msg">
+    <p>{{ msg }}</p>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: ""
+            }
+        }
+    })
+</script>
+</html>
+```
