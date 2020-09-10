@@ -477,3 +477,124 @@ v-model只能用于 input, textarea, select等。
 </script>
 </html>
 ```
+
+#### components
+组件模板中必须有个父标签，将所有标签包裹
+注意App 组件的写法，与Vue对象是不同的
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    // 组件的变量名，首字母要大写，data必须为函数，有返回值
+    // 声明一个组件
+    let App = {
+        data() {
+            return {
+                text: "App中的text"
+            }
+        },
+        template: `
+        <div>
+            <p>{{ text }}</p>
+        </div>
+        `
+    };
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: "组件"
+            }
+        },
+        //使用组件
+        template: `
+            <div class="app">
+<!--             <p> {{ msg }}</p>-->
+             <App/>
+            </div>
+        `,
+        components: {
+            // 如果key,value一样，可以 只写一个
+            // 注册组件
+            App
+        }
+    })
+</script>
+</html>
+```
+#### slot
+slot为vue提供的内容分发组件。
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <p>{{msg}}</p>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    // 组件的变量名，首字母要大写，data必须为函数，有返回值
+    // 对应组件的内容将会替换 slot标签。slot为 vue内置组件
+    Vue.component("Btn", {
+        data() {
+            return {}
+        },
+        template: `
+       <button><slot></slot></button>
+        `
+    })
+    // 声明一个组件
+    let App = {
+        data() {
+            return {
+                text: "App中的text"
+            }
+        },
+        template: `
+        <div>
+            <p>{{ text }}</p>
+            <btn>子btn</btn>
+        </div>
+        `
+    };
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: "组件"
+            }
+        },
+        //使用组件
+        template: `
+            <div class="app">
+             <p> {{ msg }}</p>
+             <btn>主btn</btn>
+             <App/>
+            </div>
+        `,
+        components: {
+            // 如果key,value一样，可以 只写一个
+            // 注册组件
+            App
+        }
+    })
+</script>
+</html>
+```
