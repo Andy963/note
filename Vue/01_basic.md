@@ -598,3 +598,143 @@ slot为vue提供的内容分发组件。
 </script>
 </html>
 ```
+
+#### parent2child
+在子组件中定义props,它的值可以是一个列表，其中为变量名。然后就可以使用了。
+在父组件中，需要通过 v-bind:props_name=props_name 将值传递给子组件
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    let Vheader = {
+        data() {
+            return {}
+        },
+        // 挂载父组件的属性
+        props: ['msg', 'post'],
+        template: `
+            <div>
+            <h2>日天</h2>
+            <h2>{{ msg }}</h2>
+            <h2> {{ post.id }}</h2>
+            <h2> {{ post.name }}</h2>
+            </div>
+        `
+    }
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                text: "App中的text",
+                post: {
+                    id: 1,
+                    name: "andy"
+                }
+            }
+        },
+        //使用组件
+        template: `
+            <Vheader :msg="text" v-bind:post="post"></Vheader>
+        `,
+        components: {
+            // 如果key,value一样，可以 只写一个
+            // 注册组件
+            Vheader
+        }
+    })
+</script>
+</html>
+```
+#### child2parent
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    Vue.component("Btn", {
+        data() {
+            return {}
+        },
+        template: `
+       <button @click="clickBtn">{{ id }}</button>
+        `,
+        props: ['id'],
+        methods: {
+            clickBtn() {
+                this.id++
+                this.$emit('VheaderAddNum', this.id) // this.id作为参数传给 Vheader,add
+            }
+        }
+    })
+    let Vheader = {
+        data() {
+            return {}
+        },
+        // 挂载父组件的属性
+        props: ['msg', 'post'],
+        template: `
+            <div>
+            <h2>日天</h2>
+            <h2>{{ msg }}</h2>
+            <h2>post id :{{ post.id }}</h2>
+            <h2>post name : {{ post.name }}</h2>
+            <Btn v-bind:id = "post.id" @VheaderAddNum="clickAddNum"></Btn>
+            </div>
+        `,
+        methods: {
+            clickAddNum(val_from_Btn) {
+                this.$emit('appClick', val_from_Btn);
+            }
+        }
+    }
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                text: "App中的text",
+                post: {
+                    id: 1,
+                    name: "andy"
+                }
+            }
+        },
+        //使用组件
+        template: `
+            <div class="a">
+                我是父组件的post id:{{post.id}}
+            <Vheader :msg="text" v-bind:post="post" @appClick="rootClick"></Vheader>
+            </div>
+        `,
+        methods: {
+            rootClick(val_from_vheader) {
+                this.post.id = val_from_vheader;
+            }
+        },
+        components: {
+            // 如果key,value一样，可以 只写一个
+            // 注册组件
+            Vheader
+        }
+    })
+</script>
+</html>
+```
