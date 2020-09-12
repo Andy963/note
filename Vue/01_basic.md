@@ -246,7 +246,34 @@ if you loop a object, it return (value, key)
 </script>
 </html>
 ```
-
+#### v-model
+v-model只能用于 input, textarea, select等。
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="msg">
+    <p>{{ msg }}</p>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                msg: ""
+            }
+        }
+    })
+</script>
+</html>
+```
 #### carousel
 ```vue
 <!DOCTYPE html>
@@ -316,7 +343,7 @@ if you loop a object, it return (value, key)
 </script>
 </html>
 ```
-
+### method
 #### ajax for data
 ```vue
 <!DOCTYPE html>
@@ -449,34 +476,7 @@ if you loop a object, it return (value, key)
 </html>
 ```
 
-#### v-model
-v-model只能用于 input, textarea, select等。
-```vue
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div id="app">
-    <input type="text" v-model="msg">
-    <p>{{ msg }}</p>
-</div>
-</body>
-<script src="../Vue.js"></script>
-<script>
-    new Vue({
-        el: "#app",
-        data() {
-            return {
-                msg: ""
-            }
-        }
-    })
-</script>
-</html>
-```
+### component
 
 #### components
 组件模板中必须有个父标签，将所有标签包裹
@@ -598,6 +598,8 @@ slot为vue提供的内容分发组件。
 </script>
 </html>
 ```
+
+### transfer data
 
 #### parent2child
 在子组件中定义props,它的值可以是一个列表，其中为变量名。然后就可以使用了。
@@ -733,6 +735,105 @@ slot为vue提供的内容分发组件。
             // 如果key,value一样，可以 只写一个
             // 注册组件
             Vheader
+        }
+    })
+</script>
+</html>
+```
+#### sibling2sibling
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <App/>
+</div>
+</body>
+<script src="../Vue.js"></script>
+<script>
+    let bus = new Vue();
+    <!--    A向B传值，B要声明事件，$on("事件名",function(val){}), A触发事件， $emit('A组件中声明的事件名',function(){})-->
+    Vue.component("Dest", {
+        data() {
+            return {
+                text: ''
+            }
+        },
+        template: `
+        <div>
+        <h2>我是Dest</h2>
+        <h2>{{ text }}</h2>
+        </div>
+        `,
+        methods: {},
+        created() {
+            bus.$on('destData', (val) => {
+                console.log(val);
+                this.text = val;
+            })
+        }
+    })
+    Vue.component("Source", {
+        data() {
+            return {
+                msg: "我是子组件source的msg"
+            }
+        },
+        template: `<div>
+        <h2>我是Source的btn</h2>
+        <button @click="sourceHandler">传递</button>
+        </div>
+        `,
+        methods: {
+            sourceHandler() {
+                bus.$emit('destData', this.msg)
+            }
+        }
+    })
+    let VHeader = {
+        data() {
+            return {}
+        },
+        template: `
+       <div class="header">
+        <Dest></Dest>
+        <br>
+        <Source></Source>
+    </div>
+       `
+    }
+    let App = {
+        data() {
+            return {}
+        },
+        template: `
+       <div class="app">
+       <VHeader></VHeader>
+</div>
+       `,
+        components: {
+            VHeader
+        }
+    }
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                text: "App中的text",
+                post: {
+                    id: 1,
+                    name: "andy"
+                }
+            }
+        },
+        components: {
+            // 如果key,value一样，可以 只写一个
+            // 注册组件
+            App
         }
     })
 </script>
