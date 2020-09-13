@@ -149,3 +149,4 @@ args = (id, name)
 sql = "select id, name from test where id=%s and name=%s"
 cursor.execute(sql, args)
 ```
+
