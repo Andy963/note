@@ -170,6 +170,9 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
 </html>
 ```
 ### router 
+$.route 路由信息对象
+$.router 路由对象（VueReouter)
+
 ```vue
 <!DOCTYPE html>
 <html lang="en">
@@ -382,6 +385,7 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
             }
         },
         template: '<div>我是用户(id={{ user_id }} )</div>',
+        // 这里用create会出现第二次请求的id不会变化的情况，因为vue 组件复用
         // created() {
         //     console.log(this.$route.params.id);
         // },
@@ -429,6 +433,117 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
                <router-link :to="{name:'User',params:{id:1}}">用户1</router-link>
                <router-link :to="{name:'User',params:{id:2}}">用户2</router-link>
                <router-link :to="{name: 'Course'}">课程</router-link>
+                </div>
+
+                <router-view></router-view>
+            </div>
+            `,
+    };
+
+    new Vue({
+        el: '#app',
+        // 挂载路由
+        router: router,
+        data() {
+            return {}
+        },
+        template:
+            `
+                <App></App>
+            `,
+        components: {
+            App
+        }
+    })
+</script>
+
+</html>
+```
+
+### program router
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+<!--import-->
+<script src="../Vue.js"></script>
+<script src="../Vue-router.js"></script>
+<script>
+    const Home = {
+        data() {
+            return {}
+        },
+        template: '<div>Home page </div>'
+    };
+
+    const User = {
+        data() {
+            return {
+                user_id: null
+            }
+        },
+        template:
+            `
+         <div>
+         <p>我是user: {{ user_id }}</p>
+                <button @click="jump">跳转首页</button>
+                </div>
+        `
+        ,
+        methods: {
+            // 编程式导航，点击按钮跳转，而不是通过router-link跳转
+            jump() {
+                this.$router.push({
+                    name: "Home",
+                })
+            }
+        },
+        watch: {
+            '$route'(to, from) {
+                console.log(to);
+                this.user_id = to.params.id
+                console.log(from);
+            }
+        }
+    };
+
+    const router = new VueRouter({
+        // mode: 'history',// 默认为hash模式，路由看起来很乱，历史模式就会很清晰
+        routes: [
+            {
+                path: '/user/:id',
+                name: "User", // 给路由取个名，类似django中的路由后面的name
+                component: User
+            },
+            {
+                path: '/home',
+                name: "Home",
+                component: Home
+            }
+        ],
+    })
+
+    let App = {
+        data() {
+            return {}
+        },
+        <!-- 使用命名的路由 用name 指定，并绑定to-->
+        template:
+            `<div>
+               <div class="header">
+
+               <router-link :to="{name:'User',params:{id:1}}">用户1</router-link>
+               <router-link :to="{name:'User',params:{id:2}}">用户2</router-link>
+<!--               <router-link :to="{name: 'Course'}">课程</router-link>-->
                 </div>
 
                 <router-view></router-view>
