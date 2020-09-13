@@ -570,3 +570,62 @@ $.router 路由对象（VueReouter)
 
 </html>
 ```
+
+### get dom ref
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+<script src="../Vue.js"></script>
+<script>
+    Vue.component('Test', {
+        data() {
+            return {}
+        },
+        template: `<p>我是输入框</p>`
+    })
+    let App = {
+        data() {
+            return {}
+        },
+        template: `
+        <div>
+        <input type="text" ref="input1">
+        <Test ref="test" />
+        </div>`,
+        mounted() {
+            this.$refs.input1.focus(); // 获取原生的DOM
+            // this.$refs.test 获取到的是组件Test实例对象
+            // this.$refs.test.$parent 获取父组件
+            // this.$refs.test.$root 获取根组件即Vue对象
+            // this.$children 获取子组件
+            for (let key in this.$refs) {
+                this.$refs[key];
+            }
+        }
+
+    }
+    new Vue({
+        el: "#app",
+        data() {
+            return {}
+        },
+        template: `
+            <App></App>
+        `,
+        components: {
+            App
+        }
+    })
+</script>
+</html>
+```
