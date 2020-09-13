@@ -169,3 +169,106 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
 </script>
 </html>
 ```
+### router 
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+<!--import-->
+<script src="../Vue.js"></script>
+<script src="../Vue-router.js"></script>
+<script>
+    // 如果以后模块化编程，Vue.Prototype.$VueRouter = VueRouter 将VueRouter挂载到Vue原型上
+    // Vue.use(VueRouter);
+    // 1. 定义 (路由) 组件。
+    // 可以从其他文件 import 进来
+    const Home = {
+        data() {
+            return{}
+        },
+        template: '<div>Home page </div>'
+    };
+
+    const Course = {
+        data() {
+            return {}
+        },
+        template: '<div>Course</div>'
+    };
+
+    // 2. 定义路由
+    // 每个路由应该映射一个组件。 其中"component" 可以是
+    // 通过 Vue.extend() 创建的组件构造器，
+    // 或者，只是一个组件配置对象。
+    // 我们晚点再讨论嵌套路由。
+    // const routes = [
+    //     {path: '/', component: Home},
+    //     {path: '/course', component: Course}
+    // ]
+
+    // 3. 创建 router 实例，然后传 `routes` 配置
+    // 你还可以传别的配置参数, 不过先这么简单着吧。
+    const router = new VueRouter({
+        //routes // (缩写) 相当于 routes: routes
+        mode: 'history',// 默认为hash模式，路由看起来很乱，历史模式就会很清晰
+        routes: [
+            // 重定向
+            // {
+            //     path: '/',
+            //     redirect:'/home'
+            // }
+            {
+                path: '/',
+                component: Home
+            },
+            {
+                path: '/course',
+                component: Course
+            }
+        ],
+    })
+
+    let App = {
+        data() {
+            return {}
+        },
+        template:
+            `<div>
+               <div class="header">
+               <router-link to="/">首页</router-link>
+               <router-link to="/course">课程</router-link>
+                </div>
+
+                <router-view></router-view>
+            </div>
+            `,
+    };
+
+    new Vue({
+        el: '#app',
+        // 挂载路由
+        router: router,
+        data() {
+            return {}
+        },
+        template:
+            `
+                <App></App>
+            `,
+        components: {
+            App
+        }
+    })
+</script>
+
+</html>
+```
