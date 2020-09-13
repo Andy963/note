@@ -272,3 +272,186 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
 
 </html>
 ```
+### named router
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+<!--import-->
+<script src="../Vue.js"></script>
+<script src="../Vue-router.js"></script>
+<script>
+    const Home = {
+        data() {
+            return {}
+        },
+        template: '<div>Home page </div>'
+    };
+
+    const Course = {
+        data() {
+            return {}
+        },
+        template: '<div>Course</div>'
+    };
+
+    const router = new VueRouter({
+        mode: 'history',// 默认为hash模式，路由看起来很乱，历史模式就会很清晰
+        routes: [
+            {
+                path: '/',
+                name: "Home", // 给路由取个名，类似django中的路由后面的name
+                component: Home
+            },
+            {
+                path: '/course',
+                name: "Course",
+                component: Course
+            }
+        ],
+    })
+
+    let App = {
+        data() {
+            return {}
+        },
+        <!-- 使用命名的路由 用name 指定，并绑定to-->
+        template:
+            `<div>
+               <div class="header">
+
+               <router-link :to="{name:'Home'}">首页</router-link>
+               <router-link :to="{name: 'Course'}">课程</router-link>
+                </div>
+
+                <router-view></router-view>
+            </div>
+            `,
+    };
+
+    new Vue({
+        el: '#app',
+        // 挂载路由
+        router: router,
+        data() {
+            return {}
+        },
+        template:
+            `
+                <App></App>
+            `,
+        components: {
+            App
+        }
+    })
+</script>
+
+</html>
+```
+### dynamic router
+```vue
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+<!--import-->
+<script src="../Vue.js"></script>
+<script src="../Vue-router.js"></script>
+<script>
+    const User = {
+        data() {
+            return {
+                user_id: null
+            }
+        },
+        template: '<div>我是用户(id={{ user_id }} )</div>',
+        // created() {
+        //     console.log(this.$route.params.id);
+        // },
+        watch: {
+            '$route'(to, from) {
+                console.log(to);
+                this.user_id = to.params.id
+                console.log(from);
+            }
+        }
+    };
+
+    const Course = {
+        data() {
+            return {}
+        },
+        template: '<div>Course</div>'
+    };
+
+    const router = new VueRouter({
+        // mode: 'history',// 默认为hash模式，路由看起来很乱，历史模式就会很清晰
+        routes: [
+            {
+                path: '/user/:id',
+                name: "User", // 给路由取个名，类似django中的路由后面的name
+                component: User
+            },
+            {
+                path: '/course',
+                name: "Course",
+                component: Course
+            }
+        ],
+    })
+
+    let App = {
+        data() {
+            return {}
+        },
+        <!-- 使用命名的路由 用name 指定，并绑定to-->
+        template:
+            `<div>
+               <div class="header">
+
+               <router-link :to="{name:'User',params:{id:1}}">用户1</router-link>
+               <router-link :to="{name:'User',params:{id:2}}">用户2</router-link>
+               <router-link :to="{name: 'Course'}">课程</router-link>
+                </div>
+
+                <router-view></router-view>
+            </div>
+            `,
+    };
+
+    new Vue({
+        el: '#app',
+        // 挂载路由
+        router: router,
+        data() {
+            return {}
+        },
+        template:
+            `
+                <App></App>
+            `,
+        components: {
+            App
+        }
+    })
+</script>
+
+</html>
+```
