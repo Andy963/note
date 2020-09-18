@@ -629,3 +629,11 @@ $.router 路由对象（VueReouter)
 </script>
 </html>
 ```
+
+### css scoped
+```vue
+
+<style scoped>
+这样定义的style只对当前组件有效
+</style>
+```

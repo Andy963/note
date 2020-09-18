@@ -10,3 +10,10 @@ cnpm i vue-router -S // install vue-router for current proejct
 ```
 
 ### start
+
+```
+vue init webpack projectname
+
+```
+
+## axios
