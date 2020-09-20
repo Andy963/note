@@ -700,3 +700,31 @@ function randInt(min,max){
     return Math.floor(Math.random()* (max-min) + min)
 }
 ```
+
+### getCurrentDomain, Url, relativeUlr
+```js
+//domain
+var domain = document.domain;
+var domain = window.location.host;
+
+//url
+var url = window.location.href;
+var url = self.location.href;
+var url = document.URL;
+var url = document.location;
+
+//relative url
+window.location.pathname
+function GetUrlRelativePath(){
+    var url = document.location.toString();
+    var arrUrl = url.split("//");
+
+    var start = arrUrl[1].indexOf("/");
+    var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+
+  if(relUrl.indexOf("?") != -1){
+      relUrl = relUrl.split("?")[0];// 取参数之前的部分
+    }
+    return relUrl;
+  }
+```
