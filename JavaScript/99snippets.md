@@ -728,3 +728,11 @@ function GetUrlRelativePath(){
     return relUrl;
   }
 ```
+
+### jq get selected option
+```js
+let select_item = $("select_id option:selected");
+let select_val = select_item.val();
+# input value can be like this
+$("input[name='name']").val();
+```
