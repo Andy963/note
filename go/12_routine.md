@@ -103,3 +103,190 @@ func main(){
     }
 }
 ```
+## channel
+### use
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main(){
+    ch := make(chan  string)
+    defer fmt.Println("主协程结束")
+
+    go func(){
+        defer fmt.Println("子协程调用完毕")
+
+        for i :=0; i<2;i++{
+            fmt.Println("子协程i=",i)
+            time.Sleep(time.Second)
+        }
+        ch <- "I am sub routine.I have job to do "
+    }()
+    // <-ch  means get mes from channel. <-ch "hello"  add msg to channel.
+    str := <-ch // if ch is empty, it will blocked
+    fmt.Println("str = ", str)
+}
+```
+### no cache channel
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch := make(chan int, 0) // set capacity to 0  means no cache
+
+	fmt.Printf("len(ch)= %d, cap(ch) =%d\n", len(ch), cap(ch))
+
+	go func() {
+		for i := 0; i < 3; i++ {
+			ch <- i
+			fmt.Printf("sub routine: i=%d\n", i)
+		}
+	}()
+
+	time.Sleep(2 * time.Second)
+	for i := 0; i < 3; i++ {
+		num := <-ch
+		fmt.Println("num = ", num)
+	}
+	fmt.Printf("")
+}
+```
+
+### cached goroutine
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main(){
+
+    ch := make(chan int, 3) // set capacity to 0  means no cache
+
+    fmt.Printf("len(ch)= %d, cap(ch) =%d\n", len(ch), cap(ch))
+
+    go func() {
+        for i := 0; i < 3; i++ {
+            ch <- i
+            fmt.Printf("sub go routine. index[%d], len(ch)= %d, cap(ch) =%d\n",i, len(ch), cap(ch))
+        }
+    }()
+
+    time.Sleep(2 * time.Second)
+    for i := 0; i < 3; i++ {
+        num := <-ch
+        fmt.Println("num = ", num)
+    }
+}
+//len(ch)= 0, cap(ch) =3
+//sub go routine. index[0], len(ch)= 1, cap(ch) =3
+//sub go routine. index[1], len(ch)= 2, cap(ch) =3
+//sub go routine. index[2], len(ch)= 3, cap(ch) =3
+//num =  0
+//num =  1
+//num =  2
+// if you send 10 item to channel, it will block, bc it's full.
+```
+
+### close channel
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int)
+
+	go func() {
+		for i := 0; i < 5; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	for {
+		if num, ok := <-ch; ok == true {
+			fmt.Println("num =", num)
+		} else {
+			break
+		}
+	}
+}
+
+//if no data to send. you can close channel, otherwise no need.
+// after close, you can not send data to channel
+// but you can receive data after close if it have
+// if nil channel no matter send or receive will blocked.
+```
+
+### range 
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int)
+	go func() {
+		for i := 0; i < 5; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+	for num := range ch {
+		fmt.Println("num=", num)
+	}
+}
+```
+
+### single direction channel
+```go
+package main
+
+func main() {
+	ch := make(chan int)
+	// double direction channel can transfer to single direction channel implicitly
+	var writeCh chan<- int = ch // only write, no read
+	var readCh <-chan int = ch  // only read, no write
+
+	writeCh <- 666
+	<-readCh
+}
+```
+or in, out
+```go
+package main
+
+import "fmt"
+
+func producer(out chan<- int) {
+	for i := 0; i < 10; i++ {
+		out <- i * i
+	}
+	close(out)
+}
+func consumer(in <-chan int) {
+	for num := range in {
+		fmt.Println("num = ", num)
+	}
+}
+func main() {
+
+	ch := make(chan int)
+	go producer(ch)
+
+	consumer(ch)
+}
+
+```
