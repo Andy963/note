@@ -290,3 +290,76 @@ func main() {
 }
 
 ```
+
+## timer && ticker
+### timer
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main2()  {
+   <-time.After(2*time.Second)
+   fmt.Println("on time.")
+}
+
+func main1()  {
+    time.Sleep(2*time.Second)
+    fmt.Println("on time.")
+}
+func main(){
+    timer := time.NewTimer(2*time.Second)
+    <- timer.C
+    fmt.Println("on time.")
+}
+```
+
+### stop and reset timer
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	timer := time.NewTimer(3 * time.Second)
+
+	go func() {
+		<-timer.C
+		fmt.Println("go routine can print.")
+	}()
+	timer.Stop() // stop timer
+	timer.Reset(time.Second) // reset to 1 sec.
+}
+
+```
+
+### ticker
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+
+	ticker := time.NewTicker(time.Second)
+	i := 0
+	for {
+		<-ticker.C
+		i++
+		fmt.Println("i= ", i)
+		if i == 5 {
+			ticker.Stop()
+			break
+		}
+	}
+}
+```
