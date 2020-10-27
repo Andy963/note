@@ -22,6 +22,17 @@ api.add_resource(LoginView,'/login/<username>/','/regist/')
 * url还是跟之前的一样，可以传递参数。也跟之前的不一样，可以指定多个url。
 * endpoint是用来给url_for反转url的时候指定的。如果不写endpoint，那么将会使用视图的名字的小写来作为endpoint。
 
+#### 对类方法添加装饰器
+```python
+class Home(Resource):
+
+    method_decorator = {'get':['login_required']
+    def get(self):
+        pass
+
+    def post(self):
+        pass
+```
 
 ### 参数验证：
 Flask-Restful插件提供了类似WTForms来验证提交的数据是否合法的包，叫做reqparse。以下是基本用法：
