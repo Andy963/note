@@ -747,3 +747,62 @@ $("#id").on("click","tr td",function(){
 	}
 })
 ```
+
+### axios interceptor
+```js
+const instance = axios.create({
+	baseUrl:'http://127.0.0.1:8000',
+	timeout: 2000,
+	headers:{
+		"content-Type":"application/json",
+		"Authorization":"Bearer " + get_local_token("access_token")
+	}
+})
+
+function refresh_token(){
+	return instance.get('http://127.0.0.1:8000/refresh_token/',{
+		headers:{
+			"content-Type":"application/json",
+			"Authorization":"Bearer " + get_local_token("refresh_token")
+		}
+	})
+	.then(res=>{
+		return res.data;
+	})
+}
+
+instance.interceptors.response.user(response =>{
+	const code = response.data.code;
+	if(code === 600){
+		return refresh_token().then(res=>{
+			// 刷新token,并更新到storage和header中
+			let new_access_token = res.data['access_token'];
+			instance.set_token("access_token",new_access_token);
+			const config = response.config;
+			config.headers['Authorization'] = "Bearer " + new_access_token;
+			config.baseUrl = "http://127.0.0.1:8000/refresh_token/index";
+			return instance(config);
+		}).catch(err=>{
+			// 刷新失败了，跳转到首页重新登陆
+			window.location.href = '/';
+			console.log(err);
+		})
+	}
+	return response
+}
+.error =>{
+	// 请求失败，状态码为400之类
+	return Promise.reject(error);
+})
+
+function get_local_token(name) {
+	return localStorage.getItem(name);
+}
+
+instance.set_token:(name,token)=>{
+	instance.defaults.headers['Authorization'] = "Bearer " + token;
+	localStorage.setItem(name,token);
+}
+
+export instance;
+```
