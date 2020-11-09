@@ -637,3 +637,18 @@ $.router 路由对象（VueReouter)
 这样定义的style只对当前组件有效
 </style>
 ```
+
+### $ref
+```html
+<div ref='div'>
+<input ref='input'>
+</div>
+<Home ref='home'></Home>
+
+let inputDom = this.$refs.input
+inputDom.focus() // 获取焦点
+//如果给组件绑定ref，则this.$refs获取到的是组件实例化对象
+.$parent获取父组件
+.$root获取要组件，vue
+.$children
+```
