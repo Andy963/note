@@ -193,6 +193,9 @@
         },
         {
             "name": "ES"
+        },
+        {
+            "name": "snippets"
         }
     ],
     "version": "1"
