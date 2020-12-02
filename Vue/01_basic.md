@@ -839,3 +839,11 @@ slot为vue提供的内容分发组件。
 </script>
 </html>
 ```
+
+### vue中绑定第三方库
+```js
+Object.defineProperty(obj,prop,descriptor)
+obj: 目标对象
+prop: 需要定义或修改的属性的名字
+descriptor:目标属性所拥有的特性
+```
