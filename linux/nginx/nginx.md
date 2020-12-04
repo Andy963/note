@@ -102,3 +102,44 @@ rewrite ^(.*)$ https://$host$1 permanent;
 
 
 ```
+# uwsgi
+```
+[uwsgi]
+# 自定义变量
+projectname = ownblog
+base = /var/www
+
+# 启用主进程
+master = true
+#
+socket = 127.0.0.1:8080
+# 网络请求
+#http = 127.0.0.1:8000
+
+# 项目目录
+chdir = %(base)/ownblog
+# 环境目录
+venv=/home/envs/ownblog-ccOfqkNN
+# module wsgi文件
+wsgi-file = %(base)/ownblog/ownblog/wsgi.py
+
+# 进程数
+processes = 2
+# 启用线程,线程数量
+enable-threads = true
+threads = 4
+
+# buffer size,default 4kb
+buffer-size = 32768
+# run background, loging to file
+daemonize = /var/log/ownblog_uwsgi.log
+pidfile = /var/run/ownblog.pid
+# max size of log file
+log-maxsize = 500000
+# auto delete unix socket pid when exit server
+vacuum = true
+# max requests for every process
+max-requests = 300
+# after 60s request will timeout
+harakiri = 60
+```
