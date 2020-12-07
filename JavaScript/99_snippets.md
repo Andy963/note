@@ -1061,3 +1061,58 @@ var rbajax = {
     }
 };
 ```
+
+### checkIsActive
+```js
+// 检测用户活跃情况
+function isActive() {
+    var arr = ['index', 'login']
+    var result = arr.some(function(item) {
+        return window.location.href.indexOf(item) > 0
+    })
+    // result 表示当前页面可能是index或者注册页面 
+    // 不是index页面 ，不是注册页面才会去检测用户的活跃状态（鼠标移动状态）
+    if (!result) {
+        var lastTime = new Date().getTime();
+        var currentTime = new Date().getTime();
+        //设置超时时间： 10分
+        var timeOut = 10 * 60 * 1000; 
+
+        window.onload = function() {
+            /* 检测鼠标移动事件 */
+            document.addEventListener('mousemove', function() {
+                // 更新最后的操作时间
+                console.log('鼠标移动了')
+                lastTime = new Date().getTime();
+            })
+        }
+
+        /* 定时器  间隔1分钟，检测是否长时间未操作页面  */
+        var quitTime = window.setInterval(testTime, 60000);
+
+        // 超时函数
+        function testTime() {
+            //更新当前时间
+            currentTime = new Date().getTime();
+            console.log('currentTime', currentTime)
+            //判断是否超时
+            if (currentTime - lastTime > timeOut) {
+                // console.log('超时拉')
+                // 超时操作
+                axios.post(logoutUrl,params)
+                .then(function (res) {
+                  // 写超时执行的代码,例如退出登录什么的
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+                // 清除掉定时器
+                window.clearInterval(quitTime)
+            }
+        }
+    }
+}
+
+isActive()
+```
+ref: https://blog.csdn.net/cofecode/article/details/82429016
