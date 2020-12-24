@@ -847,3 +847,10 @@ obj: 目标对象
 prop: 需要定义或修改的属性的名字
 descriptor:目标属性所拥有的特性
 ```
+
+###  elementUi checkbox
+```vue
+<el-checkbox   v-model="scope.row.Ipselected @change="value=>{checkIp(value,scope.row)}">
+// 在change事件中通过value将是否选中传入，scope.row则是行数据
+</el-checkbox>
+```
