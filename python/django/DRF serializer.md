@@ -1,5 +1,32 @@
 # DRF serializer
 
+## 显示choice field
+方法一：
+```python
+status = Serializer.SerializerMethodField()
+
+
+def get_status(self,obj):
+    if obj.status == 'd':
+        return "草稿"
+    elif obj.status == 'p':
+        return "发布"
+```
+方法二：
+```python
+class BlogSerializer(serializers.Serializer):
+    STATUS_CHOICES = {
+        'd': 'draft',
+        'p': 'published'
+    }
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        data["status"] = self.STATUS_CHOICES[obj.status]
+        return data
+```
+
+```python
 
 serializer中的类并不多，主要有BaseSerializer， serializer, ListSerializer, ModelSerializer, HyperlinkedModelSerializer,它们之间的继承关系如下：没错，它们的父类是Field.
 
