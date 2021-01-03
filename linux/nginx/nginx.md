@@ -143,3 +143,42 @@ max-requests = 300
 # after 60s request will timeout
 harakiri = 60
 ```
+
+# nginx sni 转发
+
+```nginx
+# 流量转发核心配置
+stream {
+    # 这里就是 SNI 识别，将域名映射成一个配置名
+    map $ssl_preread_server_name $backend_name {
+        domain.com web;
+        domain.net web1;
+        domain.cn web2;
+    # 域名都不匹配情况下的默认值
+        default web;
+    }
+ 
+    # web，配置转发详情
+    upstream web {
+        server 127.0.0.1:8080;
+    }
+ 
+    # web1，配置转发详情
+    upstream web1 {
+        server 127.0.0.1:8081;
+    }
+ 
+    # web2，配置转发详情
+    upstream web2 {
+        server 127.0.0.1:8082;
+    }
+ 
+    # 监听 443 并开启 ssl_preread
+    server {
+        listen 443 reuseport;
+        listen [::]:443 reuseport;
+        proxy_pass  $backend_name;
+        ssl_preread on;
+    }
+}
+```
