@@ -41,6 +41,29 @@ sql="select * from userinfo where name=%s and password=%s" #！！！注意%s需
 res=cursor.execute(sql,[user,pwd]) #pymysql模块自动帮我们解决sql注入的问题，只要我们按照pymysql的规矩来。
 ```
 
+### 记录一下mysqlclient版本过低的办法
+过程是在写django项目时，提示mysqlclient版本过低，然后我尝试安装Mysqlclient，结果安装失败。
+环境：linux mint 20.1 python3.8 pipenv
+```
+django.core.exceptions.ImproperlyConfigured: mysqlclient 1.4.0 or newer is required; you have 0.10.1.
+pipenv install mysqlclient
+ OSError: mysql_config not found
+```
+解决办法：
+办法一：比较正常的办法：
+解决mysqlclient安装失败
+```shell
+sudo apt-get install libmysqlclient-dev python3-dev
+pipenv install mysqlclient
+```
+再次安装就没问题了
+方法二：魔教的解决办法：
+```
+/opt/envs/shop-dnuuFijE/lib/python3.8/site-packages/django/db/backends/mysql/base.py  # 我的环境中mysql源码路径
+# 将第35,36行注释掉
+```
+这两行代码是对mysqlclient版本进行判断，如果低于1.4,则会报错，这个方法会有未知的隐患，所以我称之为魔教的解决办法，不正统。
+
 ## DBUtils 模块
 
 
