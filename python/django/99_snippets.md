@@ -41,3 +41,22 @@ django.setup()	# 启动django
 
 # now we can use model to add data
 ```
+
+### visit media
+how to visiti media like pic,video
+```python
+
+#settings.py
+MEDIA_URL = "/media/"
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# url
+from shop.ettings import MEDIA_ROOT
+from django.views.static import serve
+
+url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}
+```
