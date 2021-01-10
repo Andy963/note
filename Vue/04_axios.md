@@ -492,3 +492,93 @@ function cancelReq() {
     }
 }
 ```
+
+### use axios request
+#### basic
+axios.request(config)
+```js
+//原始的Axios请求方式
+axios({
+  method: 'post',
+  url: '/user/12345',
+  data: {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  },
+  timeout: 1000,
+  ...//其他相关配置
+});
+```
+
+#### get 
+axios.get(url[, config])
+```js
+axios.get('demo/url', {
+    params: {
+        id: 123,
+        name: 'Henry',
+    },
+   timeout: 1000,
+  ...//其他相关配置
+})
+```
+### delete
+axios.delete(url[, config])
+```js
+//如果服务端将参数作为java对象来封装接受
+axios.delete('demo/url', {
+    data: {
+        id: 123,
+        name: 'Henry',
+    },
+     timeout: 1000,
+    ...//其他相关配置
+})
+//如果服务端将参数作为url参数来接受，则请求的url为:www.demo/url?a=1&b=2形式
+axios.delete('demo/url', {
+    params: {
+        id: 123,
+        name: 'Henry',
+    },
+     timeout: 1000,
+    ...//其他相关配置
+})
+```
+
+#### post
+axios.post(url[, data[, config]])
+```js
+axios.post('demo/url', {
+    id: 123,
+    name: 'Henry',
+},{
+   timeout: 1000,
+    ...//其他相关配置
+})
+```
+
+#### put
+axios.put(url[, data[, config]])
+```js
+axios.put('demo/url', {
+    id: 123,
+    name: 'Henry',
+},{
+   timeout: 1000,
+    ...//其他相关配置
+})
+```
+
+#### patch
+axios.patch(url[, data[, config]])
+```js
+axios.patch('demo/url', {
+    id: 123,
+    name: 'Henry',
+},{
+   timeout: 1000,
+    ...//其他相关配置
+})
+```
+ref:https://www.jianshu.com/p/53deecb09077
+使用时习惯使用原始的方式，如果指定方法还得指定参数，其中get,delete是不同情况，需要指定data || params, 而其它方法则是url +json + other config
