@@ -44,6 +44,8 @@
 
 ### command
 #### v-text && v-html
+v-text会替换标签中全部的内容，即：如果你将标签绑定了v-text,而又在标签内部写了内容，这些内容会被v-text指令的内容覆盖掉，而如果使用{{}}插值表达式，则可以保存添加的值。
+v-html 绑定的内容会被渲染成标签，与v-text不同，v-text只会显示成文本
 v-text ==> innerText
 v-html ==> innerHtml
 
@@ -87,6 +89,7 @@ v-html ==> innerHtml
 you can use methods to define a function like add.
 
 #### v-show v-if
+v-show 只是更改样式display,而v-if则直接操作dom树
 v-show ==> display
 v-show="isShow" the value must be a string
 v-on:click ==> onclick
