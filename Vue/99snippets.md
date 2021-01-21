@@ -36,3 +36,39 @@
 
 并且因为这个会导致另外一个问题： 为了达到在点击后仍能回到之前的页面，我在localStorage中存在了每次跳转时的路由，在创建页面时先去LocalSorage中获取保存的路由，如果存在就跳转到该页面，如果不存在则跳转到首页，因为上面的原因，导致这种情况失败。
 最后的解决办法是：在保存时对路由做一定的处理，再往localStorage中存，具体的代码就不贴了，一是不记得，另外觉得这种方法只是临时办法，不优雅，如果有更好的办法后面再更新。
+
+### vue 全局函数
+
+```js
+Vue.prototype.checkLogin = function () {
+    let userId = localStorage.getItem('user_id')
+    if (userId === '' || userId === null || userId === undefined) {
+        return true
+    } else {
+        return false
+    }
+}
+
+Vue.prototype.checkLogin = function () {
+    let userId = localStorage.getItem('user_id')
+    return userId === '' || userId === null || userId === undefined;
+}
+
+```
+
+### vue 使用nginx二级路由
+- 在项目要目录创建Vue.config.js
+
+```js
+module.exports = {
+    publicPath: '/hlt'
+}
+
+const router = new VueRouter({
+    # mode: 'history',
+    routes: [
+        {path: '/', component: Home},
+    ],
+    base: "/hlt"
+});
+```
