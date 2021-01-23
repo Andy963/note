@@ -72,3 +72,30 @@ const router = new VueRouter({
     base: "/hlt"
 });
 ```
+
+### vue高亮 显示markdown
+#### install 
+
+```shell
+npm install marked -S
+npm install highlight.js --save
+```
+
+#### import
+main.js
+```js
+import hljs from 'highlight.js'
+import 'highlight.js/styles/monokai-sublime.css'
+```
+这里使用的sublime的高亮，也可以选择其它的，比如vs.css
+
+marked 在需要使用的页面导入
+```js
+import marked from 'marked'
+```
+
+#### use
+```js
+#<div style="margin-top:30px;" v-highlight v-html="content">
+this.content = marked(this.article.content)
+```
