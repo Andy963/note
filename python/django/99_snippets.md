@@ -60,3 +60,20 @@ from django.views.static import serve
 
 url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}
 ```
+
+### django reverse with query string
+there isn't a way to rever query string but only args or kwargs. this snippets is from github
+refs: https://gist.github.com/benbacardi/227f924ec1d9bedd242b
+```python
+from django.utils.http import urlencode
+
+def reverse_querystring(view, urlconf=None, args=None, kwargs=None, current_app=None, query_kwargs=None):
+    '''Custom reverse to handle query strings.
+    Usage:
+        reverse('app.views.my_view', kwargs={'pk': 123}, query_kwargs={'search': 'Bob'})
+    '''
+    base_url = reverse(view, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
+    if query_kwargs:
+        return '{}?{}'.format(base_url, urlencode(query_kwargs))
+    return base_url
+```
