@@ -650,7 +650,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = "__all__" 
 ```
-
+需要注意的是，当使用Modelserializer时假如category 并非article的字段，而是在另一个model中，此时在使用modelSerializer时是无法直接使用category来获取分类的，而应该使用category_set,或者在model中指定
+related_name,即反向查询的字段（这里讨论的是：article有多个category的情况，与上面的category有多篇文章是不同的）
 
 #### serializer嵌套
 
