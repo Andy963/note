@@ -108,3 +108,51 @@ v-bind:value单向绑定，v-model则是双向绑定
 </body>
 </html>
 ```
+### watch
+对于复杂数据结构如对象，数组需要使用深度监视才能监测到变化 
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../Vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="msg">
+    <h3>{{msg}}</h3>
+    <h3>{{students[0].name}}</h3>
+    <button @click="students[0].name='jack'">change</button>
+</div>
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            msg: '',
+            students: [{'name': 'andy'}]
+        }
+        ,
+        watch: {
+            // 对于基本的字符串，数字等可以直接使用watch,而复杂数据结构如对象，数组等需要使用深度监视才行
+            'msg': function (newVal, oldVal) {
+                console.log(newVal, oldVal)
+            },
+            // 当监测的对象为一个对象时 这种情况下，是监测不到变化的
+            // 'students': function (newVal, oldVal) {
+            //     console.log(newVal, oldVal)
+            // },
+            // 深度监视,因为监视的是对象的内存地址，而这个地址不会变化 ，所以也就监测不到
+            students: {
+                deep: 'true',
+                handler: function (newVal, oldVal) {
+                    console.log(newVal[0].name)
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
+```
