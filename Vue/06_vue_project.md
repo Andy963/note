@@ -74,3 +74,37 @@ once:只触发一次
 </body>
 </html>
 ```
+
+### v-bind:value && v-model
+v-bind:value单向绑定，v-model则是双向绑定
+```js
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../Vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <input type="text" style="width:100%;" :value="msg">
+    <input type="text" style="width:100%;" v-model="msg">
+
+</div>
+<script>
+    /*
+    v-bind:value 只能单向绑定，从model(data)到v（html),无法双向
+    v-model 可以实现表单元素和model中数据的双向绑定
+    表单元素包括：input(radio,text,address,email),select, checkbox, textarea等
+     */
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            msg: '好好学习，天天向上'
+        },
+        methods: {}
+    })
+</script>
+</body>
+</html>
+```
