@@ -156,3 +156,53 @@ v-bind:value单向绑定，v-model则是双向绑定
 </body>
 </html>
 ```
+
+### compute setter
+通常情况下getter就够了，setter较少用
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>compute setter</title>
+    <script src="../Vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="content" @input="handleInput">
+    {{content}}
+</div>
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            msg: '',
+        },
+        methods: {
+            handleInput: function (event) {
+                // console.log(event.target.value) 获取target的值
+                const {value} = event.target
+                this.content = value
+            }
+        },
+        computed: {
+            // 当要使用set时，content应该是一个对象，而非函数
+            // content: function () {
+            //     return this.msg
+            // }
+            content: {
+                set: function (newVal) {
+                    console.log(newVal)
+                    this.msg = newVal
+                },
+                get: function () {
+                    return this.msg
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
+```
