@@ -206,3 +206,41 @@ v-bind:value单向绑定，v-model则是双向绑定
 </body>
 </html>
 ```
+
+### filter
+filter 与django filter 类似，通过 “|”来处理
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>filter</title>
+    <script src="../Vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <h3>{{price | filterPrice('$')}}</h3>
+</div>
+<script>
+    // 创建全局过滤器
+    Vue.filter('filterReverse', (val) => {
+        return val.split('').reverse().join('')
+    })
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            price: 10,
+        },
+        // 局部过滤器
+        filters: {
+            filterPrice: function (price, flag) {
+                return flag + price
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
+```
