@@ -256,3 +256,19 @@ filter 与django filter 类似，通过 “|”来处理
 #### 其它通信方式
  -  一种是定义一个中间事件总线bus,在其中一个组件中通过bus.on('目标组件中的函数名',参数),在目标组件中通过bus.$emit('函数名',参数)来触发。
  - 在其中一个组件中通过provide定义一些变量，在目标组件中通过inject来注入变量，从而可以自由使用变量
+
+### 插槽
+
+### 匿名插槽
+在模板中使用<slot></slot>标签，自定义的内容将“插入"到这个地方来显示
+
+#### 具名插槽
+在定义的模板中定义name属性，在使用的标签中嵌套一层template,并指定template中slot为模板中的name
+
+### ref
+如果给标签添加ref,获取的就是真实的dom,如果给子组件添加ref，获取的就是子组件对象
+`this.$refs.myBtn`  定义：`<button ref='myBtn'></button>`
+
+### 动态添加属性
+在vue中动态直接赋值，可能不成功，此时需要通过Vue.$set(object,key,value)来进行设置
+或者通过es6的：Ｏbject.assign({},object,{'age':200,} 这种方式来赋值
