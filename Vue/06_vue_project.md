@@ -272,3 +272,6 @@ filter 与django filter 类似，通过 “|”来处理
 ### 动态添加属性
 在vue中动态直接赋值，可能不成功，此时需要通过Vue.$set(object,key,value)来进行设置
 或者通过es6的：Ｏbject.assign({},object,{'age':200,} 这种方式来赋值
+
+### mixin 
+将相同功能提取出来，作为Mixin 混入来使用
