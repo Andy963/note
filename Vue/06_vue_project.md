@@ -275,3 +275,6 @@ filter 与django filter 类似，通过 “|”来处理
 
 ### mixin 
 将相同功能提取出来，作为Mixin 混入来使用
+
+### nextTick
+数据变化之后，在等待vue完成DOM更新之前的这段时间，可以使用Vue.nextTick在当前回调函数中获取最新的DOM,在回调中可以获取到数据，否则可能获取不到，因为它是异步更新的。
