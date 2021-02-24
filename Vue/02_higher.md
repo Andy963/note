@@ -598,6 +598,16 @@ export default {
 </script>
 ```
 
+### 404路由
+基于优先级的考虑，这条必须放在最后面，即当其它所有路由都无法匹配到时，匹配这条
+```js
+{
+  path: '*',
+  component:()=>import('@/views/404')
+}
+```
+
+
 ### get dom ref
 ```vue
 <!DOCTYPE html>
