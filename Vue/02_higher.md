@@ -1,6 +1,6 @@
 
 ### filter and moment.js
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,7 +64,7 @@
 
 ### life cycle
 keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -173,7 +173,7 @@ keep-alive 是Vue 提供的内置组件，主要作用让组件产生缓存
 $.route 路由信息对象
 $.router 路由对象（VueReouter)
 
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,7 +276,7 @@ $.router 路由对象（VueReouter)
 </html>
 ```
 ### named router
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -361,7 +361,7 @@ $.router 路由对象（VueReouter)
 </html>
 ```
 ### dynamic router
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -461,7 +461,7 @@ $.router 路由对象（VueReouter)
 ```
 
 ### program router
-```vue
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -604,6 +604,72 @@ export default {
 {
   path: '*',
   component:()=>import('@/views/404')
+}
+```
+
+### alias 别名, redirect重定向
+```js
+{
+ path:'/home',
+ name:'home',
+ component:Home,
+ alias: '/aaa'
+ redirect:'/index'
+}
+```
+### 路由组件传值
+组件a中
+```js
+{
+  path:'/user/:id',
+  name:'user',
+  component:User,
+  props:true // 这里设置为true,就可以将上面的id传给对应的user组件中
+}
+
+// 或者为一个函数
+{
+  path:'/user/:id',
+  name:'user',
+  component:User,
+  props:(route)=>（{
+   id:route.params.id,
+   title:route.query.title
+}
+
+）
+}
+```
+在user组件中接收：
+```js
+export default{
+    // 在这里接收，然后可以直接使用id
+    props:['id'],
+}
+```
+
+### 编程式导航
+通过方法来跳转
+```js
+goRoute(){
+    this.$router.push('/')
+    this.$router.push('name')
+    this.$router.push({
+     path:'/'
+     })
+    this.$router.push({
+    name:'user',
+    params:{id:2}
+     })
+    this.$router.push({
+    name:'user',
+    query:{id:2}
+     })
+
+}
+
+goBack(){
+    this.$router.goback(-1) // 负值为后退，正值为前进
 }
 ```
 
