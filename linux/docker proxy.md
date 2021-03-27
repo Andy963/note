@@ -27,7 +27,15 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 curl https://get.acme.sh | sh
 bash acme.sh --issue -d "www.domain.com" --standalone -k ec-256 --force --test
-bash acme.sh --installcert -d "www.domain.com" --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc --force                             
+bash acme.sh --installcert -d "www.domain.com" --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc --force          
+# 签证书                   
+acme.sh --issue -d www.yibu.ga  --standalone 
+cp /root/.acme.sh/www.yibu.ga/www.yibu.ga.key /opt/cert/
+cp /root/.acme.sh/www.yibu.ga/fullchain.cer /opt/cert
+systemctl restart xray
+# 0 0 * * 1 -u root /opt/scripts/cleanXrayLog.sh
+sed -i d /var/log/xray/access.log
+sed -i d /var/log/xray/error.log
 ```
 
 ### nginx
