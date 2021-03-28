@@ -99,3 +99,18 @@ import marked from 'marked'
 #<div style="margin-top:30px;" v-highlight v-html="content">
 this.content = marked(this.article.content)
 ```
+
+### element ui table header height
+when i am using element-ui table, I have tried many ways to changer the table header height, but all of it failed. the follow one is the success one
+:cellStyle="CellStyle"
+:header-cell-style="headerCellStyle"
+```js 
+CellStyle(){
+    return {padding:'5px',height:'25px',textAlign:'center'}
+}
+
+headerCellStyle(){
+    return {textAlign:'center',lineHeight:'30px',padding:'2px',height:'30px'}
+}
+```
+ps: if the style name with a "-", you should change the name to camel case ,for ex: text-align ---> textAlign
