@@ -1,4 +1,20 @@
 ## 01_celery
+
+```python
+own_schedule
+├── celery.py
+├── config.py
+├── __init__.py
+├── main.py
+└── tasks
+    ├── bili_sign.py
+    └── test.py
+```
+几点要注意的地方 :
+- 如果在win中,接收到任务但不执行,要注意是否使用了gevent或者pool. `celey -A own_schedule worker -l info -P gevent` or `celery -A own_schedule worker --pool=solo`
+- config: field is : broker_url, result_backend, imports, beat_schedule
+- fix conflict: `from __future__ import absolute_import `
+
 ### basic use
 ```python
 from celery import Celery
