@@ -755,3 +755,62 @@ inputDom.focus() // 获取焦点
 .$root获取要组件，vue
 .$children
 ```
+
+### 自定义指令
+自定义指定大致步骤：
+- 安装 vuex
+- 创建vuex文件夹，和对应的文件
+- 在main中引入 vuex,并注入
+- 在vuex中声明变量，此时可以在任意地方访问
+- getters, mutation/commit ,actions/dispatch
+
+#TODO 些处待补充实例
+
+### vue指定中的el parentNode 为Null
+最近 有写一个vue的权限管理，因为考虑到要精确到按钮级别，在元素渲染时会验证是否有权限，如果没有权限会通过该元素的父级换到该元素，所以用到了`el.parentNode.removeChild(el)`, 但总是遇到el 为null的情况，经搜索发现是钩子函数没用对的问题：
+```js
+if (el.parentNode && !Vue.prototype.$_has(binding.value)) {
+            el.parentNode.removeChild(el);
+        }
+```
+钩子函数：
+```
+bind：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+inserted：被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
+update：所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前。指令的值可能发生了改变，也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新 (详细的钩子函数参数见下)。
+componentUpdated：指令所在组件的 VNode 及其子 VNode 全部更新后调用。
+unbind：只调用一次，指令与元素解绑时调用。
+```
+通过官方的这个文档，可以理解的，之前出错是使用的bind钩子，而使用bind在第一次绑定到元素时，父节点可能还没绑定，或者是第二次调用时。（具体的得深入原理）
+ref:https://www.cnblogs.com/chenmz1995/p/11453228.html
+
+#### 自定义指令
+项目中使用到自定义指令，比较复杂，这里用官方的一个小例子来作一下记录，大致的使用
+#### 局部自定义指令
+```js
+directives: {
+  focus: {
+    // 指令的定义
+    inserted: function (el) {
+      el.focus()
+    }
+  }
+}
+/**
+inserted 为钩子函数，即什么时候绑定
+focus为指令名称，在vue中使用时为v-facus
+fuction部分为具体的操作
+*/
+
+```
+
+#### 全局指令
+```js
+Vue.directive('focus', {
+  // 当被绑定的元素插入到 DOM 中时……
+  inserted: function (el) {
+    // 聚焦元素
+    el.focus()
+  }
+})
+```
