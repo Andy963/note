@@ -1130,3 +1130,7 @@ function parseJwt (token) {
     return JSON.parse(jsonPayload);
 };
 ```
+### async
+async await 与promise ，then 等同，简写方式
+async 用来修饰函数，如果函数前面添加了async，那么函数内部可以用await 关键字， await 后面接一个promise 
+resolve 会接收then的结果，而reject 会接收catch的结果。
