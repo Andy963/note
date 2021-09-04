@@ -54,6 +54,15 @@
             "name": "wsl jupyter notebook.md",
             "tags": [
             ]
+        },
+        {
+            "attachment_folder": "",
+            "created_time": "2021-09-04T13:32:10Z",
+            "id": "0",
+            "modified_time": "2021-09-04T13:38:33Z",
+            "name": "06_linux_mint_rime.md",
+            "tags": [
+            ]
         }
     ],
     "folders": [
@@ -83,5 +92,6 @@
         }
     ],
     "id": "0",
+    "modified_time": "",
     "version": "1"
 }
