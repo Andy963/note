@@ -79,3 +79,24 @@ def setup_periodic_tasks(sender,**kwargs):
     sender.add_periodic_task(10,adds(1,2),name="add_every_10")
 # on_after_finalize.connect only use when tasks and app in different folder.
 ```
+### different time zone (UTC)
+
+```python
+import datetime
+import pytz
+def now_fun():
+    return datetime.datetime.now(pytz.timezone('Asia/Shanghai'))
+
+'periodic_task': {
+    'task': 'api.tasks.periodic',
+    'schedule': crontab(hour=6, minute=30, nowfun=now_fun)
+}
+# or use partial
+from functools import partial
+cet_crontab = partial(crontab, nowfun=now_fun)
+'periodic_task': {
+    'task': 'api.tasks.periodic',
+    'schedule': cet_crontab(hour=6, minute=30)
+}
+```
+if you use lambda function to define now_fun, it will raise picker errror.
