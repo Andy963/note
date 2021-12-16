@@ -3,9 +3,98 @@
     "config_mgr": "vx.vnotex",
     "created_time": "2020-02-03T05:17:01Z",
     "description": "",
+    "extra_configs": {
+    },
+    "history": [
+        {
+            "last_accessed_time": "2021-09-04T13:32:01Z",
+            "line_number": 0,
+            "path": "linux/postgresql/06_linux_mint_rime.md"
+        },
+        {
+            "last_accessed_time": "2021-09-04T13:33:08Z",
+            "line_number": -1,
+            "path": "linux/06_linux_mint_rime.md"
+        },
+        {
+            "last_accessed_time": "2021-09-04T13:33:13Z",
+            "line_number": -1,
+            "path": "linux/wsl jupyter notebook.md"
+        },
+        {
+            "last_accessed_time": "2021-11-11T13:51:50Z",
+            "line_number": 75,
+            "path": "python/celery/01_celery.md"
+        },
+        {
+            "last_accessed_time": "2021-11-14T14:04:07Z",
+            "line_number": 148,
+            "path": "linux/nginx/nginx.md"
+        },
+        {
+            "last_accessed_time": "2021-11-14T14:04:08Z",
+            "line_number": -1,
+            "path": "linux/mongo/new_note.md"
+        },
+        {
+            "last_accessed_time": "2021-11-14T14:04:09Z",
+            "line_number": 136,
+            "path": "linux/安装Zsh.md"
+        },
+        {
+            "last_accessed_time": "2021-11-14T14:04:10Z",
+            "line_number": 230,
+            "path": "linux/docker proxy.md"
+        },
+        {
+            "last_accessed_time": "2021-11-14T14:04:11Z",
+            "line_number": -1,
+            "path": "linux/docker/docker.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 2,
+            "path": "python/get_order.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 77,
+            "path": "python/线程.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 64,
+            "path": "python/flask.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 46,
+            "path": "python/django/99_snippets.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 46,
+            "path": "python/django/DRF_throttle.md"
+        },
+        {
+            "last_accessed_time": "2021-11-15T14:04:35Z",
+            "line_number": 0,
+            "path": "python/leetcode/main.py"
+        },
+        {
+            "last_accessed_time": "2021-12-04T11:48:22Z",
+            "line_number": -1,
+            "path": "Algorithm/0001排序.md"
+        },
+        {
+            "last_accessed_time": "2021-12-04T11:48:22Z",
+            "line_number": 0,
+            "path": "Algorithm/0003构成子集问题.md"
+        }
+    ],
     "image_folder": "vimages",
     "name": "vnote",
-    "next_node_id": "2",
-    "version": "1",
+    "tag_graph": "",
+    "version": 3,
     "version_controller": "dummy.vnotex"
 }
