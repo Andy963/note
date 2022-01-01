@@ -3,6 +3,8 @@
 ### 安装
 ```bash
 pip3 install pymysq
+
+
 ```
 
 ### 连接

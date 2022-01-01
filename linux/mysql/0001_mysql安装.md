@@ -5,6 +5,10 @@
 sudo apt-get install mysql-server 
 sudo apt install mysql-client 
 sudo apt install libmysqlclient-dev
+
+#docker 
+docker pull mysql:5.7
+docker run -p 3306:3306 --privileged=true -v /opt/mysql/conf:/etc/mysql/conf.d -v /opt/mysql/logs:/logs -v /opt/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=yourpassword -d mysql:5.7
 ```
 
 
