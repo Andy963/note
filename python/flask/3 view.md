@@ -324,3 +324,11 @@ proxy_buffer_size 64k
 proxy_buffers 32 32k
 proxy_busy_buffers_size 128k
 ```
+
+## 装饰器（中间件）
+这两个装饰器类型于django中的中间件，
+主要有
+@app.before_request会在每个请求被创建出来的时候，执行它所装饰的函数。
+@app.teardown_request，会在每个请求结束的时候执行
+
+Flask的g对象可以为每个特定请求临时存储任何需要的数据，并且是线程安全的。请求结束的时候，这个对象会被销毁，下一个新的请求到来时，又会为它生成一个新的对象
