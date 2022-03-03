@@ -275,6 +275,9 @@
         },
         {
             "name": "leetcode"
+        },
+        {
+            "name": "01_RabbitMQ"
         }
     ],
     "id": "5",
