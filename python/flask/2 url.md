@@ -1,5 +1,19 @@
 ## URL与视图函数的映射：
-
+当同一视图函数添加多个路由装饰器
+```py
+@app.route('/')
+@app.route('/index')
+def home():
+    pass
+```
+即多个路由对应同一函数
+基于上面这一点可以将路由中使用默认参数
+```py
+@app.route('/user/<name>',defaults={'gender':None})
+@app.route('/user/<name>/<gender>')
+def home(name,gender):
+    pass
+```
 ### 传递参数：
 传递参数的语法是：`/<参数名>/`。然后在视图函数中，也要定义同名的参数。即加了尖括号会被识别为参数，而非url字符串。
 
