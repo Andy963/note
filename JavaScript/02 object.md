@@ -39,6 +39,15 @@ x.substr(start, length) －－－－start表示开始位置，length表示截取
 x.substring(start, end) －－－－end是结束位置 
 x.slice(start, end) －－－－切片操作字符串， 与python类似，左包右不包
 
+反转字符串: 利用数组的reverse方法
+```js
+function reverseString(str) {
+    return str.split("").reverse().join("");
+}
+reverseString("hello");
+#ref:https://leetcode-cn.com/problems/palindrome-number/submissions/
+```
+
 ### array
  js中数组的特性 
 - js中的数组可以装任意类型,没有任何限制. 
