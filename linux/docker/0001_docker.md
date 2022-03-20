@@ -121,3 +121,20 @@ EXPOSE 8000
 CMD ["python3", "manage.py", "runserver",
 "0.0.0.0:8000"]
 ```
+
+### docker限制日志大小
+如果没有创建文件： `sudo vim /etc/docker/daemon.json`
+
+```json
+{
+  "log-driver":"json-file",
+  "log-opts": {"max-size":"50m", "max-file":"3"}
+}
+```
+
+```sh
+# 重启docker守护进程
+sudo systemctl daemon-reload
+# 重启docker
+sudo systemctl restart docker
+```
