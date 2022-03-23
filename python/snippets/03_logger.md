@@ -124,8 +124,8 @@ class TimeSplitLogger:
             sh = logging.StreamHandler()  # 往屏幕上输出
             sh.setFormatter(format_str)  # 设置屏幕上显示的格式
             self.logger.addHandler(sh)  # 把对象加到logger里
-
-        self.logger.addHandler(th)
+        if not self.logger.handlers:
+            self.logger.addHandler(th)
 
     def __call__(self):
         return self.logger
@@ -182,7 +182,8 @@ class FileSplitLogger:
             sh = logging.StreamHandler()  # 往屏幕上输出
             sh.setFormatter(format_str)  # 设置屏幕上显示的格式
             self.logger.addHandler(sh)  # 把对象加到logger里
-        self.logger.addHandler(fs)
+        if not self.logger.handlers:# 防止多个handler,导致多次打印相同内容
+            self.logger.addHandler(fs)
 
     def __call__(self):
         return self.logger
