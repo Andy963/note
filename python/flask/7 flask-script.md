@@ -1,3 +1,34 @@
+## click 笔记
+flask_scipt 已经快10年没有维护了，新版本migrate也已经不支持了，所以这里转换到使用click,下面是一个相对稍高级的用法，将命令直接注册到蓝图上，对于app
+同理（理解blueprint和app的关系）
+
+```py
+@user_bp.cli.command('create_user')
+@click.argument('nick_name')
+@click.argument('password')
+def create_user(nick_name, password):
+    """
+    Func: 在蓝图上注册命令：命令行添加user
+    Args: user必须的参数:nick_name, password
+    Example: flask user create_user 'andy' '123456'
+    Return: None
+    :Author:  Andy
+    :Version: 1.0
+    :Created:  2022/3/26 下午9:08
+    :Modified: 2022/3/26 下午9:08
+    """
+    user = User()
+    user.nick_name = nick_name
+    user.password = password
+    with db.auto_commit():
+        db.session.add(user)
+
+#对应蓝图
+# 因为指定了cli_group所以在命令行时要使用flask user,指定 cli_group=None 会删除嵌套并把命令直接合并到应用级别
+user_bp = Blueprint('user', __name__, url_prefix='/user', cli_group='user')
+
+```
+
 ## flask_script笔记：
 Flask-Script的作用是可以通过命令行的形式来操作Flask。例如通过命令跑一个开发版本的服务器、设置数据库，定时任务等。要使用Flask-Script，可以通过`pip install flask-script`安装最新版本。
 

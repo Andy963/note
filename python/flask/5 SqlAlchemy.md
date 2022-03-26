@@ -216,6 +216,8 @@ print(res)
 
 ### filter过滤条件：
 过滤是数据提取的一个很重要的功能，以下对一些常用的过滤条件进行解释，并且这些过滤条件都是只能通过filter方法实现的：
+
+*注意*filter_by,filter之后还要接上first,all等限定，否则返回的数据会有问题
 ```py
 res = session.query(Article).filter(Article.id==5).all() 支持>,<
 res = session.query(Article).filter_by(id=5).all() 不支持>,<
