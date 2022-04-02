@@ -17,6 +17,53 @@ pip3 install pipenv
 pipenv --three可以初始化一个python3版本的虚拟环境
 pipenv --two可以初始化一个python2版本的虚拟环境
 
+### 指定镜像源：
+`pipenv install --pypi-mirror` 或者设置环境变量`PIPENV_PYPI_MIRROR`
+但是有个坑就是即使你设置了，在它生成的Pipefile,Pipefile.lock中仍然显示的官方的pypi,可能这是最后的backend吧，下面是我的验证过程：
+```sh
+value=============>https://pypi.tuna.tsinghua.edu.cn/simple
+value=============>https://pypi.tuna.tsinghua.edu.cn/simple
+Creating a virtualenv for this project...
+Pipfile: /home/andy/PycharmProjects/env_test/Pipfile
+Using /usr/bin/python (3.8.10) to create virtualenv...
+⠴ Creating virtual environment...created virtual environment CPython3.8.10.final.0-64 in 315ms
+  creator CPython3Posix(dest=/opt/envs/env_test-SMK1PzgL, clear=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/andy/.local/share/virtualenv)
+    added seed packages: pip==21.0.1, setuptools==60.9.3, wheel==0.37.1
+  activators BashActivator,CShellActivator,FishActivator,PowerShellActivator,PythonActivator,XonshActivator
+
+✔ Successfully created virtual environment! 
+Virtualenv location: /opt/envs/env_test-SMK1PzgL
+Creating a Pipfile for this project...
+Pipfile.lock not found, creating...
+Locking [dev-packages] dependencies...
+Locking [packages] dependencies...
+Updated Pipfile.lock (db4242)!
+Installing dependencies from Pipfile.lock (db4242)...
+  🐍   ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉ 0/0 — 00:00:00
+To activate this project's virtualenv, run pipenv shell.
+Alternatively, run a command inside the virtualenv with pipenv run.
+ andy@Andy  ~/PycharmProjects/env_test  echo $PIPENV_PYPI_MIRROR
+https://pypi.tuna.tsinghua.edu.cn/simple
+ andy@Andy  ~/PycharmProjects/env_test  vim Pipfile.lock
+ andy@Andy  ~/PycharmProjects/env_test  cat Pipfile
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
+```
+最上面的两行打印，是我修改了pipenv的源码，最后面是Pipfile中的内容，可以看到安装时使用的是我指定的mirror,但Pipefile仍然是官方源，我在这里卡了半天，一直在找为什么没生效。
+
+说句题外话，大家通常的做法是直接修改pipefile,pipefile.lock, 但是，事实上每次这么修改是很low的做法
+
+#ref: [pypi-mirror](https://pipenv.pypa.io/en/latest/changelog/#id1)
 ### 常用命令
 ```python
 # 安装包
