@@ -63,6 +63,9 @@ python_version = "3.8"
 
 说句题外话，大家通常的做法是直接修改pipefile,pipefile.lock, 但是，事实上每次这么修改是很low的做法
 
+### 指定虚拟环境目录
+ 设置`WORKON_HOME`变量为目标目录文件路径
+
 #ref: [pypi-mirror](https://pipenv.pypa.io/en/latest/changelog/#id1)
 ### 常用命令
 ```python

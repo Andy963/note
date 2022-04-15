@@ -28,3 +28,8 @@ Untracked files:
 ```shell
 git config --global core.quotepath false
 ```
+
+### The unauthenticated git protocol on port 9418 is no longer supported
+在win上安装autojump进出现这个错误
+具体解决办法是：`git config --global url."https://".insteadOf git://`
+ref:[The unauthenticated git protocol on port 9418 is no longer supported](https://stackoverflow.com/questions/70663523/the-unauthenticated-git-protocol-on-port-9418-is-no-longer-supported)
