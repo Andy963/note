@@ -151,6 +151,18 @@ source /path/to/virtualenv-autodetect.sh
 ```
 如果使用了oh-my-zsh, 可以直接使用它的插件形式
 
+
+### courtesy notice
+> pipenv detects itself running in a virtual env even though there isn't on
+
+: installed pipenv via pip but not pip3
+```shell
+pip3 uninstall pipenv
+pip3 install pipenv
+```
+ref: [courtesy notice](https://github.com/pypa/pipenv/issues/4327)
+
+
 #### 安装插件
 $ git@github.com:RobertDeRose/virtualenv-autodetect.git ~/.oh-my-zsh/custom/plugins
 再修改.zshrc文件启动插件
