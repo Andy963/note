@@ -130,7 +130,32 @@ regex_one_sep = regex_no_sep + sep + regex_no_sep
 ```
 ref：<http://leetschau.github.io/autojump-in-windows-console.html> 
 
+### oh-my-zsh 管理
+因为众所周知的原因，在天朝更新不了oh-my-zsh，每次自动更新都会报错（可能有某些方法可以做到），但还是建议换成国内源
+```sh
+cd ~/.oh-my-zsh
+git remote set-url origin https://gitee.com/mirrors/oh-my-zsh.git
+git pull
+ ⚡ root@tx  ~/.oh-my-zsh   master  git remote -v
+origin  https://gitee.com/mirrors/oh-my-zsh.git (fetch)
+origin  https://gitee.com/mirrors/oh-my-zsh.git (push)
+```
+或者可以考虑关闭更新：
+```sh
+vim ~/.zshrc
+- # DISABLE_AUTO_UPDATE="true"
++ DISABLE_AUTO_UPDATE="true"
+```
+之前在公司时有这么做过，后面登陆就不更新了，但是奇怪的是，我在某鹅的机器上找这个配置时竟然没找到，所以我换源了..。
 
+*手动更新*
+为什么会有这种需求呢？其实这个场景比较常见，就是因为天朝的网络，它提示你更新后，你按了y,但它更新失败了，此时如果你想更新，要怎么操作呢？
+下面三条都可以达到效果，我更推荐第一条，更好记，oh_my_zsh的首字母，update, 第二条单词较多，主要是下划线太多，第三条可以不考虑。
+```sh
+omz update
+upgrade_oh_my_zsh
+zsh ~/.oh-my-zsh/tools/check_for_upgrade.sh
+```
 
 
 ## zsh 一键安装脚本

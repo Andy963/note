@@ -5,6 +5,16 @@
 > 全局配置文件：Mac 系统在 ~/.gitconfig，Windows 系统在 C:\Users\<用户名>\.gitconfig。
 > 系统级的配置文件：在 Git 的安装目录下（Mac 系统下安装目录在 /usr/local/git）的 etc 文件夹中的 gitconfig。
 
+```sh
+#显示配置
+git config --list 
+#编辑配置
+git config -e [--global]
+
+git config [--global] user.name "[name]"
+git config [--global] user.email "[email address]"
+```
+
 ### 编码
 ```shell
  git config --global core.quotepath false # 显示 status 编码,如果不指定，中文会显示为八进制字符编码
