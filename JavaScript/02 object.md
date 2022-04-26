@@ -47,7 +47,14 @@ function reverseString(str) {
 reverseString("hello");
 #ref:https://leetcode-cn.com/problems/palindrome-number/submissions/
 ```
-
+#### format
+字符串格式化通常有两种方式，用+，以及ES6中的反引号
+```js
+var name = 'andy'
+var s0 = 'hello ' + name
+var s = `Hello ${name}`
+console.log(s)
+```
 ### array
  js中数组的特性 
 - js中的数组可以装任意类型,没有任何限制. 
