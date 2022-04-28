@@ -246,11 +246,17 @@ $ git stash clear
 ```shell
 git branch #查看本地分支
 git branch -a 列出所有分支，包括本地和远程分支
+git branch -r 列出所有远程分支
+git branch -d 删除分支
 git branch dev #创建一个名为dev的分支
+# 建立追踪关系，在现有分支与指定的远程分支之间，--set-upstream因为比较令人疑惑，被弃用，改为--set-upstream-to或者git remote --track 
+git branch --set-upstream [branch] [remote-branch] 
+
 git checkout dev #将工作切换到dev分支上
 
 git branch master
 git merge bug #分支合并---首先切换到master分支，然后在master分支上执行merge指令来合并bug分支的代码
+
 
 ```
 ### 参数
@@ -265,7 +271,9 @@ git merge bug #分支合并---首先切换到master分支，然后在master分�
 ```git
 git checkout develop
 git checkout <commitID>
- git checkout tags/1.1.4
+git checkout tags/1.1.4
+#切换到上一个分支 
+git checkout - 
 ```
 
 ### 恢复
@@ -278,7 +286,7 @@ $ git checkout -- <filename>
 $ git checkout HEAD~ -- <filename>
 ```
 ## git cherry-pick
-git cherry-pick命令”复制”一个提交节点并在当前分支做一次完全一样的新提交。
+git cherry-pick命令”复制”一个提交节点并在当前分支做一次完全一样的新提交。选择一个commit，合并进当前分支 
 
 ## git hash-object
 git hash-object命令计算一个文件的git对象ID，即SHA1的哈希值。
