@@ -324,17 +324,21 @@ git log命令按照提交时间从最晚到最早的顺序，列出所有 commit
 
 ```git
 # 列出当前分支的版本历史
-$ git log
+git log
+# 查看历史和每次变更的文件
+git log --stat 
 
 # 列出某个文件的版本历史，包括文件改名
-$ git log --follow [file]
+git log --follow [file]
 
 # 查看远程分支的变动情况。
 git log remote/branch
 
+# 显示每次提交的diff
+git log -p file
 #查找log，即搜索commit信息
 git log --author=Andy
-$ git log -i --grep="Something in the message"
+git log -i --grep="Something in the message"
 
 git shortlog -sn 查看当前用户提交次数
 ```
@@ -375,7 +379,10 @@ git log --graph --pretty=format:'%h %s' #让图形化界面显示记录的时候
 示版本号，%s是显示版本描述。
 
 ## git revert
-git revert命令用于撤销commit。
+git revert命令用于撤销commit。但会创建一个新的commit
+```sh
+git revert commit
+```
 
 ## git tag
 git tag命令用于为 commit 打标签。Tag 分两种：普通tag和注解tag。只有annotated tag 才會產生 object
@@ -385,3 +392,11 @@ $ git tag 1.0.0  # 打标签
 $ git push --tags  # 将标签推送到远程仓库
 $ git push origin master --tags
 ```
+
+## git stash 
+暂时将未提交的变化暂存起来，留下干净的工作区，稍后再移入
+```sh
+git stash
+git pop
+```
+
