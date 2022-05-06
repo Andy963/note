@@ -67,14 +67,32 @@ quit;
 
 
 ### 创建数据库:
+可以由数字，字母，下划线，@，$, #组成 且<strong>区分大小写</strong>,不能使用关键字，不能纯数字，唯一性，最长128位。
 ```sql
 CREATE DATABASE mysite_db DEFAULT CHARSET=UTF8 DEFAULT COLLATE utf8_unicode_ci;
+show databases; 查看所有数据库
+select database();
 ```
+
 
 ### 创建用户:
 ```sql
 CREATE USER 'zjg'@'localhost' IDENTIFIED BY 'Zjgisadmin';
 ```
+
+```sql
+#创建用户
+create user 'andy'@'192.168.1.1' identified by 'password'; 
+create user 'andy'@'%' identified by 'password'; 
+#删除用户
+drop user 'andy'@'ip_address'; 
+#修改用户： 
+rename user 'andy'@'ip_address' to 'jack'@'ip_address'; 
+#修改密码
+set password for 'andy'@'ip_address' = paswword('new_password'); 
+```
+
+
 
 ### 分配权限:
 ```sql

@@ -285,3 +285,5 @@ UPDATE 表名 SET
         WHERE CONDITION; #更改哪些数据，通过where条件来定位到符合条件的数据
 ```
 
+### 完整性约束
+主要有primary key, foreign key, auto_oncrement,not null,zerofill,unique,default,unsigned.

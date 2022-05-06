@@ -36,3 +36,8 @@ select id, name , status from tb_book;
 > 所有非主键字段和主键字段之间不能产生传递依赖
 
 [refs](https://www.jianshu.com/p/3e97c2a1687b)
+
+mysql中char与varchar
+
+1. 建表时定长数据往前放，变长数据往后放
+2. 一张表中，定长，变长尽量不要混用

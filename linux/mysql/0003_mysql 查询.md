@@ -71,6 +71,14 @@ GROUP BY一般都会与聚合函数一起使用，聚合是什么意思：聚合
 select post,count(id) as count from employee group by post;
 #按照岗位分组，并查看每个组有多少人，每个人都有唯一的id号，我count是计算一下分组之后每组有多少的id记录，通过这个id记录我就知道每个组有多少人了
 ```
+
+group by 如果不和聚合函数一起使用时，查询字段相同的为一组，但因为没有聚合函数，只会显示组中第一条数据，意义不大。所以通常会和聚合函数一起使用。
+Group by field having exp
+通常情况下，使用group by后无法显示分组里面有哪些元素，但我们可以通过group_concat达到这样的目的。
+```sql
+select sno,cno,group_concat(degree) from score group by sno having min(degree) > 80;
+```
+首先，它会根据sno分组，且将组内最低分数大于80的列出来，会列出sno,cno,但同时也会把组内所有的degree列出在一个字段中，可以通过 group_concat(degree) as all_degree 的方式对其进行重命名
 #### 聚合函数
 
 ```sql
