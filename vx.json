@@ -4,34 +4,52 @@
     ],
     "folders": [
         {
-            "name": "python"
+            "name": "01_python"
         },
         {
-            "name": "linux"
+            "name": "02_JavaScript"
         },
         {
-            "name": "JavaScript"
+            "name": "03_Database"
         },
         {
-            "name": "vim"
+            "name": "04_go"
         },
         {
-            "name": "ruby"
+            "name": "05_linux"
         },
         {
-            "name": "go"
+            "name": "06_Algorithm"
         },
         {
-            "name": "Vue"
+            "name": "07_git"
         },
         {
-            "name": "网络协议"
+            "name": "08_docker"
         },
         {
-            "name": "Algorithm"
+            "name": "09_nginx"
         },
         {
-            "name": "vx_recycle_bin"
+            "name": "10_vim"
+        },
+        {
+            "name": "11_ES"
+        },
+        {
+            "name": "12_网络协议"
+        },
+        {
+            "name": "13_ruby"
+        },
+        {
+            "name": "14_RabbitMQ"
+        },
+        {
+            "name": "15_celery"
+        },
+        {
+            "name": "16_Qt"
         }
     ],
     "id": "226",
