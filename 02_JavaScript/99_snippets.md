@@ -693,6 +693,21 @@ Date.prototype.format = function(fmt) {
 var time1 = new Date().format("yyyy-MM-dd hh:mm:ss");
 console.log(time1);
 ```
+在时间戳的基础上增加指定时间
+```js
+let date = new Date(1651888766)
+date.setFullYear(date.getFullYear() + 1）
+return date
+
+#不同粒度
+date.getFullYear();  // 获取完整的年份(4位,1970)
+date.getMonth();  // 获取月份(0-11,0代表1月,用的时候记得加上1)
+date.getDate();  // 获取日(1-31)
+date.getTime();  // 获取时间(从1970.1.1开始的毫秒数)
+date.getHours();  // 获取小时数(0-23)
+date.getMinutes();  // 获取分钟数(0-59)
+date.getSeconds();  // 获取秒数(0-59)
+```
 
 ### randInt
 ```js
