@@ -568,3 +568,56 @@ class Query(BaseQuery):
 
 db = SQLAlchemy(query_class=Query)
 ```
+
+### 对JSON 字段操作
+项目中的字段无法确定，动态变化或者考虑后续扩展时使用。
+也可以使用text、varchar来代替，但是text、varchar是不支持搜索的，并且不支持局部更新，只能更改全部字段，增加了i/o操作，不利于性能。
+
+```py
+class User(db.Model):
+    name= db.Column(db.String(32), comment='姓名')
+    extra = db.Column(db.JSON, comment='扩展字段')
+```
+
+增加数据：
+```py
+User(name = '张三', extra = dict(age=18, gender = 1, weght = 70kg))) 
+user = User.query.filter(User.name == '张三').first()
+
+```
+更新数据：
+```py
+from sqlalchemy.orm.attributes import flag_modified 
+user.extra.update(dict(birthday=1998-12-12))) 
+flag_modified(user, 'extra') 
+db.session.add(user) 
+db.session.commit()
+```
+删除：
+```py
+user.extra.pop('birthday') 
+flag_modified(user, 'extra') 
+db.session.add(user) 
+db.session.commit()
+```
+查询：
+```py
+from sqlalchemy import cast, type_coerce
+from sqlalchemy import String, JSON
+import json
+# 首先是针对单一数字、字符串时
+User.query.filter(User.extra['age'] == 18, User.extra['weght'] == '70kg').first()
+# 另一种特殊情况时,查询条件是一个对象时： 
+# 先增加一组数据： 
+user.extra.update(dict(info=dict(address='北京市'))) 
+flag_modified(user, 'extra') 
+db.session.commit() 
+# 查询整个info时： 
+User.query.filter(cast(User.extra['info'], String) == json.dumps({'address':'北京市'})).first() 
+# or
+User.query.filter(cast(User.extra['info'], String) == type_coerce({"address": "北京市"}, JSON)).first()
+
+```
+ref:[sqlalchemy中使用json](https://learnku.com/python/t/36061)
+
+最近确实有这样的需求，但因为需求比较简单，没有做较多尝试，上面例子的操作最后一种查询还没有验证，后续如果使用到再更新
