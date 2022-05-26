@@ -1,5 +1,152 @@
 
 ## 基础
+### string
+```js
+ let surname = 'zhou'
+ let name = "jin"
+ var firstName = new String("Bill")
+```
+定义时单双引号都可以，也可以在字符串中使用引号，只要不与最外层产生冲突就和地，这点上与python一致。
+
+
+特殊字符串需要转义
+\'	'	单引号
+\"	"	双引号
+\\	\	反斜杠
+
+x = 'zhou', y = new String('zhou') 是不完全相等的，它们是不同类型，前者为字符串，后者为对象
+
+
+#### length
+ 返回字符串长度
+```js
+console.log(name.length);
+```
+#### indexOf() 
+indexof方法返回字符串中指定文本首次出现的索引（位置
+```js
+let names = 'zhou wu zheng '
+console.log(names.indexOf('z'));
+console.log(names.lastIndexOf('z'));
+```
+当未找到指定文本时，两者均返回-1
+
+#### search() 
+search方法搜索特定值的字符串，并返回匹配的位置
+```js
+let names = 'zhou wu zheng '
+console.log(names.search('u')); // 3
+```
+search 可以使用正则
+
+#### slice
+```js
+var str = "Apple, Banana, Mango";
+var res = str.slice(7,13);
+```
+如果某个参数为负，则从字符串的结尾开始计数。
+如果省略第二个参数，则该方法将裁剪字符串的剩余部分
+
+#### substring
+substring方法与slice 类似，但它不能接受负数作为索引
+
+
+#### substr() depricate
+substr与slice 类似，但第二个参数规定提取字符串的长度
+```js
+let names = 'zhou wu zheng '
+console.log(names.substr(3,4));
+//u wu 
+```
+当忽略第二个参数时，会取第一个参数位置之后所有的字符
+当第一个参数 为负，则从结尾开始取
+
+#### replace
+```js
+str = "Please visit Microsoft!";
+var n = str.replace("Microsoft", "W3School");
+```
+默认情况下，replace 只替换第一个匹配的，且默认情况区分大小写
+使用正则的i，使其对大小写不敏感
+```js
+str = "Please visit Microsoft!";
+var n = str.replace(/MICROSOFT/i, "W3School");
+```
+使用正则的g,使其替换所有
+```js
+str = "Please visit Microsoft and Microsoft!";
+var n = str.replace(/Microsoft/g, "W3School");
+console.log(n);
+//Please visit W3School and W3School!
+```
+
+#### toUpperCase()/toLowerCase()
+```js
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toUpperCase();  // text2 是被转换为大写的 text1
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toLowerCase();  // text2 是被转换为小写的 text1
+```
+#### concat()
+连接两个或者多个字符串
+```js
+var text1 = "Hello";
+var text2 = "World";
+text3 = text1.concat(" ",text2);
+```
+#### String.trim()
+去掉两边的空格
+```js
+var str = "       Hello World!        ";
+console.log(str.trim());
+```
+
+#### charAt()
+返回字符串中指定下标（位置）的字符串
+```js
+var str = "HELLO WORLD";
+str.charAt(0);            // 返回 H
+```
+#### charCodeAt()
+返回字符串中指定索引的字符 unicode 编码
+```js
+var str = "HELLO WORLD";
+str.charCodeAt(0);         // 返回 72
+```
+#### Property Access
+属性访问
+```js
+var str = "HELLO WORLD";
+str[0];                   // 返回 H
+```
+它让字符串看起来像是数组（其实并不是）
+如果找不到字符，[ ] 返回 undefined，而 charAt() 返回空字符串。
+它是只读的。str[0] = "A" 不会产生错误（但也不会工作！）
+
+#### split
+将字符串转换成数组
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(","));          // 用逗号分隔
+console.log(txt.split(" "));          // 用空格分隔
+console.log(txt.split("|"));          // 用竖线分隔
+
+[ 'a', 'b', 'c', 'd', 'e' ]
+[ 'a,b,c,d,e' ]
+[ 'a,b,c,d,e' ]
+```
+当用于分割的字符不存在时，则将字符串作为整体放在数组中。这与省略分割符相同，这与python语言中不同，python中默认使用空格
+当分割符为“”时，返回是间隔单个字符的数组
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(""));          // 用逗号分隔
+[
+  'a', ',', 'b',
+  ',', 'c', ',',
+  'd', ',', 'e'
+]
+```
+
 ### import
 ```js
 //1 直接编写,就将其放在html的<head>标签内 
