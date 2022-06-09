@@ -22,6 +22,7 @@ docker exec -it mymongo:mongo
 ```
 
 ### docker rm
+it's better to use docker container rm. so it's clear to know it's container or image.
 ```
 #删除容器
 docker rm ubuntu
@@ -91,6 +92,11 @@ docker run -d -p 9000:9000 --name v2ray --restart=always -v /etc/v2ray:/etc/v2ra
  --volumes-from来挂载dbdata容器中的数据卷，例如创建db1和db2两个容器，并从dbdata容器挂载数据卷
 ```
 
+### docker image
+docker image is read only file, it contains file system,source code, lib file,dependency tools etc. you can treat it as a template. docker image contains layer.
+
+### docker containers
+a container is a running images. it copy a image and add read-write layer(container layer) upon it. one images can create many containers, and that's why you can't delete the image when there is some container is running.
 
 ### 构建镜像实例
 ```docker
