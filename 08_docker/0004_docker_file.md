@@ -85,6 +85,16 @@ EXPOSE 80
 CMD /bin/bash
 ```
 
+### ENV && ARG
+env,arg都可以设置变量，在dockerfile中作为变量使用，避免硬编码，但两者作用范围不同，env定义的变量作用范围包括：构建+container, 即构建时可用，后面运行docker时仍然可用，但arg仅在构建时可用，到运行container时，arg定义的变量已经不存在。
+
+arg在构建时甚至可以不修改dockerfile 而通过命令行`--build-args`来改变变量的值
+假如我们的dockerfile中定义了VERSION=1,那么：
+```sh
+docker image build -f .\dockerfile -t ipinfo --build-arg VERSION=2.0
+```
+将修改version字段
+
 ### 容器启动命令
 CMD可以用来设置容器启动时默认执行的命令
 - 容器启动时默认执行的命令
