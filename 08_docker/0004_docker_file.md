@@ -84,3 +84,11 @@ RUN yum -y install net-tools
 EXPOSE 80
 CMD /bin/bash
 ```
+
+### 容器启动命令
+CMD可以用来设置容器启动时默认执行的命令
+- 容器启动时默认执行的命令
+- 如果docker container run 启动容器时指定了其它命令，则CMD命令会被忽略
+- 如果定义了多个CMD,只有最后一个会被执行
+如果dockerfile中指定了空命令，那么父级的cmd会被覆盖。
+--rm 参数，当使用docker container run 命令时，指定了`--rm`，则当容器退出时，container会被自动删除
