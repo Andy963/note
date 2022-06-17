@@ -102,3 +102,6 @@ CMD可以用来设置容器启动时默认执行的命令
 - 如果定义了多个CMD,只有最后一个会被执行
 如果dockerfile中指定了空命令，那么父级的cmd会被覆盖。
 --rm 参数，当使用docker container run 命令时，指定了`--rm`，则当容器退出时，container会被自动删除
+
+### Entrypoint && CMD
+entrypoint无法被覆盖，一定会执行，但cmd可以被覆盖。通常两者结合一起用，通过命令行将cmd命令作为参数传给entrypoint.
