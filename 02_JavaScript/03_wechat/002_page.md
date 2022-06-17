@@ -179,3 +179,141 @@ aspectFit 保持纵横缩放，保证长边完全显示，可以完整的将图�
 aspectFill 缩放模式，保持纵横比缩放，只保证短边能能完全显示出来，可能导致长边的截取
 widthFix 缩放模式，宽度不变，高度自动变化，保持原图宽高比不变
 heightFix 缩放模式，高度不变，宽度自动变化，保持原图宽高比不变
+
+
+### 事件绑定
+常见事件有 tap,input, change 分别是手指触摸后离开，文本框输入，状态改变事件，绑定方式如：bindtap或者bind:tap. 事件触发时会传event对象，它包含一系列的属性。
+type:事件类型
+timestamp: 页面打开到触发事件所经历的毫秒数
+target:触发事件的组件，源头
+currentTarget:当前组件的一些属性值组合，当前事件的组件
+detail:额外信息
+touches:触摸事件，当前停留在屏幕中的触摸点信息的数组
+changedTouches 触摸事件，当前变化的触摸点信息的数组
+
+
+#### bindtap
+传值操作
+通过下面的按钮将上面的数字加一
+
+```html
+<button type="default">count:{{count}}</button>
+<button type="primary" bindtap="plusOne">plus one</button>
+```
+
+在js中使用`this.setData`方法，里面是对象，`{key,value}`形式
+
+```js
+  plusOne(){
+    this.setData({
+      count:this.data.count +1
+    })
+  }
+```
+
+*注意* 在小程序中，`<button type="primary" bindtap='btnHandler(123)'>事件传参</button>`  这样小程序不会把123当成参数处理，而是整个当前一个名为：btnHandler(123)的事件来处理。
+
+正确的传参方法为 `data-*` 如data-info, 而获取时通过 `event.target.dataset.info`即可获取，看下面示例：
+
+通过data-变量名传入变量，如果直接使用data-c="2"，传入的是字符串，而非数字
+
+```html
+<span>count2:{{count2}}</span>
+<button type="primary" bind:tap="plusTwo" data-c="{{2}}">plus two</button>
+```
+
+通过event.target.dataset.c 获取传入的参数值
+
+```js
+plusTwo(event){
+ this.setData({
+   count2:this.data.count2 + event.target.dataset.c
+ })
+},
+```
+
+#### bindinput
+bindinput用法：`<input bindinput="inputHandler"><input>` 要拿到变化之后的值通过`e.detail.value`
+
+绑定bindinput
+
+```html
+<input bindinput="inputHandler" placeholder="input value"></input>
+```
+
+通过e.detai.value获取到改变后的值：
+
+```js
+ /**
+   * 输入
+   * @param {*} options
+   */
+  inputHandler(e) {
+    console.log(e.detail.value);
+  },
+```
+
+### 条件渲染
+可以通过`wx:if="{{condition}}"`来决定
+
+
+```html
+<view wx:if="{{type === 1}}">男</view>
+<view wx:elif="{{ type=== 2}}">女</view>
+<view wx:else>保密</view>
+```
+
+```js
+data:{
+    type:1
+}
+```
+
+如果要一次性控制多个组件的展示与隐藏，可以使用一个`<block></block>`标签将多个组件包裹起来，并在block中使用wx:if控制，而block只是一个包裹性质的容器，不会在页面中做任何渲染
+
+同样，hidden也可以达到类似目的 hidden="{{condition}}"
+
+### wxss
+rpx :微信小程序中定义的单位，r代表response ，将屏幕等分为750份。
+
+@require
+
+在根目录下建文件夹common/common.wxss
+
+```css
+.success{
+  color:green;
+}
+```
+
+在pages中的list.wxss导入：
+
+```css
+@import "/common/common.wxss";
+```
+
+这样在list.wxml中就可以直接使用了
+
+```html
+<view wx:if="{{type === 1}}" class="success">男</view>
+```
+
+### 全局配置
+window 全局设置小程序窗口的外观
+常用配置项：
+app.json window对象中设置
+
+```
+// 导航栏相关
+navigationBarTitleText  导航栏标题
+navigationBarBackgroundColor 导航栏背景色，只支持十六进制
+navigationBarTextStyle 导航栏标题文字颜色
+//
+backgroundColor 窗口背景色， 只支持十六进制
+backgroundTextStyle 下拉时的三个小圆点样式，默认为light,
+// 
+enablePullDownRefresh 下拉刷新
+onReachBottomDistance 上拉触底的距离，上拉到加载更多数据，默认为50px,设置时只需要写数字，不需要单位。通常不需要修改
+
+```
+tabBar 设置小程序底部的tabBar效果
