@@ -105,3 +105,20 @@ CMD可以用来设置容器启动时默认执行的命令
 
 ### Entrypoint && CMD
 entrypoint无法被覆盖，一定会执行，但cmd可以被覆盖。通常两者结合一起用，通过命令行将cmd命令作为参数传给entrypoint.
+
+
+### 分阶段编译
+
+```docker
+From gcc:9.4 AS builder
+COPY hello.c /src/hello.c
+WORKDIR /src
+RUN gcc --static -o hello hello.c
+
+FROM alphine:3.13.5
+COPY --from=builder /src/hello /src/hello
+ENTRYPOINT ["/src/hello"]
+CMD []
+```
+
+这种技巧通常只对编译型语言有效，不过像python这种解释型语言也可以通过pyinstaller之类进行打包，前面编译出来的文件会复制到后面的镜像使用，这样体积就缩小了很多，同时构建时间也短了
