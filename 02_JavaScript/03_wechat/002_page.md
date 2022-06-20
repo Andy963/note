@@ -316,4 +316,148 @@ enablePullDownRefresh 下拉刷新
 onReachBottomDistance 上拉触底的距离，上拉到加载更多数据，默认为50px,设置时只需要写数字，不需要单位。通常不需要修改
 
 ```
+
 tabBar 设置小程序底部的tabBar效果
+tabBar最少两个，最多5个，如果是顶部，则不包含icon.
+
+配置项：
+postion : tabBar 的位置，只支持bottom/top
+borderStyle: tabBar上边框的颜色，仅支持black/white
+color: tab上文字的默认颜色
+selectedColor:tab上文字选中时的颜色
+backgroundColor: tabBar背景色
+list：Array, tab面签的列表，最少2，最多5个tab, *在tabBar中list为必填项*,而listK的每期有两个必填项：pagePath,text,可选项是iconPath, selectedIconPath
+
+如果页面是在tab中显示的，则要在app.json中的pages中长靠前放
+配置在app.json中
+
+```js
+"tabBar":{
+    "list":[
+        {
+            "pagePath":"pages/index/index",
+            "text":"index"
+        },
+        {
+            "pagePath":"pages/test/test",
+            "text":"test"
+        }
+    ]
+}
+```
+
+页面json
+局部配置：
+navigationBarBackgroundColor: 当前页面导航栏背景颜色
+navigationBarTextStype: 当前页面导航栏颜色，仅支持black/white
+navigationBarTitleText: 当前页面导航栏标题文字内容
+backgroundColor: 当前页面窗口的背景色
+backgroundTextStyle： 当前页面下拉 loading样式，仅支持dark/light
+enablePullDownRefresh: 是否开启下拉 刷新 
+onReachBottomDistance： 上拉触发时距页面底部距离 单位为px
+
+
+### get/post
+微信中必须使用https类型接口，接口的域名一定要添加到后台的信任列表中
+
+在页面刚加载时加载数据，需要在onLoad事件中调用对应的请求。
+
+发送请求都是使用wx.request
+
+
+### 导航
+
+#### 声明式导航
+在页面声明一个<navigator>导航组件，通过点击<navigator>组件实现页面跳转
+编程式导航，调用小程序的导航API，实现页面的跳转
+
+
+tabBar 页面指的是被配置为tabBar的页面，在使用`<navigator>`组件跳转到指定的tabBar页面时，需要指定url属性和open-type属性，其中url表示要跳转的页面的地址，必须以"/"开头
+open-type表示跳转方式，必须是switchTab
+
+```html
+<navigator url="/pages/message/message" open-type="switchTab">跳转到消息页面</navigator>
+```
+
+跳转到非tabBar页面
+
+```html
+<navigator url="/pages/info/info" open-type="navigate">跳转到info页面</navigator>
+```
+
+与导航页面相同，url必须以/开头，但open-type则应该指定为navigate, 实际开发时，navigate为默认open-type 如果导航到非tabBar页面，可以省略不写。
+
+后退导航：
+如果要后退到上一页面或多级页面，则需要指定open-type属性和delta属性，其中：open-type必须是navigateBack,表示要后退导航，delta值为数字，表示后退的层级，默认为1
+
+```html
+<navigator open-type="navigateBack" delta='1'>后退</navigator>
+```
+
+delta默认值就是1，所以后退一级可以省略该属性，delta的值虽然是数字，但写的时候仍要加上引号，否则会报错。
+
+#### 编程式导航
+
+home.wxml
+
+```html
+<button bindtap="goToMessage">跳转到消息页面</button>
+<!-- 非导航页面 -->
+<button bindtap="goToInfo">跳转到info页面</button>
+```
+
+home.js
+
+```js
+  goToMessage(){
+    wx.switchTab({
+      url: '/pages/message/message',
+    })
+  }
+  
+// 非导航页面用navigateTo
+  goToInfo(){
+    wx.navigateTo({
+      url: '/pages/info/info',
+    })
+  },
+```
+
+后退：
+
+info.wxml
+
+```html
+<button bindtap="gotoBack">后退</button>
+```
+
+info.js
+
+```js
+gotoBack(){
+    wx.navigateBack(
+    delta:1
+    )
+}
+```
+
+#### 导航传参
+声明式导航传参：与普通网页传参一样
+
+```html
+navigator url="/pages/info/info?name=zhou&age=30">跳转到info页面<navigator>
+```
+
+编程式传参：
+
+```html
+<button bindtap="gotoinfo">跳转到info</button>
+```
+
+```js
+gotoInfo(){
+    wx.navigateTo({
+        url:'/pages/info/info?name=zhou&age=30'
+    })
+}
+```
