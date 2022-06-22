@@ -461,3 +461,52 @@ gotoInfo(){
     })
 }
 ```
+
+那么在新的页面要怎么获取到参数呢？获取到的是什么形式的参数
+
+在页面的onLoad事件中可以取到参数，参数形式为对象{}
+
+```js
+onLoad:function(options){
+    // options是导航传过来的参数，已经将其转成了键值对对象
+    console.log(options)
+}
+```
+
+### 下拉刷新
+开启下拉刷新包括全局，和局部两种，一般不要开全局
+全局是在app.json中的window节点中，将  `enablePullDownRefresh:true`,如果是局部，则需要在页面对应的json文件中设置该值
+
+怎么监听下拉刷新事件呢？继续刷监测到下拉刷新要更新数据？
+onPullDownRefresh事件,但下拉刷新的效果会一直存在，不会自己主动消失。那要怎么关闭下拉刷新事件呢
+
+```ts
+onPullDownRefresh:function(){
+    // console.log("触发了message页面的下拉刷新")
+    this.setData(
+    {
+        count:0
+    }
+    )
+    wx.stopPullDownRefresh()
+}
+```
+
+### 上拉触底
+上拉触底怎么监听，通常作用是什么？
+`onReachBottom`上拉触底在小程序中通常用来分布，加载更多数据
+
+```ts
+onReachBottom:function(){
+    console.log('触发了上拉触底事件')
+}
+```
+
+如果上一次触发发起了请求还没有完成，用户再次触发了该事件应该怎么处理呢？
+在上一次请求未完成前，再次请求不发起新的请求，可以使用一个标志位？
+具体步骤如下：
+
+- 在data中定义isloading标志位，false表示当前没有进行中的数据请求，true表示当前有正在进行的数据请求
+- 在getColors()方法中修改isloading值，即在刚刚发起请求时将isloading的值修改为true,在网络请求的complete回调函数中，将节流值改变false
+- 在onReachBottom中判断isloading的值，如果值为true,则阻止请求，如果值为false则发起新的请求
+
