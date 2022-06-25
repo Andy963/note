@@ -510,3 +510,30 @@ onReachBottom:function(){
 - 在getColors()方法中修改isloading值，即在刚刚发起请求时将isloading的值修改为true,在网络请求的complete回调函数中，将节流值改变false
 - 在onReachBottom中判断isloading的值，如果值为true,则阻止请求，如果值为false则发起新的请求
 
+
+### 生命周期
+小程序的应用生命周期函数需要在app.js中进行声明
+
+```js
+App({
+    // 小程序初始化完成时，执行此函数，全局只触发一次，可以做一些初始化的工作
+    onLaunch:function(options){},
+    // 小程序启动或从后台进入前台显示时触发
+    onShow:function(options){},
+    // 小程序从前台进入后台时触发
+    onHide:function(){}
+})
+```
+
+#### 页面生命周期函数
+小程序的页面生命周期函数需要在页面对应的js文件中进行声明，
+
+```js
+Page({
+    onLoad:function(options){}, // 监听页面加载，一个页面只调用一次
+    onShow:function(){}, // 监听页面显示
+    onReady:function(){}, // 监听页面初次渲染完成，一个页面只调用一次
+    onHide:function(){}, // 监听页面隐藏
+    onUnload:function(){} // 监听页面卸载，一个页面只调用一次
+})
+```
