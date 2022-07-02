@@ -1,5 +1,16 @@
 ## string
 ### method
+strings.HasPrefix, strings.HasSuffix 分别判断是还是是以某前缀/后缀开始/结束
+strings.Index, strings.LastIndex,判断s在字符串中第一次/最后一次出现的位置,如果没有出现则返回-1
+strings.Replace
+strings.Count(str, substr) 统计substr在str中出现的次数
+strings.toLower, strings.toUpper
+strings.TrimSpace() 去掉字符首尾的空格
+strings.Trim("abb", "b") 去掉b
+strings.TrimeLeft, strings.TrimRight
+strings.Fileds("abc bcd") 默认以空格分割,如果要以及其它东西切,应该用strings.split
+strings.Join(s,[]) 把s所有元素连接起来
+
 ```go
 package main
 
