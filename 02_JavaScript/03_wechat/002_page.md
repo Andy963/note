@@ -537,3 +537,8 @@ Page({
     onUnload:function(){} // 监听页面卸载，一个页面只调用一次
 })
 ```
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+### 动态设置页面标题：
+
+使用wx.setNavigatorBarTitle这个Api,但这个api只能在onReady下面调用
