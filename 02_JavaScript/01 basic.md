@@ -147,6 +147,9 @@ console.log(txt.split(""));          // 用逗号分隔
 ]
 ```
 
+### string2Number
+there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
+
 ### import
 ```js
 //1 直接编写,就将其放在html的<head>标签内 
