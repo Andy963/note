@@ -10,6 +10,8 @@ strings.Trim("abb", "b") 去掉b
 strings.TrimeLeft, strings.TrimRight
 strings.Fileds("abc bcd") 默认以空格分割,如果要以及其它东西切,应该用strings.split
 strings.Join(s,[]) 把s所有元素连接起来
+strings.Itoa(i int) 把一个整数i转成字符串
+strings.Atoi(str string)(int,error) 把一个字符串转成整数
 
 ```go
 package main
