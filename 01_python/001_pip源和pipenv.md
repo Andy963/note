@@ -1,3 +1,50 @@
+
+## 源
+
+### 创建文件目录
+linu在用户home目录下，win下为：C:\Users\Andy Andy即我的用户名
+
+```shell
+mkdir .pip
+cd .pip
+vim pip.conf
+```
+
+### 添加源
+```python
+[global]
+index-url = http://mirrors.aliyun.com/pypi/simple/
+extra-index-url=
+        https://pypi.org/simple
+
+[install]
+trusted-host=
+        mirrors.aliyun.com
+        pypi.org
+
+```
+
+###  更多源的配置
+添加多个源有个问题是每次都会把所有的源都会遍历一次，最后才做选择，这样有个问题是如果访问其实一个源有问题时导致不断在尝试，从而浪费很多时间。
+
+```python
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
+extra-index-url=
+        http://mirrors.aliyun.com/pypi/simple/
+        http://pypi.douban.com/simple/
+        https://pypi.org/simple
+
+[install]
+trusted-host=
+        pypi.tuna.tsinghua.edu.cn
+        mirrors.aliyun.com
+        pypi.douban.com 
+        pypi.org
+```
+
+
+## Pipenv
 pipenv是Python官方推荐的包管理工具.
 它能够自动为项目创建和管理虚拟环境，从Pipfile文件添加或删除安装的包，同时生成Pipfile.lock来锁定安装包的版本和依赖信息，避免构建错误。
 
