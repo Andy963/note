@@ -1,11 +1,57 @@
+### import
 
-## 基础
+```js
+//1 直接编写,就将其放在html的<head>标签内 
+<script> 
+    alert('hello world') # alert（）实际为window.alert() 
+</script> 
+//2 导入文件 
+<script src="hello.js"></script> 
+<script language="javascript" type="text/javascript"></script> 
+```
+
+### variable
+js中var 定义的变量没法通过{}锁定作用域，而let是块级作用域。
+
+#### variable 
+
+```js
+//1、声明变量时不用声明变量类型. 可以使用var,let关键字; 
+var a; 
+a=3; 
+
+#2、一行可以声明多个变量.并且可以是不同类型 
+var name="andy, age=20, job="geologist"; 
+
+#3、声明变量时,如果没有使用var 那么它是全局变量 
+
+#4、变量命名,首字符只能是字母,下划线,$美元符 三选一，余下的字符可以是下划线、美元符号或任何字母或数字字符且区分大小写，x与X是两个变量. 
+```
+
+#### constant
+常量 ：直接在程序中出现的数据值 
+标识符： 
+- 由不以数字开头的字母、数字、下划线(_)、美元符号($)组成 
+- 常用于表示函数、变量等的名称 
+- 例如：_abc,$abc,abc,abc123是标识符，而1abc不是 
+- JavaScript语言中代表特定含义的词称为保留字，不允许程序再定义为标识符 
+
+### data type
+
+number     -----  数值 
+boolean    -----  布尔值 
+string     -----  字符串 
+undefined  -----  undefined 
+null       -----   null  
 ### string
+是由Unicode字符、数字、标点符号组成的序列；字符串常量首尾由单引号或双引号括起；JavaScript中没有字符类型；常用特殊字符在字符串中的表达；字符串中部分特殊字符必须加上右划线\；常用的转义字符 \n:换行 \':单引号 \":双引号 \\:右划线
+
 ```js
  let surname = 'zhou'
  let name = "jin"
  var firstName = new String("Bill")
-```
+``` 
+
 定义时单双引号都可以，也可以在字符串中使用引号，只要不与最外层产生冲突就和地，这点上与python一致。
 
 
@@ -121,9 +167,10 @@ str[0];                   // 返回 H
 ```
 它让字符串看起来像是数组（其实并不是）
 如果找不到字符，[ ] 返回 undefined，而 charAt() 返回空字符串。
-它是只读的。str[0] = "A" 不会产生错误（但也不会工作！）
+它是只读的。<u>**str[0] = "A" 不会产生错误（但也不会工作！）**</u>
 
 #### split
+
 将字符串转换成数组
 ```js
 var txt = "a,b,c,d,e";   // 字符串
@@ -137,6 +184,7 @@ console.log(txt.split("|"));          // 用竖线分隔
 ```
 当用于分割的字符不存在时，则将字符串作为整体放在数组中。这与省略分割符相同，这与python语言中不同，python中默认使用空格
 当分割符为“”时，返回是间隔单个字符的数组
+
 ```js
 var txt = "a,b,c,d,e";   // 字符串
 console.log(txt.split(""));          // 用逗号分隔
@@ -147,50 +195,12 @@ console.log(txt.split(""));          // 用逗号分隔
 ]
 ```
 
-### string2Number
+#### string2Number
 there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
 
-### import
-```js
-//1 直接编写,就将其放在html的<head>标签内 
-<script> 
-    alert('hello world') # alert（）实际为window.alert() 
-</script> 
-//2 导入文件 
-<script src="hello.js"></script> 
-<script language="javascript" type="text/javascript"></script> 
-```
-### variable
-js中var 定义的变量没法通过{}锁定作用域，而let是块级作用域。
-```js
-//1、声明变量时不用声明变量类型. 可以使用var,let关键字; 
-var a; 
-a=3; 
 
-#2、一行可以声明多个变量.并且可以是不同类型 
-var name="andy, age=20, job="geologist"; 
 
-#3、声明变量时,如果没有使用var 那么它是全局变量 
-
-#4、变量命名,首字符只能是字母,下划线,$美元符 三选一，余下的字符可以是下划线、美元符号或任何字母或数字字符且区分大小写，x与X是两个变量. 
-```
-
-### constant
-常量 ：直接在程序中出现的数据值 
-标识符： 
-- 由不以数字开头的字母、数字、下划线(_)、美元符号($)组成 
-- 常用于表示函数、变量等的名称 
-- 例如：_abc,$abc,abc,abc123是标识符，而1abc不是 
-- JavaScript语言中代表特定含义的词称为保留字，不允许程序再定义为标识符 
-
-### data type
-number     -----  数值 
-boolean    -----  布尔值 
-string     -----  字符串 
-undefined  -----  undefined 
-null       -----   null  
-
-#### number
+### number
 不区分整型数值和浮点型数值; 所有数字都采用64位浮点格式存储，相当于Java和C语言中的double格式.能表示的最大值是±1.7976931348623157 x 10308,能表示的最小值是±5 x 10 -324 
 整数： 
    在JavaScript中10进制的整数由数字的序列组成 
@@ -210,11 +220,11 @@ null       -----   null
    2进制: 1111 0011 1101 0100   <-----> 16进制:0xF3D4 <-----> 10进制:62420 
    2进制: 1 111 001 111 010 100 <-----> 8进制:0171724 
 
-#### string 
-是由Unicode字符、数字、标点符号组成的序列；字符串常量首尾由单引号或双引号括起；JavaScript中没有字符类型；常用特殊字符在字符串中的表达；字符串中部分特殊字符必须加上右划线\；常用的转义字符 \n:换行 \':单引号 \":双引号 \\:右划线 
 
-#### boolean
+
+### boolean
 Boolean类型仅有两个值：true和false，也代表1和0，实际运算中true=1,false=0.布尔值也可以看作on/off、yes/no、1/0对应true/false.Boolean值主要用于JavaScript的控制语句，例如： 
+
 ```js
 if (x==1){ 
       y=y+1; 
@@ -222,12 +232,33 @@ if (x==1){
       y=y-1; 
       } 
 ```
-#### null/undefined
+
+### null/undefined
 Null 与undefined类型： 
 - Undefined类型:Undefined 类型只有一个值，即 undefined。当声明的变量未初始化时，该变量的默认值是 undefined。当函数无明确返回值时，返回的也是值 "undefined"; 
 - Null类型:另一种只有一个值的类型是 Null，它只有一个专用值 null，即它的字面量。值 undefined 实际上是从值 null 派生来的，因此 ECMAScript 把它们定义为相等的。 
 
 尽管这两个值相等，但它们的含义不同。undefined 是声明了变量但未对其初始化时赋予该变量的值，null 则用于表示尚未存在的对象（在讨论 typeof 运算符时，简单地介绍过这一点）。如果函数或方法要返回的是对象，那么找不到该对象时，返回的通常是 null。 
+
+
+### NaN
+NaN:属于Number类型的一个特殊值,当遇到将字符串转成数字无效时,就会得到一个NaN数据
+```js
+var d="andy"; 
+d=+d; 
+alert(d);//NaN
+alert(typeof(d));//Number 
+```
+//NaN特点:
+```js
+var n=NaN; 
+alert(n>3); 
+alert(n<3); 
+alert(n==3); 
+alert(n==NaN); 
+alert(n!=NaN); 
+```
+//NaN参与的所有的运算都是false,除了!= 
 
 ### operator
  ` +   -    *    /     %       ++        --`
@@ -248,27 +279,7 @@ Null 与undefined类型：
 假如x=2，那么x++表达式执行后的值为3，x--表达式执行后的值为1；i++相当于i=i+1，i--相当于i=i-1；
 递增和递减运算符可以放在变量前也可以放在变量后：--i 
 
-#### NaN
-NaN:属于Number类型的一个特殊值,当遇到将字符串转成数字无效时,就会得到一个NaN数据
-```js
-var d="andy"; 
-d=+d; 
-alert(d);//NaN
-alert(typeof(d));//Number 
-```
-//NaN特点:
-```js
-var n=NaN; 
-alert(n>3); 
-alert(n<3); 
-alert(n==3); 
-alert(n==NaN); 
-alert(n!=NaN); 
-```
-//NaN参与的所有的运算都是false,除了!= 
-
-
-#### compare
+### compare
 ```
  >   >=   <    <=    !=    ==    ===   !==
 ```
@@ -284,7 +295,8 @@ console.log(2=="2");
 console.log(2==="2"); 
 console.log(2!=="2"); 
 
-#### alert
+### alert
+
 ```js
 var bResult = "Blue" < "alpha"; 
 alert(bResult); //输出 true 
