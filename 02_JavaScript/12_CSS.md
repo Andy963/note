@@ -16,3 +16,14 @@ css 有多种引入的方式：按优先级排序为：
 看下面这张图：
 ![](https://raw.githubusercontent.com/Andy963/notePic/main/vnote/02_javascript/12_css.md/509531122239177.png =591x)
 
+
+#### 组合选择器：
+E,F 多元素选择器，同时匹配所有E,F元素，E,F之间用逗号分隔
+
+E F后代元素选择器，匹配所有E元素后代F元素，E,F之间用空格
+
+E>F 子元素选择器，匹配所有E元素的子元素F
+
+E+F 毗邻元素选择器，匹配所有E元素之后的<u>**同级F元素**</u>
+
+E ~ F 普通兄弟选择器
