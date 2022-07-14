@@ -33,3 +33,18 @@ git config --global core.quotepath false
 在win上安装autojump进出现这个错误
 具体解决办法是：`git config --global url."https://".insteadOf git://`
 ref:[The unauthenticated git protocol on port 9418 is no longer supported](https://stackoverflow.com/questions/70663523/the-unauthenticated-git-protocol-on-port-9418-is-no-longer-supported)
+
+
+### git 无法连接 
+有时git 会连接不上
+
+```shell
+#!/bin/bash
+host_ip=$(cat /etc/resolv.conf |grep "nameserver" |cut -f 2 -d " ")
+export ALL_PROXY="http://$host_ip:10809"
+```
+
+还可以尝试：
+```shell
+git config --global url.git://github.com/.insteadOf https://github.com/
+```

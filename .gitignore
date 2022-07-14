@@ -5,3 +5,4 @@ vx_recycle_bin/*
 *.jpg
 *.png
 *.db
+.idea
