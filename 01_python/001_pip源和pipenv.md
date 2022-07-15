@@ -44,6 +44,8 @@ trusted-host=
 ```
 
 
+使用了一段时间的pipenv后，感觉这玩意问题真多，还是回到virtualenv + virtualenvwrapper的老路上来，连尝试poetry的兴趣都没有了，配置virtualenv+virtualenvwrapper原来有记录，现在就懒得记了，直接贴个链接吧：
+<a href="https://segmentfault.com/a/1190000014935970" target="_blank">virtualenv+virutalenvwrapper</a>
 ## Pipenv
 pipenv是Python官方推荐的包管理工具.
 它能够自动为项目创建和管理虚拟环境，从Pipfile文件添加或删除安装的包，同时生成Pipfile.lock来锁定安装包的版本和依赖信息，避免构建错误。
