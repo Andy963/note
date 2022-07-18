@@ -28,6 +28,12 @@ E+F 毗邻元素选择器，匹配所有E元素之后的<u>**同级F元素**</u>
 
 E ~ F 普通兄弟选择器
 
+### 属性选择器
+
+E[attr~=val] 匹配所有attr属性具有多个空格分隔的值，其中一个值等于“val"的E元素td[class~="name"]{color:red}
+E[attr^=val] 匹配属性值以指定值开头的每个元素，div[class^="test"]{background:red}
+E[attr$=val] 匹配属性值以指定结尾的每个元素,div[class$="test"]{color:blue}
+E[attr*=val] 匹配属性值中包含指定值的每个元素,div[class="test"]{color:green}
 
 ### 伪类
 *anchor* 伪类主要用来控制链接的显示样式
