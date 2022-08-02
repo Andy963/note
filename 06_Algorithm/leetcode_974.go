@@ -1,4 +1,4 @@
-/**
+GoInstallBinaries/**
  * File              : leetcode_974.go
  * Author            : Andy
  * Date              : 01.08.2022
