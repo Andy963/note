@@ -263,6 +263,9 @@ print(res)
     query.filter(User.name != None)
     # 或者是
     query.filter(User.name.isnot(None))
+    # 上面是v1.1之后的isnot
+    # https://docs.sqlalchemy.org/en/13/core/metadata.html?highlight=isnot
+    # 在v2.0中为is_not 具体哪个版本开始改的不清楚
     ```
 
 7. and：
@@ -399,7 +402,7 @@ session.commit()
 4. 在两个需要做多对多的模型中随便选择一个模型，定义一个relationship属性，来绑定三者之间的关系，在使用relationship的时候，需要传入一个secondary=中间表。
 
 
-```py
+```python
 #encoding: utf-8
 from sqlalchemy import create_engine,Column,Integer,Float,Boolean,DECIMAL,Enum,Date,DateTime,Time,String,Text,func,and_,or_,ForeignKey,Table
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -621,3 +624,6 @@ User.query.filter(cast(User.extra['info'], String) == type_coerce({"address": "�
 ref:[sqlalchemy中使用json](https://learnku.com/python/t/36061)
 
 最近确实有这样的需求，但因为需求比较简单，没有做较多尝试，上面例子的操作最后一种查询还没有验证，后续如果使用到再更新
+
+
+todo 测试get_or_404
