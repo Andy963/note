@@ -128,3 +128,36 @@ class Solution:
         return ans
 
 ```
+
+
+#### [剑指 Offer II 056. 二叉搜索树中两个节点之和](https://leetcode.cn/problems/opLdQZ/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def findTarget(self, root: TreeNode, k: int) -> bool:
+        if not root:
+            return False
+        flag = False
+        ans = []
+        def dfs(node):
+            nonlocal ans, flag
+            if not node:
+                return
+            val = node.val
+            if k - val in ans:
+                flag = True
+            else:
+                ans.append(val)
+            dfs(node.left)
+            dfs(node.right)
+
+        dfs(root)
+        return flag
+        
+```
