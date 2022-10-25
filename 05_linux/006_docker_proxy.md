@@ -23,6 +23,8 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 
+oracle linux安装docker: https://www.cnblogs.com/52by/p/16678772.html
+
 ### 证书
 ```
 curl https://get.acme.sh | sh
