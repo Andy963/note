@@ -262,3 +262,19 @@ df.iloc[:,0:1]
 a	andy
 b	zhou
 ```
+
+匹配到相等的修改：
+
+```python
+import pandas as pd  
+  
+dybl = pd.read_csv('./dongyuanbinglilijiajieguo.csv',encoding='gbk')  
+dy = pd.read_excel('./东院.xlsx')  
+  
+for i in range(len(dybl)):  
+    row = dybl.iloc[i]  
+    id = row[0] # 如果有玩名，这里可以通过列名取数据如：row['检查号'] 
+    dy.loc[dy['检查号'] == id, ['病理']] = row[6] # 匹配到相等，并赋值到'病理' 这一列
+  
+dy.to_excel('./东院1026.xlsx')
+```
