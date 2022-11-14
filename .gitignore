@@ -7,3 +7,4 @@ vx_recycle_bin/*
 *.db
 .idea
 .obsidian
+.trash
