@@ -2,12 +2,12 @@
 ## 源
 
 ### 创建文件目录
-linu在用户home目录下，win下为：C:\Users\Andy Andy即我的用户名
+linu在用户home目录下，win下为：C:\\Users\\Andy Andy即我的用户名
 
 ```shell
-mkdir .pip
+mkdir .pip # window中不需要加".""
 cd .pip
-vim pip.conf
+vim pip.conf # window中为pip.ini
 ```
 
 ### 添加源
