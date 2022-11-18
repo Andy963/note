@@ -136,6 +136,16 @@ ele.onclick = function() {
 ```
 如果不能确定this指代什么，那么可以看看onclick动作前面的对象，在这里指代ele，也就是当前触发事件的对象。
 
+#### input on input via jquery
+
+```js
+// 通过input 监听input框的输入事件
+phone_input.on("input", function () {  
+    phone = phone_input.value;  
+    phone_input.removeClass("input-error");  
+});
+```
+
 #### onload
 onload 属性开发中 只给 body元素加.这个属性的触发 标志着 页面内容被加载完成.应用场景: 当有些事情我们希望页面加载完立刻执行,那么可以使用该事件属性
 ```js
