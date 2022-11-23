@@ -13,7 +13,7 @@
 ### variable
 js中var 定义的变量没法通过{}锁定作用域，而let是块级作用域。
 
-#### variable 
+#### var
 
 ```js
 //1、声明变量时不用声明变量类型. 可以使用var,let关键字; 
@@ -60,7 +60,7 @@ null       -----   null
 \"	"	双引号
 \\	\	反斜杠
 
-x = 'zhou', y = new String('zhou') 是不完全相等的，它们是不同类型，前者为字符串，后者为对象
+x = 'zhou', y = new String('zhou') 是<strong>不完全相等的</strong>，它们是不同类型，前者为字符串，后者为对象
 
 
 #### length
@@ -74,8 +74,16 @@ indexof方法返回字符串中指定文本首次出现的索引（位置
 let names = 'zhou wu zheng '
 console.log(names.indexOf('z'));
 console.log(names.lastIndexOf('z'));
+
 ```
 当未找到指定文本时，两者均返回-1
+通常我们判断字符串中是否有某个字符会通过索引是否为-1,但其实，我们也可以通`includes`
+
+```js
+let name = 'zhou abc'
+console.log(name.includes('zh'))
+// true
+```
 
 #### search() 
 search方法搜索特定值的字符串，并返回匹配的位置
@@ -84,6 +92,12 @@ let names = 'zhou wu zheng '
 console.log(names.search('u')); // 3
 ```
 search 可以使用正则
+```js
+let name = 'zhou abc '
+reg = new RegExp('ab')
+reg.test(name)
+//true
+```
 
 #### slice
 ```js
@@ -197,6 +211,16 @@ console.log(txt.split(""));          // 用逗号分隔
 
 #### string2Number
 there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
+
+```js
+let a = parseInt('90')
+typeof(a) // number
+
+// 浮点数据则是使用parseFloat
+// 与之类似的还有Number
+
+typeof(Number('90')) // number
+```
 
 
 
