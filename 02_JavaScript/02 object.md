@@ -137,6 +137,16 @@ start表示开始位置索引 end是结束位置下一数组元素索引编号
 x. splice(start, deleteCount, value, ...) 
 splice的主要用途是对数组指定位置进行删除和插入 start表示开始位置索引 deleteCount删除数组元素的个数 value表示在删除位置插入的数组元素 value参数可以省略  
 
+```js
+a = ['a','b','c']
+(3) ['a', 'b', 'c']
+a.splice(1,0,'d')
+[]
+a 
+(4) ['a', 'd', 'b', 'c']
+// 第三个元素是要添加的元素
+```
+
 ##### push/pop
 数组的push和pop： 
 push pop这两个方法模拟的是一个栈操作 x.push(value, ...)  压栈 x.pop()弹栈       
@@ -344,6 +354,3 @@ f(1,2,3,4,5)
         console.log(arg); 
     })('123') 
 ```
-BOM
-
-DOM
