@@ -37,7 +37,7 @@ open('','','width=200,resizable=no,height=100'); // 新打开一个宽为200 高
 //close();
 ```
 
-#### settimeOut
+#### setTimeout
 ```html
 <!DOCTYPE html>
 <html lang='en'>
