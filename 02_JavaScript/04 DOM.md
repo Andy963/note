@@ -38,6 +38,7 @@ nextElementtSibling     // 下一个兄弟标签元素
 previousElementSibling  // 上一个兄弟标签元素 
 ```
 注意，js中没有办法找到所有的兄弟标签！ 一种方法是：先找到父节点，从父节点找它的子节点，然后去掉自己即可
+
 ### Node
 #### create
 ```js
@@ -105,8 +106,8 @@ onkeyup        某个键盘按键被松开。
 onload         一张页面或一幅图像完成加载。 
 onmousedown    鼠标按钮被按下。 
 onmousemove    鼠标被移动。 
-onmouseout     鼠标从某元素移开。 
-onmouseover    鼠标移到某元素之上。 
+onmouseout     鼠标从某元素移开。 // jq中使用 mouseout 与mouseover对应
+onmouseover    鼠标移到某元素之上。 // jq中使用mouseover
 onmouseleave   鼠标从元素离开 
 onselect       文本被选中。 
 onsubmit       确认按钮被点击。 
@@ -141,7 +142,7 @@ ele.onclick = function() {
 ```js
 // 通过input 监听input框的输入事件
 phone_input.on("input", function () {  
-    phone = phone_input.value;  
+    phone = phone_input.val();  
     phone_input.removeClass("input-error");  
 });
 ```
@@ -269,7 +270,7 @@ ele.onkeydown = function(e) {
 stopPropagation: 阻止冒泡, 阻止传播到父节点. 
 event.cancelBubble: 传播到此就停了 
 event.stopImmediatePropagation: 阻止在我之后的事件 
-```
+```js
 <div id="abc_1" style="border:1px solid red;width:300px;height:300px;"> 
         <div id="abc_2" style="border:1px solid red;width:200px;height:200px;"> 
 
