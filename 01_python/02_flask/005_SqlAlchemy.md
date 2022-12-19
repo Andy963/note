@@ -39,6 +39,8 @@ cur.close()
 conn.close()
 ```
 
+在win 下如果对应的app.py 没有叫“app.py" 直接执行 `flask shell` 是没有效果的，此时需要指定 ”app.py" 可通过：`set FLASK_APP=main.py`  Linux下是 `export`
+
 ## ORM：
 1. ORM：Object Relationship Mapping
 2. 大白话：对象模型与数据库表的映射
