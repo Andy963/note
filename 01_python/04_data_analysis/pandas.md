@@ -201,8 +201,21 @@ df[['name','age']]
 a	andy	20
 b	zhou	30
 ```
-##### 取列
+
+##### 取行
 loc,iloc
+df.loc['a'] 这里面是取索引为 'a'的行，取的一是一行数据，而不是列:
+
+|  | 0 |
+| :--- | :--- |
+| name | 郭瑞华 |
+| 是否 | 否 |
+| s\_14 | 2023-12-28 |
+| s\_7 | 2024-01-04 |
+| s\_1 | 2024-01-10 |
+
+而对于iloc，df.iloc[0] 与上面的效果相同，因为i是取数字索引，而这里的数字索引0与上面的loc相同,那么为什么会有两个呢？ 因为数据的索引不一定是数值类型，也可能是其它非数值类型，而iloc只能使用整型。
+
 ```python
 df.loc['a']  # 显式索引
 name    andy
@@ -213,6 +226,7 @@ name    andy
 age       20
 Name: a, dtype: object
 ```
+
 同样的道理，取多行，要用一个列表表示 
 ```python
 df.loc[['a','b']]
@@ -278,3 +292,33 @@ for i in range(len(dybl)):
   
 dy.to_excel('./东院1026.xlsx')
 ```
+
+
+### 修改dataframe
+
+df.loc, df.iloc都可以修改
+
+```python
+data = pd.read_excel('rs.xlsx')  
+data.loc[0, 'name'] = '周'
+data.iloc[0, 0] = '王'
+
+# 上面两种效果相同，但为什么用法不一样呢，具体就是要理解 loc与iloc的区别，iloc中只能是数值索引，所以不能用data.iloc[0, 'name'], 而 loc[0, 'name'] 修改的是第0行，name这一列的值，同样的道理，iloc[0,0] 因为只能用数值索引，所以第一个0表示 0 行，而'name'对应的列索引也是0，所以是[0,0]
+```
+
+同样通过条件去修改元素
+
+```python
+data.loc[data.name=='陈剑','name'] = '王'
+# name是它的列名，可以通过data.name=='陈剑'定位到具体的行，第二个name则表明修改它的name属性为王
+
+data.iloc[data.name=='陈剑',0] = '周' 
+# 因为是iloc,所以第二个不能用'name'，而是用它对应的索引数字0
+```
+
+
+
+
+
+
+
