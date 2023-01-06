@@ -211,3 +211,44 @@ Ref:
 [Flask Context](https://viniciuschiele.github.io/flask-apscheduler/rst/usage.html)
 [Querying model in Flask-APScheduler job raises app context RuntimeError](https://stackoverflow.com/questions/40117324/querying-model-in-flask-apscheduler-job-raises-app-context-runtimeerror)]
 [Flask-APScheduler定时任务查询操作数据库（多文件/模块](https://www.cnblogs.com/cangqinglang/p/13700082.html)
+
+
+### 多实例重复执行
+当flask中使用了多进程或者集群存在多实例时，此时会导致现一任务重复执行的情况。对于因为 `debug=True`  导致执行两次的暂不讨论
+
+这里要说的是使用全局锁的方式：
+
+```python
+def register_scheduler():  
+    """  
+    注册定时任务,使用全局锁，防止重复执行    """    
+    f = open("scheduler.lock", "wb")  
+    # noinspection PyBroadException  
+    try:  
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)  
+        #   fcntl.LOCK_EX  排他锁
+        #   fcntl.LOCK_NB  非阻塞锁, 函数不能获得文件锁就立即返回
+        scheduler.start()  
+    except:  
+        pass  
+  
+    def unlock():  
+        fcntl.flock(f, fcntl.LOCK_UN)   # fcntl.LOCK_UN 解锁 
+        f.close()  
+  
+    atexit.register(unlock)
+```
+
+[[17_flask_APScheduler#Interval]] 在将其中的scheduler.start() 修改为执行上面的函数
+
+通过上面的函数，会在开始时创建scheduler.lock文件，并且加上排他锁，非阻塞锁，并启动scheduler,当第二个进程来启动时，发现有锁，而又因为有非阻塞锁，会立马返回不会启动scheduler,从而达到全局只启动一个scheduler的目的。代码上线，有待检验，因windows无fnctl 无法进行本地验证。
+
+Ref:
+ - [Multiple instances of shceduler problem · Issue #51 · viniciuschiele/flask-apscheduler · GitHub](https://github.com/viniciuschiele/flask-apscheduler/issues/51?utm_source=ld246.com)
+-  [Gunicorn 部署 Flask-Apscheduler 重复执行问题 - 醒日是归时 - 博客园 (cnblogs.com)](https://www.cnblogs.com/cherylgi/p/16911787.html)
+- [关于fcntl锁的说明参考这里](https://blog.51cto.com/zhou123/1650185)
+- [fcntl在windows上不支持python - ModuleNotFoundError: No module named 'fcntl' - Stack Overflow](https://stackoverflow.com/questions/62788628/modulenotfounderror-no-module-named-fcntl)
+- [atexit 退出处理器使用说明]( https://www.bookstack.cn/read/python-3.10.0-zh/e34a1a39f116875d.md)
+
+
+ 
