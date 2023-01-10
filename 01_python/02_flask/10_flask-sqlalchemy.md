@@ -41,3 +41,22 @@ class CustomJSONEncoder(JSONEncoder):
 
 app.json_encoder = CustomJSONEncoder
 ```
+
+
+### postgresql Enum update/add value
+
+Enum 类型直接在model中添加了新的状态，然后再migrate是没有效果的。
+
+```sql
+CREATE TYPE "public"."visitstatus" AS ENUM ('pending_review', 'pending_visit', 'visiting','has_revisited','unnecessary_visit','visit_failed');
+
+ALTER TYPE "public"."visitstatus" ADD VALUE 'visit_failed'
+
+DROP TYPE "public"."visitstatus"
+```
+
+
+
+Ref:
+[6. 枚举类型-postgresql教程 (cntofu.com)](https://www.cntofu.com/book/194/chapters/6.md)
+[PostgreSQL删除或修改枚举 - 简书 (jianshu.com)](https://www.jianshu.com/p/de4f16953020)
