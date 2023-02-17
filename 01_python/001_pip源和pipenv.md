@@ -218,3 +218,20 @@ $ git@github.com:RobertDeRose/virtualenv-autodetect.git ~/.oh-my-zsh/custom/plug
 
 #### 找到启动plugins的行添加启用插件
 plugins=(... virtualenv-autodetect)
+
+
+### pip3 
+
+```sh
+sudo apt install python3-pip
+
+sudo pip3 install virtualenvwrapper
+
+mkdir -p /opt/Envs
+
+# 设置virtualenvwrapper
+export WORKON_HOME=~/opt/Envs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+# 打开终端自动启用
+source /usr/local/bin/virtualenvwrapper.sh
+```

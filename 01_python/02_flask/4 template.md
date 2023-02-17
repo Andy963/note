@@ -28,13 +28,15 @@
 1. `safe`过滤器：可以关闭一个字符串的自动转义。
 2. `escape`过滤器：对某一个字符串进行转义。
 3. `autoescape`标签，可以对他里面的代码块关闭或开启自动转义。
-    ```jinja
+    ```jinja2
     {% autoescape off/on %}
         ...代码块
     {% endautoescape %}
     ```
     
-```jinjia2
+
+```Jinja2
+
 abs(value)：返回一个数值的绝对值。示例：-1|abs
 default(value,default_value,boolean=false)：如果当前变量没有值，则会使用参数中的值来代替。示例：name|default('xiaotuo')——如果name不存在，则会使用xiaotuo来替代。boolean=False默认是在只有这个变量为undefined的时候才会使用default中的值，如果想使用python的形式判断是否为false，则可以传递boolean=true。也可以使用or来替换。
 escape(value)或e：转义字符，会将<、>等符号转义成HTML中的符号。示例：content|escape或content|e。
@@ -59,6 +61,7 @@ trim：截取字符串前面和后面的空白字符。
 string(value)：将变量转换成字符串。
 wordcount(s)：计算一个长字符串中单词的个数。
 ```
+
 ### 自定义模版过滤器：
 过滤器本质上就是一个函数。如果在模版中调用这个过滤器，那么就会将这个变量的值作为第一个参数传给过滤器这个函数，然后函数的返回值会作为这个过滤器的返回值。需要使用到一个装饰器：`@app.template_filter('cut')`
 ```python
@@ -73,7 +76,8 @@ def cut(value):
 
 #### 时间处理(距离现在多长时间）
 
-```py
+```python
+
 @app.template_filter('handle_time')
 def handle_time(time):
     """
@@ -110,7 +114,8 @@ def handle_time(time):
 ## for
 在`jinja2`中的`for`循环，跟`python`中的`for`循环基本上是一模一样的。也是`for...in...`的形式。并且也可以遍历所有的序列以及迭代器。但是唯一不同的是，`jinja2`中的`for`循环没有`break`和`continue`语句。
 
-```jinjia2
+```Jinja2
+
 <table border="1">
     <tbody>
         {% for x in range(1,10) %}
@@ -146,7 +151,8 @@ def handle_time(time):
 3. 宏文件路径，不要以相对路径去寻找，都要以`templates`作为绝对路径去找。
 4. 如果想要在导入宏的时候，就把当前模版的一些参数传给宏所在的模版，那么就应该在导入的时候使用`with context`。示例：`from 'xxx.html' import input with context`。这样就能将当前模板中的变量经过宏渲染后再传回来，类似于django中的inclusion_tag
 
-```
+```jinja2
+
 {% from "macros.html" import input as input_field %}
 {% import "macros/macros.html" as macros with context %}
 
@@ -295,7 +301,7 @@ index.html
 {% endblock %}
 ```
 macro.html
-```jinjia2
+```jinja2
 {# itemGroup的宏 #}
 {% macro itemGroup(thumbnail,title,rating) %}
     <div class="item-group">
@@ -355,7 +361,8 @@ flash 即flask中的闪现
 使用：
 在视图函数中调用 flash(message, category)
 在模板中使用get_flashed_messages()
-```jinjia2
+```jinja2
+
 {% set message = get_flash_message() %} # 此时message变量的范围是当前block,如果又定义了另一个block，则无法使用
 
 {% with message = get_flash_message() %}

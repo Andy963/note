@@ -8,6 +8,7 @@ add_url_rule(rule,endpoint=None,view_func=None)
 ### app.route装饰器：
 app.route(rule,**options)
 这个装饰器底层，其实也是使用`add_url_rule`来实现url与视图函数映射的。
+
 ```python
 @app.route('/hello/')
 def hello():
@@ -33,6 +34,7 @@ def hello():
     return response
     # return '<html></html>',301,header 与上面构建的response对象效果相同。
 ```
+
 **代码原则××
 ```python
 if '-' in q and  len(short_q)==10 and short_q.isdigit():
@@ -40,6 +42,7 @@ if '-' in q and  len(short_q)==10 and short_q.isdigit():
 优先将可能为假的放在前面，这样后面的就可能不会运算
 优先将比较耗时的判断放在后面，同样耗时的操作也可能不会执行
 ```
+
 ### 标准类视图：
 1. 标准类视图，必须继承自`flask.views.View`.
 2. 必须实现`dipatch_request`方法，以后请求过来后，都会执行这个方法。这个方法的返回值就相当于是之前的函数视图一样。也必须返回`Response`或者子类的对象，或者是字符串，或者是元组。
@@ -65,7 +68,7 @@ class ListView(JSONView):
 1. 基于方法的类视图，是根据请求的`method`来执行不同的方法的。如果用户是发送的`get`请求，那么将会执行这个类的`get`方法。如果用户发送的是`post`请求，那么将会执行这个类的`post`方法。其他的method类似，比如`delete`、`put`。
 2. 这种方式，可以让代码更加简洁。所有和`get`请求相关的代码都放在`get`方法中，所有和`post`请求相关的代码都放在`post`方法中。就不需要跟之前的函数一样，通过`request.method == 'GET'`。
 
-```py
+```python
 class LoginView(views.MethodView):
     def __render(self,error=None):
         return render_template('login.html',error=error)
@@ -86,7 +89,8 @@ class LoginView(views.MethodView):
 1. 如果使用的是函数视图，那么自己定义的装饰器必须放在`app.route`下面。否则这个装饰器就起不到任何作用。
 2. 类视图的装饰器，需要重写类视图的一个类属性`decorators`，这个类属性是一个列表或者元组都可以，里面装的就是所有的装饰器。
 
-```py
+```python
+
 from flask import Flask,request,views
 from functools import wraps
 
@@ -127,7 +131,8 @@ if __name__ == '__main__':
 1. 蓝图的作用就是让我们的Flask项目更加模块化，结构更加清晰。可以将相同模块的视图函数放在同一个蓝图下，同一个文件中，方便管理。
 2. 基本语法：
     * 在蓝图文件中导入Blueprint：
-        ```python
+
+```python
         from flask import Blueprint
         user_bp = Blueprint('user',__name__)
         ```。
@@ -136,9 +141,11 @@ if __name__ == '__main__':
         from blueprints.user import user_bp
         app.regist_blueprint(user_bp)
         ```
+ 
  user.py
  
-```py
+```python
+
 from flask import Blueprint
 
 user_bp = Blueprint('user',__name__,url_prefix='/user')
@@ -152,7 +159,9 @@ def profile():
 def settings():
     return '个人设置页面'
 ```
+
 manage.py
+
 ```python
 from blueprints.user import user_bp
 app.regist_blueprint(user_bp)
@@ -268,6 +277,7 @@ def not_found(e):
     # 这里写自定义的处理
     return render_template('404.html'), 404
 ```
+
 ### 生成token
 使用内置的方法，并放入用户的id
 ```python

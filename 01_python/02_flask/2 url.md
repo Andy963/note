@@ -48,7 +48,8 @@ def home(name,gender):
 ## url_for
 
 ### `url_for`的基本使用：
-`url_for`第一个参数，应该是视图函数的名字的字符串。后面的参数就是传递给`url`。如果传递的参数之前在`url`中已经定义了，比如Page,那么这个参数就会被当成`path`的形式给`url`。如果这个参数之前没有在`url`中定义，那么将变成查询字符串的形式放到`url`中,即`？count=2`的形式。
+`url_for`第一个参数，应该是视图函数的名字的字符串。后面的参数就是传递给`url`。如果传递的参数之前在`url`中已经定义了，比如Page,那么这个参数就会被当成`path`的形式给`url`。如果
+这个参数之前没有在`url`中定义，那么将变成查询字符串的形式放到`url`中,即`？count=2`的形式。
 ```python
 @app.route('/post/list/<page>/')
 def my_list(page):
@@ -100,7 +101,8 @@ if __name__ == '__main__':
 ### `to_python`的作用：
 这个方法的返回值，将会传递到view函数中作为参数。
 比如：如果传的url中是/post/a+b/,我希望到视图函数中时已经转成a,b两个参数，就可以在to_python中做split，如下
-```py
+
+```python
 from flask import Flask,url_for
 from werkzeug.routing import BaseConverter
 
@@ -117,6 +119,7 @@ def posts(boards):
     print(boards)
     return "您提交的板块是：%s" % boards
 ```
+
 ### `to_url`的作用：
 这个方法的返回值，将会在调用url_for函数的时候生成符合要求的URL形式。
 比如：我在传入参数时是['a','b'],我希望在url中是/post/a+b/的形式，那么在to_url中对它进行拼接，上面代码中value即传进来的列表['a','b'],然后通过join来处理。
@@ -128,7 +131,8 @@ def posts(boards):
 
 * 暂时性重定向：`http`的状态码是`302`，表示页面的暂时性跳转。比如访问一个需要权限的网址，如果当前用户没有登录，应该重定向到登录页面，这种情况下，应该用暂时性重定向。
 
-```py
+```python
+
 from flask import Flask,request,redirect,url_for
 
 app = Flask(__name__)
@@ -155,7 +159,7 @@ def profile():
     * `POST`请求：把参数放到`Form Data`中。会把参数放到`Form Data`中，避免了被偷瞄的风险，但是如果别人想要偷看你的密码，那么其实可以通过抓包的形式。因为POST请求可以提交一些数据给服务器，比如可以发送文件，那么这就增加了很大的风险。所以POST请求，对于那些有经验的黑客来讲，其实是更不安全的。
 
 4. 在`Flask`中，`route`方法，默认将只能使用`GET`的方式请求这个url，如果想要设置自己的请求方式，那么应该传递一个`methods`参数。
-5. 
+
 ## 其它
 ### 在局域网中让其他电脑访问我的网站：
 如果想在同一个局域网下的其他电脑访问自己电脑上的Flask网站，
@@ -183,7 +187,8 @@ Flask项目，默认使用`5000`端口。如果想更换端口，那么可以设
 3. 指定`app.response_class`为你自定义的`Response`对象。
 4. 如果视图函数返回的数据，不是字符串，也不是元组，也不是Response对象，那么就会将返回值传给`force_type`，然后再将`force_type`的返回值返回给前端。
 
-```py
+```python
+
 from flask import Flask,Response,jsonify,render_template
 # flask = werkzeug+sqlalchemy+jinja2
 import json
