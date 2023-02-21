@@ -3,7 +3,8 @@
 
 ### 单例模式
 第一种
-```py
+
+```python
 class Singleton:
     __instance = None
     __is_first_init = False
@@ -17,8 +18,11 @@ class Singleton:
         if not self.__is_first_init:
             Singleton.__is_first_init = True
 ```
+
 第二种
-```py
+
+```python
+
 class Singleton(type):
     def __init__(cls,what,bases=None,dict=None):
         super().__init__(what,bases,dict)
@@ -36,7 +40,9 @@ class NewClass(metaclass=Singleton):
 ```
 
 第三种
-```py
+
+```python
+
 def singletonDecorator(cls,*args, **kwargs):
     instance = {}
     
