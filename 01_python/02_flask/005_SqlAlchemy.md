@@ -1,10 +1,13 @@
-## 连接数据库
+## SQLAlchemy
+
+### 连接数据库
 `pip install flask-sqlalchemy`
 
 ### 使用SQLAlchemy去连接数据库：
 这里连接数据库与flask没有任何关系
 
 使用SQLALchemy去连接数据库，需要使用一些配置信息，然后将他们组合成满足条件的字符串：
+
 ```python
 HOSTNAME = '127.0.0.1'
 PORT = '3306'
@@ -15,7 +18,9 @@ PASSWORD = 'root'
 # dialect+driver://username:password@host:port/database
 DB_URI = "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8".format(username=USERNAME,password=PASSWORD,host=HOSTNAME,port=PORT,db=DATABASE)
 ```
+
 然后使用`create_engine`创建一个引擎`engine`，然后再调用这个引擎的`connect`方法，就可以得到这个对象，然后就可以通过这个对象对数据库进行操作了：
+
 ```python
 engine = create_engine(DB_URI)
 #创建engine时可以指定echo=True查看语句：create_engine(DB_URI,echo=True)
@@ -28,7 +33,8 @@ print(result.fetchone())
 (1,)
 ```
 
-```py
+```python
+
 conn = pymysql.connect(HOSTNAME, USERNAME, PASSWORD, DATABASE)
 cur = conn.cursor()
 lock.acquire()
@@ -41,22 +47,26 @@ conn.close()
 
 在win 下如果对应的app.py 没有叫“app.py" 直接执行 `flask shell` 是没有效果的，此时需要指定 ”app.py" 可通过：`set FLASK_APP=main.py`  Linux下是 `export`
 
-## ORM：
+### ORM：
 1. ORM：Object Relationship Mapping
 2. 大白话：对象模型与数据库表的映射
 
-### 将ORM模型映射到数据库中：
+#### 将ORM模型映射到数据库中：
 1. 用`declarative_base`根据`engine`创建一个ORM基类。
+
     ```python
     from sqlalchemy.ext.declarative import declarative_base
     engine = create_engine(DB_URI)
     Base = declarative_base(engine)
     ```
+
 2. 用这个`Base`类作为基类来写自己的ORM类。要定义`__tablename__`类属性，来指定这个模型映射到数据库中的表名。
+
     ```python
     class Person(Base):
         __tablename__ = 'person'
     ```
+
 3. 创建属性来映射到表中的字段，所有需要映射到表中的属性都应该为Column类型：
 
     ```python
@@ -68,11 +78,13 @@ conn.close()
         name = Column(String(50))
         age = Column(Integer)
     ```
+	
 4. 使用`Base.metadata.create_all()`来将模型映射到数据库中。
 5. 一旦使用`Base.metadata.create_all()`将模型映射到数据库中后，即使改变了模型的字段，也不会重新映射了。
 
 ### 用session做数据的增删改查操作：
 1. 构建session对象：所有和数据库的ORM操作都必须通过一个叫做`session`的会话对象来实现，通过以下代码来获取会话对象：
+
     ```python
     from sqlalchemy.orm import sessionmaker
 
@@ -124,6 +136,7 @@ conn.close()
     session.delete(person)
     session.commit()
     ```
+	
 ### SQLAlchemy常用数据类型：
 1. Integer：整形，映射到数据库中是int类型。
 2. Float：浮点类型，映射到数据库中是float类型。他占据的32位。
@@ -132,13 +145,16 @@ conn.close()
 5. Boolean：布尔类型，映射到数据库中的是tinyint类型。
 6. DECIMAL：定点类型。是专门为了解决浮点类型精度丢失的问题的。在存储钱相关的字段的时候建议大家都使用这个数据类型。并且这个类型使用的时候需要传递两个参数，第一个参数是用来标记这个字段总能能存储多少个数字，第二个参数表示小数点后有多少位。
 7. Enum：枚举类型。指定某个字段只能是枚举中指定的几个值，不能为其他值。在ORM模型中，使用Enum来作为枚举，示例代码如下：
+
     ```python
     class Article(Base):
         __tablename__ = 'article'
         id = Column(Integer,primary_key=True,autoincrement=True)
         tag = Column(Enum("python",'flask','django'))
     ```
+    
     在Python3中，已经内置了enum这个枚举的模块，我们也可以使用这个模块去定义相关的字段。示例代码如下：
+    
     ```python
     import enum
     class TagEnum(enum.Enum):
@@ -184,6 +200,7 @@ conn.close()
 12. LONGTEXT：长文本类型，映射到数据库中是longtext类型。
 
 
+
 ### Column常用参数：
 1. primary_key：设置某个字段为主键。
 2. autoincrement：设置这个字段为自动增长的。
@@ -192,10 +209,31 @@ conn.close()
 5. unique：指定某个字段的值是否唯一。默认是False。
 6. onupdate：在数据更新的时候会调用这个参数指定的值或者函数。在第一次插入这条数据的时候，不会用onupdate的值，只会使用default的值。常用的就是`update_time`（每次更新数据的时候都要更新的值）。
 7. name：指定ORM模型中某个属性映射到表中的字段名。如果不指定，那么会使用这个属性的名字来作为字段名。如果指定了，就会使用指定的这个值作为参数。这个参数也可以当作位置参数，在第1个参数来指定。
+
     ```python
     title = Column(String(50),name='title',nullable=False)
     title = Column('my_title',String(50),nullable=False)
     ```
+
+8. Index 创建索引
+
+单独某个列创建索引直接在column中指定 `index=True` 即可，下面是创建联合索引
+
+```python
+
+from sqlalchemy import Column, Integer, String, Index
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    email = Column(String(120))
+    
+# 创建一个联合索引
+Index('idx_name_email', User.name, User.email)
+
+```
+
 ### query可用参数：
 1. 模型对象。指定查找这个模型中所有的对象。
 2. 模型中的属性。可以指定只查找某个模型的其中几个属性。
@@ -216,11 +254,15 @@ print(res)
     * func.sum：求和。
     `func`上，其实没有任何聚合函数。但是因为他底层做了一些魔术，只要mysql中有的聚合函数，都可以通过func调用。
 
+
+
 ### filter过滤条件：
 过滤是数据提取的一个很重要的功能，以下对一些常用的过滤条件进行解释，并且这些过滤条件都是只能通过filter方法实现的：
 
 *注意*filter_by,filter之后还要接上first,all等限定，否则返回的数据会有问题
-```py
+
+```python
+
 res = session.query(Article).filter(Article.id==5).all() 支持>,<
 res = session.query(Article).filter_by(id=5).all() 不支持>,<
 print(res)
@@ -629,3 +671,107 @@ ref:[sqlalchemy中使用json](https://learnku.com/python/t/36061)
 
 
 todo 测试get_or_404
+
+
+## Flask-SQLAlchemy
+
+### 安装：
+```shell
+pip install flask-sqlalchemy
+```
+
+### 数据库连接：
+1. 跟sqlalchemy一样，定义好数据库连接字符串DB_URI。
+2. 将这个定义好的数据库连接字符串DB_URI，通过`SQLALCHEMY_DATABASE_URI`这个键放到`app.config`中。示例代码：`app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI`.
+3. 使用`flask_sqlalchemy.SQLAlchemy`这个类定义一个对象，并将`app`传入进去。示例代码：`db = SQLAlchemy(app)`。
+
+### 创建ORM模型：
+1. 还是跟使用sqlalchemy一样，定义模型。现在不再是需要使用`delarative_base`来创建一个基类。而是使用`db.Model`来作为基类。
+2. 在模型类中，`Column`、`String`、`Integer`以及`relationship`等，都不需要导入了，直接使用`db`下面相应的属性名就可以了。
+3. 在定义模型的时候，可以不写`__tablename__`，那么`flask_sqlalchemy`会默认使用当前的模型的名字转换成小写来作为表的名字，并且如果这个模型的名字使用了多个单词并且使用了驼峰命名法，那么会在多个单词之间使用下划线来进行连接。**虽然flask_sqlalchemy给我们提供了这个特性，但是不推荐使用。因为明言胜于暗喻**
+
+### 将ORM模型映射到数据库：
+1. db.drop_all()
+2. db.create_all()
+
+### 使用session：
+以后session也不需要使用`sessionmaker`来创建了。直接使用`db.session`就可以了。操作这个session的时候就跟之前的`sqlalchemy`的`session`是iyimoyiyang的。
+
+### 查询数据：
+如果查找数据只是查找一个模型上的数据，那么可以通过`模型.query`的方式进行查找。`query`就跟之前的sqlalchemy中的query方法是一样用的。示例代码如下：
+```python
+users = User.query.order_by(User.id.desc()).all()
+print(users)
+```
+
+### 对choice序列化
+```python
+from flask.json import JSONEncoder
+from sqlalchemy_utils import Choice
+
+class CustomJSONEncoder(JSONEncoder):
+     def default(self, obj):
+        if isinstance(obj, Choice):
+            return obj.code
+
+        return JSONEncoder.default(self, obj)  # aka super()
+
+app.json_encoder = CustomJSONEncoder
+```
+
+
+### postgresql Enum update/add value
+
+Enum 类型直接在model中添加了新的状态，然后再migrate是没有效果的。
+
+```sql
+CREATE TYPE "public"."visitstatus" AS ENUM ('pending_review', 'pending_visit', 'visiting','has_revisited','unnecessary_visit','visit_failed');
+
+ALTER TYPE "public"."visitstatus" ADD VALUE 'visit_failed'
+
+DROP TYPE "public"."visitstatus"
+```
+
+
+
+Ref:
+[6. 枚举类型-postgresql教程 (cntofu.com)](https://www.cntofu.com/book/194/chapters/6.md)
+[PostgreSQL删除或修改枚举 - 简书 (jianshu.com)](https://www.jianshu.com/p/de4f16953020)
+
+
+### view model
+
+```python from gpt
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(50))
+    email = db.Column(db.String(120), unique=True)
+
+class UserView(db.Model):
+    __tablename__ = 'users_view'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key=True)
+    username = db.Column(db.String(50))
+    email = db.Column(db.String(120))
+
+    user = db.relationship(User, uselist=False, backref=db.backref('view', uselist=False))
+
+    @hybrid_property
+    def full_name(self):
+        return self.username + ' (' + self.email + ')'
+
+```

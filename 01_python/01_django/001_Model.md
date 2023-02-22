@@ -1,22 +1,70 @@
-# Django 知识点
+
+- Fields
+	- fields types
+	- field options
+	- relationship
+- Meta
+- Model attribute
+- Model method
+- Model instance
+	- proxy model
 
 
-## django中的13种操作
->all
->filter
->values
->values_list
->get
->exist
->distinct
->first
->count
->order_by
->reverse
->exclude
->last
->only 只取某些字段，但如果取其它字段会再次查询数据库
->defer 排除某些字段
+### proxy model
+
+```python
+from django.db import models
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    published_date = models.DateField()
+    is_published = models.BooleanField(default=False)
+
+class PublishedBook(Book):
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        self.is_published = True
+        super().save(*args, **kwargs)
+
+# 定制管理功能
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+
+class ProductActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+class ProductActive(Product):
+    class Meta:
+        proxy = True
+    objects = ProductActiveManager()
+
+# active_products = ProductActive.objects.all()
+```
+
+flask 中有view model [[10_flask-sqlalchemy#view model]]
+
+### Model
+
+table_name 通过meta 设置，而flask 则是通过 __tablename__指定 [[005_SqlAlchemy#将ORM模型映射到数据库中：]]
+
+```python
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=50)
+    age = models.IntegerField()
+
+    class Meta:
+        db_table = 'my_table'
+
+```
+
+
 
 ## 保存搜索条件
 
