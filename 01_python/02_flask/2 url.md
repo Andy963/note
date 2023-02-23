@@ -1,6 +1,6 @@
 ## URL与视图函数的映射：
 当同一视图函数添加多个路由装饰器
-```py
+```python
 @app.route('/')
 @app.route('/index')
 def home():
@@ -8,7 +8,7 @@ def home():
 ```
 即多个路由对应同一函数
 基于上面这一点可以将路由中使用默认参数
-```py
+```python
 @app.route('/user/<name>',defaults={'gender':None})
 @app.route('/user/<name>/<gender>')
 def home(name,gender):

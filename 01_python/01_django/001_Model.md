@@ -61,112 +61,147 @@ class MyModel(models.Model):
 
     class Meta:
         db_table = 'my_table'
-
 ```
 
+### OneToOne
 
-
-## 保存搜索条件
-
-默认情况下request中的参数是不能修改的，我们先拷贝一份，再修改
 ```python
 
-def gen_url(request,id):
-    params = request.GET.copy()
-    params._matable=True
-    params['id] = id
-    return params.urlencode()
+from django.contrib.auth.models import User
+from django.db import models
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+
 ```
 
-## CBV加装饰器的三种方式
-
->  对类使用method_decorator(装饰器名, name='方法名')
->  对dispathc使用 method_decorator(装饰器名）
->  对类中的某个方法使用 method_decorator(装饰器名）
-
-
-```python
-from django.shortcuts import render,redirect,HttpResponse
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views import View
-
-def wrapper(fn):
-    def inner(request,*args,**kwargs):
-        ret = fn(request)
-        print('xsssss')
-        return ret
-    return inner
-
-# @method_decorator(wrapper,name='get')#CBV版装饰器方式一
-class BookList(View):
-    @method_decorator(wrapper) #CBV版装饰器方式二
-    def dispatch(self, request, *args, **kwargs):
-        print('请求内容处理开始')
-        res = super().dispatch(request, *args, **kwargs)
-        print('处理结束')
-        return res
-    def get(self,request):
-        print('get内容')
-        # all_books = models.Book.objects.all()
-        return render(request,'login.html')
-    @method_decorator(wrapper) #CBV版装饰器方式三
-    def post(self,request):
-        print('post内容')
-        return redirect(reverse('book_list'))
-# @wrapper
-def book_list(request):
-    return HttpResponse('aaa')
-```
-ref： https://www.cnblogs.com/clschao/articles/10409764.html
-
-## ManyToMany
-
-### 添加
 #### add
-正向add
+
+```python
+user = User.objects.create(username='johndoe')
+user_profile = UserProfile.objects.create(user=user, bio='I am John Doe', location='New York')
+
+```
+
+
+#### del
+
+```python
+user_profile = UserProfile.objects.get(user__username='johndoe')
+user_profile.delete()
+
+```
+
+#### query
+
+```python
+user_profile = UserProfile.objects.get(user__username='johndoe')
+print(user_profile.bio)
+
+```
+
+#### update
+
+```python
+user_profile = UserProfile.objects.get(user__username='johndoe')
+user_profile.bio = 'New bio'
+user_profile.save()
+
+```
+
+### ForeignKey
+
+#### add 
+
+```python
+from myapp.models import Book, Author
+
+author = Author.objects.create(name='Tom')
+book = Book.objects.create(name='Django', author=author)
+
+# 添加新的Author实例，并将其关联到book上
+new_author = Author.objects.create(name='Lucy')
+book.author = new_author
+book.save()
+```
+
+#### del
+
+```python
+book.delete()
+
+book = Book.objects.get(id=1)
+author.book_set.remove(book)
+
+# 删除所有
+author.book_set.clear()
+
+```
+
+
+#### query
+
+```python
+# 查询关联的Author实例
+author = book.author
+
+# 查询关联到某个Author实例的所有Book实例
+books = author.book_set.all()
+
+```
+
+#### update
+
+```python
+new_author = Author.objects.create(name='Jerry')
+book.author = new_author
+book.save()
+
+```
+
+### ManyToMany
+
+ 添加
+#### add
+
 ```python
 # 假设；book, tag外键
 # tag为Tag对象
 book1.tags.add(tag1)
 book1.tags.add([tag1,tag2])
-```
-反向add
-```python
+
 tag3 = Tag(name='python')
 tag3.book_set.add(tag3)
 ```
+
 #### create
 ```python
 book1.tag.create(name='go')
-```
-反向create
-```python
 tag3.book_set.create(name='python')
+
 ```
+
+
 #### set
 ```python
 book2.tag.set([tag1])
-```
 
-### 查询
-#### 正向
-```python
 book1.tag.all()
 Book.objects.filter(tag=1)
-```
-#### 反向
-```python
+
 tag1.book_set.all()
 Tag.objects.filter(book__name='python')
 ```
 
-### 删除
+
 #### delete
 ```python
 book1.tag.all()
 tag1.delete()
 ```
+
 #### remove
 ```python
 book1.tag.remove(tag1)
@@ -177,83 +212,7 @@ clear解除关联关系
 ```python
 tag1.book_set.clear()
 ```
-## 自定义标签过,滤器
 
-#### 在app中新建一个templatetags包
-
-
-#### 创建文件
-> 在settings中注册当前app
-> 如：cus_tags.py 那么在页面中引用 为`{% load cus_tags %}`
-
-#### 编写标签，过滤器
-```python
-from django import template
-from django.utils.safestring import mark_safe
-
-register = template.Library()   #register的名字是固定的,不可改变
-
-
-@register.filter
-def filter_multi(v1,v2):
-    return  v1 * v2
-
-@register.simple_tag  #和自定义filter类似，只不过接收更灵活的参数，没有个数限制。
-def simple_tag_multi(v1,v2):
-    return  v1 * v2
-
-@register.simple_tag
-def my_input(id,arg):
-    result = "<input type='text' id='%s' class='%s' />" %(id,arg,)
-    return mark_safe(result)
-```
-
-```python
-from django import template
-
-register = template.Library()
-
-
-@register.inclusion_tag('result.html')  #将result.html里面的内容用下面函数的返回值渲染，然后作为一个组件一样，加载到使用这个函数的html文件里面
-def show_results(n): #参数可以传多个进来
-    n = 1 if n < 1 else int(n)
-    data = ["第{}项".format(i) for i in range(1, n+1)]
-    return {"data": data}#这里可以穿多个值，和render的感觉是一样的{'data1':data1,'data2':data2....}
-```
-
-####  页面中使用
-` {% simple_tag_multi 1 2 %}`
-
-
-## 表单批量添加bootstrap样式
-```python
-
-from django import forms
-
-from auc import models as auc_models
-
-
-class BootstrapModelForm(forms.ModelForm):
-    """为form表单批量添加bootstrap样式"""
-    exclude_bootstrap_field = []  # 排除的字段
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            if field in self.exclude_bootstrap_field:
-                continue
-            old_class = self.fields[field].widget.attrs.get('class', '')
-            self.fields[field].widget.attrs["class"] = old_class + ' form-control'
-
-
-class AuctionModelForm(BootstrapModelForm):
-    exclude_bootstrap_field = ['cover', ]
-
-    class Meta:
-        model = auc_models.Vendue
-        fields = ['title', 'cover', 'start_time', 'cash_deposit']
-
-```
 
 ## 表单模板
 
