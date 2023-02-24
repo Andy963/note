@@ -1,24 +1,10 @@
-## route
-app.run(debug=True) 添加 debug=True之后代码作了更改后会自动重新启动。
-
-### add_url_rule
-add_url_rule(rule,endpoint=None,view_func=None)
-这个方法用来添加url与视图函数的映射。如果没有填写`endpoint`，那么默认会使用`view_func`的名字作为`endpoint`。以后在使用`url_for`的时候，就要看在映射的时候有没有传递`endpoint`参数，如果传递了，那么就应该使用`endpoint`指定的字符串，如果没有传递，那么就应该使用`view_func`的名字。
-
-### app.route装饰器：
-app.route(rule,**options)
-这个装饰器底层，其实也是使用`add_url_rule`来实现url与视图函数映射的。
-
-```python
-@app.route('/hello/')
-def hello():
-    return 'Hello world'
-    
-app.add_url_rule('/hello/',view_func=hello)  # 对于类视图只能使用这种方式 
-```
-app.config.from_object('config') 如果使用from_object,必须全部大写，否则是读取不到的。在Flask中debug的默认值为False.
 
 ## view
+
+### 视图函数中可以返回哪些值：
+1. 可以返回字符串：返回的字符串其实底层将这个字符串包装成了一个`Response`对象。
+2. 可以返回元组：元组的形式是(响应体,状态码,头部信息)，也不一定三个都要写，写两个也是可以的。返回的元组，其实在底层也是包装成了一个`Response`对象。
+3. 可以返回`Response`及其子类。
 
 ### response对象
 视图函数中的return默认会带很多其它信息，比如：content-type: text/plain. return 后面跟着：内容 ，状态码，headers
@@ -35,13 +21,56 @@ def hello():
     # return '<html></html>',301,header 与上面构建的response对象效果相同。
 ```
 
-**代码原则××
+
+### 实现一个自定义的`Response`对象：
+1. 继承自`Response`类。
+2. 实现方法`force_type(cls,rv,environ=None)`。
+3. 指定`app.response_class`为你自定义的`Response`对象。
+4. 如果视图函数返回的数据，不是字符串，也不是元组，也不是Response对象，那么就会将返回值传给`force_type`，然后再将`force_type`的返回值返回给前端。
+
 ```python
-if '-' in q and  len(short_q)==10 and short_q.isdigit():
-    pass
-优先将可能为假的放在前面，这样后面的就可能不会运算
-优先将比较耗时的判断放在后面，同样耗时的操作也可能不会执行
+
+from flask import Flask,Response,jsonify,render_template
+# flask = werkzeug+sqlalchemy+jinja2
+import json
+
+app = Flask(__name__)
+
+# 将视图函数中返回的字典，转换成json对象，然后返回
+# restful-api
+class JSONResponse(Response):
+
+    @classmethod
+    def force_type(cls, response, environ=None):
+        """
+        这个方法只有视图函数返回非字符、非元组、非Response对象才会调用
+        response：视图函数的返回值
+        """
+        if isinstance(response,dict):
+            # jsonify除了将字典转换成json对象，还将改对象包装成了一个Response对象
+            response = jsonify(response)
+        return super(JSONResponse, cls).force_type(response,environ)
+
+app.response_class = JSONResponse
+
+@app.route('/list1/')
+def list1():
+    resp = Response('list1')
+    resp.set_cookie('country','china')
+    return resp
+
+@app.route('/list2/')
+def list2():
+    return 'list2',200,{'X-NAME':'zhiliao'}
+
+@app.route('/list3/')
+def list3():
+    return {'username':'zhiliao','age':18}
+
+if __name__ == '__main__':
+    app.run(debug=True,port=5000)
 ```
+
 
 ### 标准类视图：
 1. 标准类视图，必须继承自`flask.views.View`.
@@ -327,18 +356,20 @@ request.json: parsed JSON data. The request must have the application/json conte
         return decorated_view
 ```
 
-### 502
-这个当请求头过长时，nginx buffer过小会导致502且静态文件加载过慢
-```nginx
-proxy_buffer_size 64k
-proxy_buffers 32 32k
-proxy_busy_buffers_size 128k
-```
 
-## 装饰器（中间件）
+### 装饰器（中间件）
 这两个装饰器类型于django中的中间件，
 主要有
 @app.before_request会在每个请求被创建出来的时候，执行它所装饰的函数。
 @app.teardown_request，会在每个请求结束的时候执行
 
 Flask的g对象可以为每个特定请求临时存储任何需要的数据，并且是线程安全的。请求结束的时候，这个对象会被销毁，下一个新的请求到来时，又会为它生成一个新的对象
+
+
+**代码原则××
+```python
+if '-' in q and  len(short_q)==10 and short_q.isdigit():
+    pass
+优先将可能为假的放在前面，这样后面的就可能不会运算
+优先将比较耗时的判断放在后面，同样耗时的操作也可能不会执行
+```

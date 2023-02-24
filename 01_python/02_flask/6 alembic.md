@@ -1,5 +1,6 @@
 ## alembic笔记：
 
+alembic 与sqlalchemy 一样可以独立存在
 使用alembic的步骤：
 1. 定义好自己的模型。
 2. 使用alembic创建一个仓库：`alembic init [仓库的名字，推荐使用alembic]`。
