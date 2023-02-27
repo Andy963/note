@@ -30,7 +30,6 @@ user_bp = Blueprint('user', __name__, url_prefix='/user', cli_group='user')
 
 ```
 
-## flask_script笔记：
 Flask-Script的作用是可以通过命令行的形式来操作Flask。例如通过命令跑一个开发版本的服务器、设置数据库，定时任务等。要使用Flask-Script，可以通过`pip install flask-script`安装最新版本。
 
 ### 命令的添加方式：
