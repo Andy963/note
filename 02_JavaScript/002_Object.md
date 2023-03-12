@@ -354,3 +354,84 @@ f(1,2,3,4,5)
         console.log(arg); 
     })('123') 
 ```
+
+
+### class
+
+#### 属性
+
+```js
+
+class Person{
+	/* 
+		 类的代码块默认就是严格模式，是用来设置对象的属性的，不是什么代码都能写的
+	*/
+	name='p' // Person的实例属性name, 实例属性只能通过实例访问
+	static age = 18 // 静态（类）属性，只能通过类本身去访问
+}
+
+p = new Person()
+p.name = 'andy'
+p.age = '18'
+```
+
+
+#### 方法
+
+```js
+class Person{
+	name='p' // Person的实例属性name, 实例属性只能通过实例访问
+	static age = 18 // 静态（类）属性，只能通过类本身去访问
+	// sayhello = function(){}  添加方法的一种方式
+	sayhello(){
+		console.log('hello');
+		// 方法内部可以使用this,this代表当前实例
+	}
+	// 同样有static 方法，需要通过类来调用
+	static test(){
+		// static方法只能类调用，并且它的this指向类，而非类对象
+	}
+}
+
+```
+
+#### 构造函数
+
+```js
+
+class Person{
+	// 类中可以添加一个特殊的方法constructor
+	// 该方法称为构造函数
+	constructor(name, age, gender){
+		console.log('构造函数', name, age, gender)
+		this.name = name
+		this.age = age
+		this.gender = gender
+	}
+}
+
+ /* #file_name 将属性变成私有属性，私有属性只能在类内部访问，并且需要先声明*/
+
+class Person{
+	#name;
+	#age 
+	constructor(name, age){
+		this.#name = name;
+		this.#age = age
+	}
+	/*暴露接口给外面使用*/
+	getName(){
+		return this.#name
+	}
+	setName(name){
+		this.#name = name
+	}
+	/*get, set 新的使用方式*/
+	get age(){
+		return this.#age;
+	}
+	set age(age){
+		this.#age = age
+	}
+}
+```
