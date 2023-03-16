@@ -1,3 +1,19 @@
+### dockerhub
+
+本地构建docker镜像并推送到dockerhub
+
+```shell
+
+docker build . -t telegram_chatgpt_bot:1.05
+
+docker tag chatgpt:1.0.5 andy963/telegram_chatgpt_bot:1.0.5
+
+docker push andy963/telegram_chatgpt_bot:1.0.5
+
+docker run -d  --name chatgpt -v /etc/gpt:/etc/gpt andy963/telegram_chatgpt_bot:latest
+```
+
+
 ### watchtower
 用来更新docker镜像
 ```sh
@@ -17,4 +33,32 @@ docker run --rm \
     containrrr/watchtower -c \
     --run-once \
     ct
+```
+
+
+#### ct
+
+shell 命令
+
+```sh
+docker run -d -p 127.0.0.1:3000:3000 --name ct --restart=always -e AUTH="andy963:pwd" -e TITLE="Hello download" -v /opt/downloads:/downloads boypt/cloud-torrent
+
+```
+
+nginx 配置
+
+```nginx
+#ctorrent
+ location /ctorrent/ {
+    proxy_pass http://127.0.0.1:3000/; # note the trailing slash here, it matters!
+}
+
+location /ctorrent/sync {
+   proxy_pass http://127.0.0.1:3000/sync;
+   proxy_set_header Connection '';
+   proxy_http_version 1.1;
+   chunked_transfer_encoding off;
+   proxy_buffering off;
+   proxy_cache off;
+}
 ```

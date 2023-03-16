@@ -435,3 +435,88 @@ class Person{
 	}
 }
 ```
+
+#### 继承
+
+```js
+
+class Animal{
+	constructor(name){
+		this.name = name;
+	}
+	sayHello(){
+		console.log('Animal is speaking');
+	}
+}
+
+class Dog extends Animal{
+
+}
+
+/* 如果要重写构造方法，则需要使用super()*/ 
+
+class Cat extends Animal{
+	constructor(name){
+		super(name)
+	}
+}
+
+// 方法调用父类的方法
+super.sayHello()
+```
+
+#### 原型对象
+
+对象中存储属性的地方有两个：对象自身，原型对象prototype
+
+```
+对象自身： 直接通过对象所添加的属性，位于对象自身中
+		   在类中通过 x= y 的形式添加的属性，位于对象自身中 
+
+原型对象： 对象中有一些内容会存储到其他的对象里（原型对象）这个属性叫__proto__
+		   原型对象也负责为对象存储属性，当我们访问对象中属性时，会优先访问对象中
+		   属性，如果自身中不存在，则会去原型对象中去寻找
+		   会添加原型对象的情况：
+		    1. 在类中通过 xxx(){}方式添加的方法
+		    2. 主动向原型中添加的属性或方法。
+```
+
+不要通过类的实例去修改原型：
+	- 通过一个对象影响所有同类对象，不合适
+	- 修改原型要先创建实例
+	- 危险
+正确做法：
+    通过类的prototype属性，来访问实例的原型，也可以赋值
+```js
+
+class Person{
+	name = 'Andy'
+	age = 19
+
+	sayHello(){
+		console.log('hello world');l
+	}
+}
+
+Person.prototype.fly = () = > {
+	console.log('I am flying.');
+}
+```
+
+instanceof 
+hasOwnProperty && in 
+```js
+console.log('sayHello' in p); // 无论属性是在对象自身还是在原型中，都会返回true
+console.log(p.hasOwnPorperty('name')) // 检查对象自身是否有name属性 不推荐
+
+console.log(Object.hasOwn(对象，属性名))
+```
+
+
+### Array
+
+```js
+
+arr = new Array();
+arr2 = [];
+```
