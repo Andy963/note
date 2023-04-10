@@ -317,7 +317,15 @@ data.iloc[data.name=='陈剑',0] = '周'
 ```
 
 
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
 
+```python
+df1.loc[(df1['姓名'] == name) & (df1['性别'] == gender) & (df1['年龄'] == age), '病理诊断'] = row['病理诊断']
+
+# 注意加括号，并且在pandas中使用 & 不要使用and
+```
+
+ref:https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
 
 
 

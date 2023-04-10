@@ -20,7 +20,7 @@ clearTimeout()     取消由 setTimeout() 方法设置的 timeout。
 scrollTo()         把内容滚动到指定的坐标。 
 
 alert confirm prompt以及open函数 
-```
+```js
 var result = confirm("您确定要删除吗?");
 alert(result); 
 

@@ -227,10 +227,10 @@ sudo apt install python3-pip
 
 sudo pip3 install virtualenvwrapper
 
-mkdir -p /opt/Envs
+mkdir -p /opt/envs
 
 # 设置virtualenvwrapper
-export WORKON_HOME=~/opt/Envs
+export WORKON_HOME=/opt/Envs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 # 打开终端自动启用
 source /usr/local/bin/virtualenvwrapper.sh

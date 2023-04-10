@@ -55,11 +55,14 @@ var s0 = 'hello ' + name
 var s = `Hello ${name}`
 console.log(s)
 ```
-### array
+
+### Array
  js中数组的特性 
 - js中的数组可以装任意类型,没有任何限制. 
 - js中的数组,长度是随着下标变化的.用到多长就有多长.
+
 #### create
+
 ```js
 //创建方式1: 
 var arrname = [元素0,元素1,….];          // var arr=[1,2,3]; 
@@ -88,14 +91,18 @@ cnweek[6][0]="星期六";
 cnweek[6][1]="Saturday"; 
 ```
 
-#### attr && method
-##### join
+attr && method
+
+#### join
+
 ```js
 var arr1=[1, 2, 3, 4, 5, 6, 7]; 
 var str1=arr1.join("-"); 
 alert(str1);  //结果为"1-2-3-4-5-6-7"  
 ```
-##### concat 
+
+#### concat 
+
 ```js
 x.concat(value,...)    －－－－  
 var a = [1,2,3]; 
@@ -103,7 +110,9 @@ var b=a.concat(4,5) ;
 alert(a.toString());  //返回结果为1,2,3             
 alert(b.toString());  //返回结果为1,2,3,4,5,相当于+ 
 ```
-##### reverse/sort
+
+#### reverse/sort
+
 array sort并不是按数字大小，而是ascii
 ```js
 var arr1=[32, 12, 111, 444]; 
@@ -127,7 +136,8 @@ function intSort(a,b){
 arr.sort(intSort); 
 alert(arr); 
 ```
-##### slice /splice
+
+#### slice /splice
 x.slice(start, end) 
 start表示开始位置索引 end是结束位置下一数组元素索引编号 
 //第一个数组元素索引为0 
@@ -140,21 +150,25 @@ splice的主要用途是对数组指定位置进行删除和插入 start表示�
 ```js
 a = ['a','b','c']
 (3) ['a', 'b', 'c']
-a.splice(1,0,'d')
+a.splice(1,0,'d') // 从索引为1的位置开始删除，删除0个，并用'd'来替换
 []
 a 
 (4) ['a', 'd', 'b', 'c']
 // 第三个元素是要添加的元素
 ```
 
-##### push/pop
+#### push/pop
 数组的push和pop： 
 push pop这两个方法模拟的是一个栈操作 x.push(value, ...)  压栈 x.pop()弹栈       
 value可以为字符串、数字、数组等任何值 push是将value值添加到数组x的结尾 pop是将数组x的最后一个元素删除 
 
-##### shift/unshift
+push 返回新数组的长度， pop返回删除的那个元素
+
+#### shift/unshift
 x.unshift(value,...) x.shift() 
 value可以为字符串、数字、数组等任何值 unshift是将value值插入到数组x的开始位置 shift是将数组x的第一个元素删除
+
+unshift 会返回新数组的长度， shift 删除数组的第一个元素
 
 #### 合并两个数组并同时去重
 经常会有这种需求，比如在页面进行勾选时，有时需要与已经勾选的列表进行合并（某些情况下勾选一个会添加多个子项），此时就存在合并的情况，以前我都是通过循环，判断的方式
@@ -192,7 +206,9 @@ alert(nowd3.toUTCString());
 var nowd4=new Date(2004,2,20,11,12,0,300); 
 alert(nowd4.toLocaleString( ));//毫秒并不直接显示 
 ```
+
 #### method
+
 getDate()                 获取日 
 getDay ()                 获取星期 
 getMonth ()               获取月（0-11） 
@@ -302,6 +318,9 @@ var 函数名 = new Function("参数1","参数n","function_body");
 ECMAScript 定义的属性 length 声明了函数期望的参数个数。 alert(func1.length) 
 
 ##### arguments
+
+arguments是一个类数组对象，但不是数组，无法调用数组的方法如forEach
+
 ```js
 function add(a,b){ 
 
@@ -339,6 +358,60 @@ function f(a,b,c){
 
 f(1,2,3,4,5) 
 ```
+
+可变参数：
+
+```js
+
+const f = function(...args){
+	return args.reduce((a,b) => a+b)
+}
+
+const f3 = function(){
+	for(let v in arguments){
+		console.log(n);
+	}
+    for(let w of arguments){
+      console.log(w);
+    }
+}
+```
+
+可变参数名字可以自己定义
+可变参数本身就是一个数组，可直接使用数组方法
+
+#### apply & call
+
+```js
+function fn(){
+	console.log('函数被调用了');
+}
+fn.call();
+fn.apply();
+```
+
+还可以指定函数中的this, call, apply 的第一个参数将成为函数中的 `this`
+通过call方法调用函数，函数的实参直接在第一个参数后一个一个列出来
+通过apply方法调用函数，函数的实参需要通过一个数组传递
+
+#### bind
+bind 返回一个新的函数， 函数中this 由bind第一个参数决定（无法修改）
+bind：
+	- 为新函数绑定this
+	- 为新函数绑定参数
+
+```js
+function fn(a,b,c){
+	console.log(a,b,c);
+}
+
+const obj = {name:"andy"};
+const newFn = fn.bind(obj, 10)
+// newFn的this永远为obj, 且a参数绑定为10，不需要传，且传的参数也不会分配给a,在python中为partial 偏函数
+```
+
+但箭头函数比较特殊，它的this不受apply,call, bind影响，只与外部作用域有关。并且箭头函数中没有arguments
+
 ##### anonymous function
 ```js
    var func = function(arg){ 
@@ -355,6 +428,7 @@ f(1,2,3,4,5)
     })('123') 
 ```
 
+如果函数的参数或者返回值是函数，则其为高阶函数。 参数是函数意味着可以动态的传递参数
 
 ### class
 
@@ -513,10 +587,20 @@ console.log(Object.hasOwn(对象，属性名))
 ```
 
 
-### Array
+### Obj copy
+
+obj copy 属于浅复制
 
 ```js
+const obj = {'name':'andy',age:18}
 
-arr = new Array();
-arr2 = [];
+const obj2 = Object.assign({}, obj)
+
+const obj3 = {}
+Object.assign(obj3, obj)
+
+// Object.assign 将第二个参数的属性复制到第一个参数中
+// 如果{}已经有属性，如果新的属性也有则会覆盖，如果新属性中没有，则保持不变
+const obj4={}
+obj4 = {...obj3}
 ```
