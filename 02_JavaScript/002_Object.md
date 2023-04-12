@@ -170,6 +170,13 @@ value可以为字符串、数字、数组等任何值 unshift是将value值插�
 
 unshift 会返回新数组的长度， shift 删除数组的第一个元素
 
+#### Array 解构
+
+```js
+let [a,b,c] = ['1',2,3] // 声明同时解构
+;[d,c,e,f=10] = [1,3,5] // 前边加";"告诉后面是一个独立的句子，并且f设置了默认值
+【g,h,i=i] = [1,2] // i如有有赋新值，则使用新值，如果没有赋值则使用原来的值。
+```
 #### 合并两个数组并同时去重
 经常会有这种需求，比如在页面进行勾选时，有时需要与已经勾选的列表进行合并（某些情况下勾选一个会添加多个子项），此时就存在合并的情况，以前我都是通过循环，判断的方式
 在ES6中可以使用下面的方法进行：
@@ -183,6 +190,135 @@ d = Array.from(new Set([...a,...b]))
 
 其实就是通过set去重，然后将set转成array
 
+
+
+
+### Obj
+
+```js
+let obj = {'name':'andy', 'age':18}
+
+let {addresss} = obj // 没有的属性，返回undefined
+let {name:a, age:b address:d='花果山'} = obj // 给name 取别名，这样可以通过a访问name, 而address则既有别名，又有默认值
+
+```
+
+#### Obj has key
+
+```js
+// in 操作符会查找整个原型链, 如果只想看是否对象本身包含，就使用hasOwnPorperty
+const myObj = { key: 'value' };
+if ('key' in myObj) {
+  console.log('key exists in myObj');
+}
+
+// 查看本身是否包含某个属性
+const myObj = { key: 'value' };
+if (myObj.hasOwnProperty('key')) {
+  console.log('key exists in myObj');
+}
+
+// 查看某个对象的属性列表使用keys
+const myObj = { key: 'value' };
+if (Object.keys(myObj).includes('key')) {
+  console.log('key exists in myObj');
+}
+
+
+
+```
+### Obj copy
+
+obj copy 属于浅复制
+
+```js
+const obj = {'name':'andy',age:18}
+
+const obj2 = Object.assign({}, obj)
+
+const obj3 = {}
+Object.assign(obj3, obj)
+
+// Object.assign 将第二个参数的属性复制到第一个参数中
+// 如果{}已经有属性，如果新的属性也有则会覆盖，如果新属性中没有，则保持不变
+const obj4={}
+obj4 = {...obj3}
+```
+
+### Map
+
+Obj 的键只能是字符串或者符号symbol，如果传入一个对象,js会自动将它转为字符
+Map任何类型的对象都可以是数据的key
+
+```js
+const mp = new Map();
+const obj = {'age':18};
+// 设置
+mp.set('name', 'Andy');
+mp.set(obj, 'age')
+mp.set(NaN, 'hello')
+// 取
+mp.get('name');
+mp.get(obj) // 这里取必须用obj,不能像obj取对象可以传任意对象如{}
+mp.get(NaN)
+mp.size // 获取map中键值对的数量
+
+// 删除
+mp.delete(NaN)
+//是否包含key
+mp.has(key) // return ture, false
+mp.clear() // 清空
+
+// map 转数组
+let arr = Array.from(mp); // [['name':'Andy']]
+arr = [...mp] // 这种方式也可以
+
+// 从二维数组构建map
+const mp2 = new Map([['name','andy']])
+
+// 遍历 map
+
+for (let entry of mp2){ // let [key, val] of mp2 也可以
+	const [key, val] = entry;
+	console.log(key, val);
+}
+
+mp2.forEach(key, val){ // 如果有第三个参数，那么第三个参数是mp2本身
+	console.log(key, val)
+}
+
+mp.keys() // 获取所有的key 与python中的dict类似，返回的结果是一个迭代器
+mp.values()
+```
+
+### set
+集合，与数组类似，不同点在于set中不能存重复数据
+
+```js
+const set = new Set()
+
+// 添加数据 
+set.add(10);
+
+// 是否包含
+set.has(10)
+
+// 删除
+set.delete(10)
+
+// 遍历 
+for(let item of set){
+	console.log(item)
+}
+
+// 如果想按顺序取，如取第一个，第二个，只能先将其转成数组
+let arr =  Array.from(set) // [...set]
+
+// 去重
+const arr = [1,3,3,4,2];
+const set2 = new Set(arr); 
+const arr2 = [...set2] // 转加数组
+```
 
 ### Date
 #### create
@@ -412,7 +548,7 @@ const newFn = fn.bind(obj, 10)
 
 但箭头函数比较特殊，它的this不受apply,call, bind影响，只与外部作用域有关。并且箭头函数中没有arguments
 
-##### anonymous function
+#### anonymous function
 ```js
    var func = function(arg){ 
         return "tony"; 
@@ -586,21 +722,3 @@ console.log(p.hasOwnPorperty('name')) // 检查对象自身是否有name属性 �
 console.log(Object.hasOwn(对象，属性名))
 ```
 
-
-### Obj copy
-
-obj copy 属于浅复制
-
-```js
-const obj = {'name':'andy',age:18}
-
-const obj2 = Object.assign({}, obj)
-
-const obj3 = {}
-Object.assign(obj3, obj)
-
-// Object.assign 将第二个参数的属性复制到第一个参数中
-// 如果{}已经有属性，如果新的属性也有则会覆盖，如果新属性中没有，则保持不变
-const obj4={}
-obj4 = {...obj3}
-```
