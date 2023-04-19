@@ -566,7 +566,7 @@ const newFn = fn.bind(obj, 10)
 
 如果函数的参数或者返回值是函数，则其为高阶函数。 参数是函数意味着可以动态的传递参数
 
-### class
+## class
 
 #### 属性
 
@@ -722,3 +722,17 @@ console.log(p.hasOwnPorperty('name')) // 检查对象自身是否有name属性 �
 console.log(Object.hasOwn(对象，属性名))
 ```
 
+
+## RegExp
+
+let reg = new RegExp("a", 'i')
+reg = /a/i, //  /正则/匹配模式
+
+```js
+// 反转义
+let reg = /\w/
+let reg = new RegExp("\\w")
+
+let reg2 = /a/
+let res = reg2.test('abc')
+```
