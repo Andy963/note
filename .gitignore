@@ -8,3 +8,6 @@ vx_recycle_bin/*
 .idea
 .obsidian
 .trash
+
+# Ignore Smart Connections folder because embeddings file is large and updated frequently
+.smart-connections
