@@ -14,6 +14,7 @@ vim pip.conf # window中为pip.ini
 ```python
 [global]
 index-url = http://mirrors.aliyun.com/pypi/simple/
+proxy = http://127.0.0.1:51837
 extra-index-url=
         https://pypi.org/simple
 
