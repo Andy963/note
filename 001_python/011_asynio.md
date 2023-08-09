@@ -629,3 +629,10 @@ async def main():
 if __name__ == '__main__':
     asyncio.run(main())
 ```
+
+
+### some good article about async
+
+1. [Python 3 – An Intro to asyncio](https://www.blog.pythonlibrary.org/2016/07/26/python-3-an-intro-to-asyncio/)
+2. [# Asyncio Semaphore in Python](https://superfastpython.com/asyncio-semaphore/)
+3. 
