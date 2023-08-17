@@ -1,5 +1,52 @@
 
 
+- 高并发，高可用
+- 热部署
+
+配置语法：
+- 配置文件由指令与指令块构成
+- 每条指令以;分号结尾,指令与参数间以空格符号分隔
+- 指令块以 {} 大括号将多条指令组织在一起
+- include语句允许组合多个配置文件以提升可维护性
+- 使用#符号添加注释,提高可读性
+- 使用$符号使用变量
+- 部分指令的参数支持正则表达式
+
+http
+upstream
+
+
+### nginx signal
+
+[nginx signal](https://github.com/Andy963/notePic/blob/57ccb7b79e957d498f8ce290b32fea82556d8bc9/0037_nginx%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BF%A1%E5%8F%B7.jpg)
+
+
+
+```nginx
+
+gzip on;
+gzip_min_length 1;
+gzip_comp_level 2;
+gzip_types text/plain application/x-javascript image/jpeg image/gif image/png;
+
+log_format main '$remote_addr - $remote_user [$time_local] "$request"'
+'$status $body_bytes_sent "$http_referer"'
+'$http_user_agent" "$http_x_forwarded_for"';
+
+access_log logs/access.log main;
+
+
+location / {
+				proxy_set_header Host $host;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for ;
+				
+				#proxy_cache my_cache; # 共享内存
+				#proxy_cache_key $host$uri$is_args$args;
+				#proxy_cache_valid 200 304 302 1d;
+				proxy_pass http://local;
+			}
+```
 ### 卸载
 
 ```shell
