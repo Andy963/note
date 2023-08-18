@@ -432,3 +432,64 @@ map
 <input type="submit” value="提交">
 </form>
 ```
+
+### bindForm
+
+view
+```go
+type UserInfo struct {  
+    Id   int    `form:"id" json:"id"`  
+    Name string `form:"name" json:"name"`  
+    Age  int    `form:"age" json:"age"`  
+}
+
+func bindForm(c *gin.Context) {  
+    var user UserInfo  
+    if err := c.ShouldBind(&user); err != nil {  
+       c.String(http.StatusBadRequest, "请求参数错误：%s", err.Error())  
+       return  
+    }  
+    c.String(http.StatusOK, "name:%s,age:%d", user.Name, user.Age)  
+}
+```
+
+### upload file
+
+view
+
+```go
+	router.GET("/getupload", chapter2.GetUploadView)
+	router.POST("/postupload", chapter2.PostUploadView)
+
+func GetUploadView(c *gin.Context) {
+	c.HTML(200, "chapter2/upload.html", gin.H{
+		"title": "upload",
+	})
+}
+
+func PostUploadView(c *gin.Context) {
+	file, _ := c.FormFile("file")
+	dst := "upload/" + file.Filename
+	c.SaveUploadedFile(file, dst)
+	c.String(200, "%s uploaded!", file.Filename)
+}
+
+// multifile
+func PostMultiFileView(c *gin.Context) {
+	form, _ := c.MultipartForm()
+	files := form.File["file"]
+	for file := range files {
+		dst := "upload/" + files[file].Filename
+		c.SaveUploadedFile(files[file], dst)
+	}
+}
+
+```
+
+### upload via ajax
+
+如果使用ajax 要注意：
+processData:false 默认为true,当设置为true的时候,jquery ajax 提交的时候不会序列化 data,而是直接使用data
+contentType: false ，不使用默认的application/x-www-form-urlencoded这种contentType
+● 分界符:目的是防止上传文件中出现分界符导致服务器无法正确识别文件起始位置
+● ajax 中 contentType 设置为 false 是为了避免 JQuery 对其操作,从而失去分界符
