@@ -493,3 +493,30 @@ processData:false 默认为true,当设置为true的时候,jquery ajax 提交的�
 contentType: false ，不使用默认的application/x-www-form-urlencoded这种contentType
 ● 分界符:目的是防止上传文件中出现分界符导致服务器无法正确识别文件起始位置
 ● ajax 中 contentType 设置为 false 是为了避免 JQuery 对其操作,从而失去分界符
+
+### redirect
+
+view
+
+```go
+func RedirectView(c *gin.Context){
+
+    // http.StatusFounc 302
+    // http.StatusMovedPermanently 301
+    c.Redirect(http.StatusMovedPermanently, "http://www.baidu.com")
+}
+```
+
+
+### http config
+
+```go
+	router.Run()
+	// http.ListenAndServe(":8080", router)
+	// s := &http.Server{
+	// 	Addr:    ":8080",
+	// 	Handler: router,
+	// 	ReadTimeout: 10 * time.Second,
+	// 	WriteTimeout: 10 * time.Second,}
+	// 	s.ListenAndServe()
+```
