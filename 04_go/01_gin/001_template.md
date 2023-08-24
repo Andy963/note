@@ -520,3 +520,243 @@ func RedirectView(c *gin.Context){
 	// 	WriteTimeout: 10 * time.Second,}
 	// 	s.ListenAndServe()
 ```
+
+
+### context
+
+```html
+
+. 访问当前位置的上下文
+$ 引用当前模板根级的上下文
+$. 引用模板中的根级上下文
+
+{{define "chapter3/test.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模板语法</title>
+</head>
+<body>
+    这是模板语法页面
+{{.name}}
+{{range .arr}}
+{{.}}
+/*  此时如果要用name 则应该使用$.{name} */
+{{$.name}}
+{{end}}
+</body>
+</html>
+
+{{end}}
+
+{{ "andy"}} 字符串
+{{'a'}}  显示字母的ascii码对应的数字
+{{`a`}}  显示字母a,不会转义
+
+{{print "andy"}}
+
+```
+
+#### 定义变量
+
+```html
+定义变量
+{{$name := "andy"}}
+使用：
+{{$name}}
+```
+
+### pipeline
+
+```html
+{{.name}} 是上下文的变量输出 
+{{“hallen"|len}} 函数通过管理传递返回值，是pipeline
+```
+
+#### if
+
+if 可以进行嵌套
+
+```
+{{ if .name}}
+   欢迎 {{.name}}
+{{else}}
+	欢迎 游客
+{{end}}
+```
+
+#### range
+
+```
+第一种
+{{range $v := .arr_struct }}
+	{{$v.name}}
+	 {{$v.age}}
+{{end}}
+
+{{ range $v  := .arr}}
+	{{ /*{{$v}}*/}}
+	 {{.}}
+{{end}}
+
+第二种
+{{ range .arr_struct }}
+	{{ .name }}
+	 {{ .age}}
+  {{ $.total}}  // 使用"$." 引用模板中的根级上下文
+{{end}}
+```
+
+range 中也可以像if一样写else
+
+#### with
+
+```
+{{with .user}}  // 本来是.article.user,通过with可以不用每次都输入article 
+		{{.id}} // 如果没有.user 可以通过else殒，让它显示别的
+	{{.name}} 
+{{end}}
+```
+
+
+#### template
+
+引入另一个网页，类似django中的 include
+
+```
+{{ template "chapter/base.html"}}
+// 如果base 页面想共享扩展它的页面的上下文，则在后面加上点
+{{ template "chapter/base.html" . }}
+```
+
+#### 注释
+
+```
+{{ /* 这是注释*/}}
+```
+
+### 模板函数
+
+print  对应fmt.Sprint  不会打印，但可以格式化返回结果
+printf 对应fmt.Sprintf
+println 对应fmt.Sprintln
+
+#### 括号
+
+{{ printf "nums is %s %d " (prinf "%d %d" 1 2) 3 }}
+
+#### and
+作用： 只要有一个为空，则整体为空，如果都不为空，则返回最后一个
+
+#### or 
+只要有一个为空，就返回第一个不为空的，否则返回空
+
+
+#### index
+
+```go
+package chapter3
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func TplFunc(c *gin.Context) {
+
+	slice_data := []string{"张三", "李四", "王五"}
+	data := map[string]interface{}{
+		"Name": "张三",
+		"Age":  18,
+	}
+	map_data := map[string]interface{}{
+		"Name":       "张三",
+		"Age":        18,
+		"slice_data": slice_data,
+		"map_":       data,
+	}
+
+	c.HTML(http.StatusOK, "chapter3/func.html", map_data)
+
+}
+
+
+{{ define "chapter3/func.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模板函数</title>
+</head>
+<body>
+{{/* 后端传的变量为slice_data,
+slice_data := []string{"张三", "李四", "王五"}
+index 变量名 索引 */}}
+
+{{/* 对于map index 后面可以使用map 的key进行索引  */}}
+slice for map : {{index .map_ "Name"}}<br>
+</body>
+</html>
+
+
+{{ end }}
+```
+
+#### len 
+
+```go
+{{ "andy" | len}}
+
+{{ len "andy"}}
+```
+
+#### not
+not 取反
+
+#### urlquery
+
+有些符号在url中是不能直接传递的，如果要传递这些包含特殊字符的url,就要使用urlquery
+
+```go
+{{ urlquery "http://www.baidu.com"}}
+结果： http%3A%2F%2Fwww.baidu.com
+```
+
+#### js
+
+对js字符串进行编码
+
+```go
+{{js "<script> alert(1) </script"}}
+```
+### 自定义template func
+
+定义函数
+
+```go
+//1 定义函数  
+func Add(a, b int) int {  
+    return a + b  
+}
+```
+
+注册函数
+
+```go
+router := gin.Default()  
+// 注册要在router.LoadHTMLGlob之前  
+router.SetFuncMap(template.FuncMap{  
+    "add": chapter3.Add,  
+})
+```
+
+使用
+
+```html
+<br>  
+{{   len "andy" }}  
+<br>  
+{{ add 1 0}}
+```
