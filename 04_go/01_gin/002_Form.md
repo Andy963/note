@@ -235,7 +235,7 @@ email
 contains
 excludes
 
-#### 自定义
+### 自定义验证器
 
 #### 安装validator
 
@@ -275,4 +275,55 @@ type Article struct {
     Content string `form:"content" binding:"min=5"`  
 }
 // Key: 'Article.Title' Error:Field validation for 'Title' failed on the 'lenValidate' tag
+```
+
+
+### beego
+
+安装
+
+```go
+go get github.com/astaxie/beego/validation
+```
+
+#### 定义
+
+```go
+func Validate4Beego(c *gin.Context) {  
+    var art Artic  
+    _ := c.ShouldBind(&art)  
+  
+    //初始化validator  
+    valid := validation.Validation{}  
+    isValid, err := valid.Valid(&art)  
+    fmt.Println(err)  
+    if !isValid {  
+       for _, e := range valid.Errors {  
+          fmt.Println(e.Key, e.Message)  
+       }  
+       return  
+    }  
+}
+```
+
+#### 使用
+
+```go
+type Artic struct {  
+    Id      int    `form:"-"`  
+    Title   string `form:"title" valid:"Required"`  
+    Content string `form:"content" valid:"Min(5)"`  
+}
+```
+
+#### 重写错误信息
+
+```go
+var MsgTpl = map[string]string{  
+    "Required": "不能为空",  
+}  
+validation.SetDefaultMessage(MsgTpl)  
+  
+//初始化validator  
+valid := validation.Validation{}
 ```
