@@ -1,4 +1,5 @@
 ## object
+
 在JavaScript中除了null和undefined以外其他的数据类型都被定义成了对象，也可以用创建对象的方法定义变量，String、Math、Array、Date、RegExp都是JavaScript中重要的内置对象，在JavaScript程序大多数功能都是基于对象实现的.
 ```js
 <script language="javascript"> 
@@ -47,6 +48,187 @@ function reverseString(str) {
 reverseString("hello");
 #ref:https://leetcode-cn.com/problems/palindrome-number/submissions/
 ```
+
+##### length
+
+ 返回字符串长度
+```js
+console.log(name.length);
+```
+##### indexOf()
+
+indexof方法返回字符串中指定文本首次出现的索引（位置
+
+```js
+let names = 'zhou wu zheng '
+console.log(names.indexOf('z'));
+console.log(names.lastIndexOf('z'));
+
+```
+
+当未找到指定文本时，两者均返回-1
+通常我们判断字符串中是否有某个字符会通过索引是否为-1,但其实，我们也可以通`includes`
+
+```js
+let name = 'zhou abc'
+console.log(name.includes('zh'))
+// true
+```
+
+##### search() 
+
+search方法搜索特定值的字符串，并返回匹配的位置
+
+```js
+let names = 'zhou wu zheng '
+console.log(names.search('u')); // 3
+```
+
+search 可以使用正则
+
+```js
+let name = 'zhou abc '
+reg = new RegExp('ab')
+reg.test(name)
+//true
+```
+
+##### slice
+
+```js
+var str = "Apple, Banana, Mango";
+var res = str.slice(7,13);
+```
+
+如果某个参数为负，则从字符串的结尾开始计数。
+如果省略第二个参数，则该方法将裁剪字符串的剩余部分
+
+##### substring
+substring方法与slice 类似，但它不能接受负数作为索引
+
+
+##### substr() depricate
+substr与slice 类似，但第二个参数规定提取字符串的长度
+```js
+let names = 'zhou wu zheng '
+console.log(names.substr(3,4));
+//u wu 
+```
+当忽略第二个参数时，会取第一个参数位置之后所有的字符
+当第一个参数 为负，则从结尾开始取
+
+##### replace
+```js
+str = "Please visit Microsoft!";
+var n = str.replace("Microsoft", "W3School");
+```
+默认情况下，replace 只替换第一个匹配的，且默认情况区分大小写
+使用正则的i，使其对大小写不敏感
+```js
+str = "Please visit Microsoft!";
+var n = str.replace(/MICROSOFT/i, "W3School");
+```
+使用正则的g,使其替换所有
+```js
+str = "Please visit Microsoft and Microsoft!";
+var n = str.replace(/Microsoft/g, "W3School");
+console.log(n);
+//Please visit W3School and W3School!
+```
+
+##### toUpperCase()/toLowerCase()
+
+```js
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toUpperCase();  // text2 是被转换为大写的 text1
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toLowerCase();  // text2 是被转换为小写的 text1
+```
+##### concat()
+
+连接两个或者多个字符串
+```js
+var text1 = "Hello";
+var text2 = "World";
+text3 = text1.concat(" ",text2);
+```
+##### String.trim()
+
+去掉两边的空格
+
+```js
+var str = "       Hello World!        ";
+console.log(str.trim());
+```
+
+##### charAt()
+
+返回字符串中指定下标（位置）的字符串
+```js
+var str = "HELLO WORLD";
+str.charAt(0);            // 返回 H
+```
+##### charCodeAt()
+
+返回字符串中指定索引的字符 unicode 编码
+```js
+var str = "HELLO WORLD";
+str.charCodeAt(0);         // 返回 72
+```
+##### Property Access
+
+属性访问
+```js
+var str = "HELLO WORLD";
+str[0];                   // 返回 H
+```
+
+它让字符串看起来像是数组（其实并不是）
+如果找不到字符，[ ] 返回 undefined，而 charAt() 返回空字符串。
+它是只读的。<u>**str[0] = "A" 不会产生错误（但也不会工作！）**</u>
+
+##### split
+
+将字符串转换成数组
+
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(","));          // 用逗号分隔
+console.log(txt.split(" "));          // 用空格分隔
+console.log(txt.split("|"));          // 用竖线分隔
+
+[ 'a', 'b', 'c', 'd', 'e' ]
+[ 'a,b,c,d,e' ]
+[ 'a,b,c,d,e' ]
+```
+
+当用于分割的字符不存在时，则将字符串作为整体放在数组中。这与省略分割符相同，这与python语言中不同，python中默认使用空格
+当分割符为“”时，返回是间隔单个字符的数组
+
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(""));          // 用逗号分隔
+[
+  'a', ',', 'b',
+  ',', 'c', ',',
+  'd', ',', 'e'
+]
+```
+
+##### string2Number
+
+there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
+
+```js
+let a = parseInt('90')
+typeof(a) // number
+
+// 浮点数据则是使用parseFloat
+// 与之类似的还有Number
+
+typeof(Number('90')) // number
+```
+
 #### format
 字符串格式化通常有两种方式，用+，以及ES6中的反引号
 ```js
@@ -76,7 +258,9 @@ var arrname = new Array(长度);
     cnweek[1]="星期一";  
     cnweek[6]="星期六"; 
 ```
+
 two demension array
+
 ```js
 var cnweek=new Array(7); 
 for (var i=0;i<=6;i++){ 
@@ -110,6 +294,231 @@ var b=a.concat(4,5) ;
 alert(a.toString());  //返回结果为1,2,3             
 alert(b.toString());  //返回结果为1,2,3,4,5,相当于+ 
 ```
+
+#### copyWithin
+
+copyWithin(targetIndex, startIndex,endIndex )
+
+```js
+
+const fruits = ["Banana", "Orange", "Apple", "Mango", "Kiwi"];
+fruits.copyWithin(2, 0, 2);
+// 结果：["Banana", "Orange", "Banana", "Orange", "Kiwi"]
+
+
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.copyWithin(2, 0);
+// 结果：["Banana", "Orange", "Banana", "Orange"]
+
+let evenNumbers= [2,4,6,8];
+evenNumbers.copyWithin(-1);
+// 结果：[2, 4, 6, 2]
+```
+
+它的一种应用场景是原地修改数组的元素
+
+#### entries
+返回数组的可迭代对象,该对象包含数组中每个索引的键值对
+
+```js
+const arr = ['a', 'b', 'c'];
+
+const iterator = arr.entries();
+
+for (let e of iterator) {
+  console.log(e);
+}
+
+// [0, 'a']
+// [1, 'b'] 
+// [2, 'c']
+
+```
+
+entries()方法的常见应用场景包括:
+
+1. 遍历数组时获取每个元素的索引。
+2. 将数组转化为Map。例如:
+
+```js
+const map = new Map(arr.entries()); 
+```
+
+3. 遍历对象属性时获取键名。例如:
+
+```js
+const obj = { foo: 'bar' }; 
+
+for (let [key, value] of Object.entries(obj)) {
+  console.log(key, value);
+}
+
+// 'foo' 'bar'
+```
+
+entries与python中的enumerate[[004_函数与类#enumerate]]有相似之处，也有不同之处。
+entries在获取迭代器时会立即计算所有值，且不接受任何参数，无法指定起始索引值。
+
+#### every
+
+用于数组中的所有元素是否都满足某个测试函数
+
+```js
+const numbers = [12, 25, 18, 130, 44];
+const isAllNumbersGreaterThan10 = numbers.every(num => num > 10);
+console.log(isAllNumbersGreaterThan10); // 输出：true
+```
+
+常见使用场景：
+- 检查数组所有元素是否都满足某个条件
+- 判断数组是具有某个统一的格式或者结构
+
+python中有类似的all() [[004_函数与类#all]]方法，两者都可以判断可迭代对象的所有元素是否都计算为True
+但 every 仅可用于数组，但all可用于任意可迭代对象，every,all 都会找到第一个false就短路返回，
+
+#### fill
+
+```js
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.fill("Kiwi");
+// 结果：["Kiwi", "Kiwi", "Kiwi", "Kiwi"]
+
+arr = new Array(8).fill(false)
+//arr [false, false, false,false, false, false,false, false ]
+
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.fill("Kiwi", 2, 4);
+// 结果：["Banana", "Orange", "Kiwi", "Kiwi"]
+
+```
+
+#### filter
+
+```js
+let arr = [56, 15, 48, 3, 7];
+let newArr = arr.filter(function (value, index, array) {
+    return value % 2 === 0;
+});
+console.log(newArr)
+
+// 去除空值
+let  newrr = ['','',1,2,3]
+var newArr = newrr.filter(item => item)
+console.log(newArr)
+//[1,2,3]  因为'' 被认为为false 的值
+```
+
+#### find
+
+find 返回符合传入函数条件的第一个数组元素
+
+```js
+arr = [1, 2, 3, 4, 5]
+let result = arr.find(item => item > 3);
+console.log(result);  // 输出：4
+```
+
+注意它是只返回符合条件的第一个元素，而filter会返回所有元素
+
+#### findIndex
+返回符合传入数组条件的数组第一个元素的索引，如果没有返回-1
+
+#### forEach
+
+数组中每个元素都执行一次回调函数, 函数有三个参数
+
+```js
+array.forEach(callbackFn(currentValue, index, arr), thisValue)
+- currentValue - 数组中当前被处理的元素
+- index - 当前元素的索引
+- arr - 数组本身
+```
+
+通常情况下，只会用到第一个参数：
+
+```js
+const numbers = [1, 2, 3, 4];
+
+let sum = 0;
+numbers.forEach(function(n) {
+  sum += n; 
+});
+
+console.log(sum); // 10
+```
+
+#### from
+
+from 从一个类数组或可迭代对象创建一个新的浅拷贝的数组实例 `Array.from(arrayLike, mapFn, thisArg)` 
+- arrayLike - 想要转换成数组的类数组对象或可迭代对象。
+- mapFn - 可选,新数组中的每个元素会执行该回调函数。
+- thisArg - 可选,执行回调函数 mapFn 时 this 对象。
+
+```js
+var myArr = Array.from('RUNOOB');
+console.log(myArr);  // 输出：[ 'R', 'U', 'N', 'O', 'O', 'B' ]
+
+var arr = Array.from([1, 2, 3], x => x * 10);
+console.log(arr);  // 输出：[10, 20, 30]
+
+```
+
+#### includes
+
+判断一个数组是否包含一个指定的值，如果是返回true,否则 返回false
+
+```js
+[1, 2, 3].includes(2); // 返回 true
+[1, 2, 3].includes(4); // 返回 false
+```
+
+#### indexOf
+
+搜索数组中元素，返回它所在的位置。它与findIndex的区别是： indexOf 用于查找 数组中特定的元素，而findIndex则接收一个函数作为参数。但如果不存在的元素，两者都会返回-1
+
+```js
+let arr = [1, 2, 3, 4, 5];
+console.log(arr.indexOf(3));  // 输出：2
+
+```
+
+#### isArray
+
+isarray用于确定传递的数值是否是一个数组，它不检查原型链，也不依赖于它所附加的构造函数，对于使用数组字面量语法或者Array构造函数创建的值，它都返回true
+
+```js
+console.log(Array.isArray([1, 2, 3]));  // 输出：true
+console.log(Array.isArray('Runoob'));  // 输出：false
+```
+
+下面内容来自claude2 未验证
+
+```js
+- instanceof 可以判断对象的类型,但可能由于多窗口而失败
+- Array.isArray() 只检测数组,但不会失败
+
+所以 Array.isArray() 是更可靠地判断数组的方法。
+
+注意,它在存在 iframes 的情况下也可以正常工作,而 instanceof 会失败。
+
+例如:
+
+
+let iframe = document.createElement('iframe');
+document.body.appendChild(iframe);
+let iArray = window.frames[window.frames.length-1].Array;
+
+let arr = [1, 2, 3]; 
+
+// 在 iframe 中创建的数组
+console.log(arr instanceof iArray); // false  
+
+// 正确的方法  
+console.log(Array.isArray(arr)); // true
+```
+
+主要用于数据类型检查，避免出现错误。
+
 
 #### reverse/sort
 
