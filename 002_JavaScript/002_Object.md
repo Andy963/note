@@ -519,7 +519,58 @@ console.log(Array.isArray(arr)); // true
 
 主要用于数据类型检查，避免出现错误。
 
+#### join
 
+Array.join(sep)
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let result = fruits.join(); // 默认使用逗号作为分隔符
+console.log(result); // 输出 "apple,banana,cherry"
+```
+
+功能上它与Python中字符串的join[[002_数据运算与类型#join]]是一样的，但区别是python中是字符串内建方法
+
+#### keys
+
+返回数组每个索引的迭代对象
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let keys = fruits.keys();
+
+for (let key of keys) {
+  console.log(key); // 输出 "0", "1", "2"
+}
+```
+
+它与[[002_Object#entries]] 的不同之处在于，它只返回索引，而entries会返回索引和值
+
+#### lastIndexOf
+
+它用于从数组的末尾开始向前查找指定元素，并返回它的索引。如果没有找到元素，则返回-1
+
+` array.lastIndexOf(item, start) `  `item`是必需的，指定要搜索的元素。`start`是可选的，指定从哪个位置开始搜索
+
+```js
+let fruits = ['apple', 'banana', 'cherry', 'apple', 'banana'];
+let index = fruits.lastIndexOf('apple'); 
+console.log(index); // 输出 "3"
+```
+
+lastIndexOf 类似python中字符串的 rindex方法[[002_数据运算与类型#rindex]]
+
+#### map
+
+`map()`方法是数组的一个内置方法，它创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果 `array.map(function(currentValue, index, arr), thisValue)
+`
+```js
+let numbers = [1, 2, 3, 4];
+let squares = numbers.map(x => x * x);
+console.log(squares); // 输出 "[1, 4, 9, 16]"
+```
+
+它与forEach的不同在于：forEach不会返回一个新的数组,而python中map[[004_函数与类#map]] 是 一个内建函数
 #### reverse/sort
 
 array sort并不是按数字大小，而是ascii
@@ -553,6 +604,12 @@ start表示开始位置索引 end是结束位置下一数组元素索引编号
 //start、end可为负数，-1代表最后一个数组元素 
 //end省略则相当于从start位置截取以后所有数组元素
 
+```js
+let fruits = ['apple', 'banana', 'cherry', 'date', 'elderberry'];
+let someFruits = fruits.slice(1, 3);
+console.log(someFruits); // 输出 ["banana", "cherry"]
+```
+
 x. splice(start, deleteCount, value, ...) 
 splice的主要用途是对数组指定位置进行删除和插入 start表示开始位置索引 deleteCount删除数组元素的个数 value表示在删除位置插入的数组元素 value参数可以省略  
 
@@ -573,11 +630,80 @@ value可以为字符串、数字、数组等任何值 push是将value值添加�
 
 push 返回新数组的长度， pop返回删除的那个元素
 
+```js
+let fruits = ['apple', 'banana'];
+let newLength = fruits.push('cherry');
+console.log(fruits); // 输出 ["apple", "banana", "cherry"]
+console.log(newLength); // 输出 3
+
+let fruits = ['apple', 'banana', 'cherry'];
+let lastFruit = fruits.pop();
+console.log(fruits); // 输出 ["apple", "banana"]
+console.log(lastFruit); // 输出 "cherry"
+```
+
 #### shift/unshift
 x.unshift(value,...) x.shift() 
 value可以为字符串、数字、数组等任何值 unshift是将value值插入到数组x的开始位置 shift是将数组x的第一个元素删除
 
 unshift 会返回新数组的长度， shift 删除数组的第一个元素
+
+```js
+let fruits = ['banana', 'cherry'];
+let newLength = fruits.unshift('apple');
+console.log(fruits); // 输出 ["apple", "banana", "cherry"]
+console.log(newLength); // 输出 3
+
+let fruits = ['apple', 'banana', 'cherry'];
+let firstFruit = fruits.shift();
+console.log(fruits); // 输出 ["banana", "cherry"]
+console.log(firstFruit); // 输出 "apple"
+```
+
+#### reduce
+
+
+```js
+let numbers = [1, 2, 3, 4];
+let sum = numbers.reduce((total, num) => total + num, 0);
+console.log(sum); // 输出 "10"
+```
+
+#### reduceRight
+
+`reduceRight()`方法与`reduce()`方法类似，但它是从数组的末尾开始向前应用函数，而不是从开始处
+
+#### some
+
+查看是否有满足条件的元素，是则返回true, 否则 返回false
+
+```js
+array.some(function(currentValue, index, arr), thisValue)
+let numbers = [1, 2, 3, 4];
+let hasNegativeNumbers = numbers.some(num => num < 0);
+console.log(hasNegativeNumbers); // 输出 "false"
+
+```
+#### toString
+
+将数组转化成字符串,注意，它把逗号也带上了
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let str = fruits.toString();
+console.log(str); // 输出 "apple,banana,cherry"
+```
+
+#### valueOf
+
+获取数组的原始值
+
+```js
+let numbers = [1, 2, 3, 4];
+let originalValue = numbers.valueOf(); // [1, 2, 3, 4]
+let stringValue = numbers.toString(); // "1,2,3,4"
+let sum = numbers.reduce((total, num) => total + num, 0); // 10
+```
 
 #### Array 解构
 
