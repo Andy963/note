@@ -180,6 +180,18 @@ df.shape
 对行/列进行索引，对元素进行索引
 当设定了显式索引，就不能用隐式索引
 
+##### 获取某列的数字索引
+
+```python
+import pandas as pd
+
+df = pd.read_excel('data.xlsx') 
+
+col_index = df.columns.get_loc('随访时间')
+col_index = df.columns.to_list().index('随访时间')
+col_index = df.columns.get_indexer_for(['随访时间'])[0]
+```
+
 ##### 取列
 直接通过括号取的不是行，而是列：
 ```python

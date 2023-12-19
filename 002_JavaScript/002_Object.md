@@ -730,15 +730,34 @@ d = Array.from(new Set([...a,...b]))
 
 ### Obj
 
+使用花括号`{ }`来创建对象，`{ }`中用来定义对象中的属性。属性是一个个`键:值`对的组合，其中键（属性名称）始终是字符串类型的，而值（属性值）则可以是任意类型，例如字符串、数组、函数或其它对象等.
+
+在定义对象时，属性名称虽然是字符串类型，但通常不需要使用引号来定义，但是以下三种情况则需要为属性名添加引号：  
+
+- 属性名为 JavaScript 中的保留字；
+- 属性名中包含空格或特殊字符（除字母、数字、_ 和 $ 以外的任何字符）；
+- 属性名以数字开头
+
 ```js
 let obj = {'name':'andy', 'age':18}
 
 let {addresss} = obj // 没有的属性，返回undefined
 let {name:a, age:b address:d='花果山'} = obj // 给name 取别名，这样可以通过a访问name, 而address则既有别名，又有默认值
 
+// 访问属性
+obj.name
+
+// 删除属性
+delete obj.name
+
+// 修改对象的属性
+obj.name = "zhou"
+
 ```
 
 #### Obj has key
+
+
 
 ```js
 // in 操作符会查找整个原型链, 如果只想看是否对象本身包含，就使用hasOwnPorperty
@@ -857,14 +876,19 @@ const arr2 = [...set2] // 转加数组
 
 ### Date
 #### create
+JavaScript 中提供了四种不同的方法来创建 Date 对象
+
 ```js
 //方法1：不指定参数 
 var nowd1=new Date(); 
+// Fri Sep 15 2023 13:48:10 GMT+0800 (China Standard Time)
 alert(nowd1.toLocaleString( )); 
 
 //方法2：参数为日期字符串 
 var nowd2=new Date("2004/3/20 11:12"); 
-alert(nowd2.toLocaleString( )); 
+alert(nowd2.toLocaleString( )); // '3/20/2004, 11:12:00 AM'
+nowd2.toLocalDateString() // '3/20/2004'
+nowd2.toLocalTimeString() // '11:12:00 AM'
 var nowd3=new Date("04/03/20 11:12"); 
 alert(nowd3.toLocaleString( )); 
 
@@ -878,9 +902,96 @@ var nowd4=new Date(2004,2,20,11,12,0,300);
 alert(nowd4.toLocaleString( ));//毫秒并不直接显示 
 ```
 
+#### property
+
+Date中主要包含两个属性：constructor， prototype
+
+##### constructor
+
+返回构造函数
+
+```js
+d = new Date()
+d.constructor
+ƒ Date() { [native code] }
+```
+
+##### prototype
+
+通过该属性您可以向对象中添加属性和方法,通过prototype添加的方法可以被所有实例共享
+
+```js
+// 定义一个构造函数
+function Person(name) {
+    this.name = name;
+}
+
+// 给Person的原型添加一个方法
+Person.prototype.sayHello = function() {
+    console.log("Hello, my name is " + this.name);
+}
+
+// 创建一个Person的实例
+var alice = new Person("Alice");
+
+// 调用原型中的方法
+alice.sayHello();  // 输出：Hello, my name is Alice
+```
+
+在对象上直接添加方法,它会在所有实例上进行拷贝，从而占用更多内存。
+
+```js
+let obj = {};
+obj.sayHello = function() {
+    console.log("Hello, world!");
+};
+obj.sayHello();  // 输出："Hello, world!"
+```
+
+在构造函数内部添加方法, 这种与直接在对象上添加方法一样，新添加的方法会在所有实例上拷贝。
+
+```js
+function Person(name) {
+    this.name = name;
+    this.sayHello = function() {
+        console.log("Hello, my name is " + this.name);
+    };
+}
+
+let alice = new Person("Alice");
+alice.sayHello();  // 输出："Hello, my name is Alice"
+```
+
 #### method
 
-getDate()                 获取日 
+```js
+function getDate(sep = '-') {
+    let today = new Date();
+    let y = today.getFullYear();
+    let m = today.getMonth() + 1;
+    let d = today.getDate();
+    if (m >= 1 && m <= 9) {
+        m = '0' + m;
+    }
+
+    if (d >= 0 && d <= 9) {
+        d = '0' + d;
+    }
+
+    return `${y}${sep}${m}${sep}${d}`;
+
+}
+```
+
+##### getDate()  
+获取日 
+
+```js
+var date = new Date();
+var day = date.getDate();
+console.log(day); // 15
+```
+
 getDay ()                 获取星期 
 getMonth ()               获取月（0-11） 
 getFullYear ()            获取完整年份 
