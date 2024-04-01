@@ -10,6 +10,9 @@ alembic 与sqlalchemy 一样可以独立存在
         ```python
         import sys,os
         sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+		# this works fine
+		from myapp.models import Base
+		target_metadata = Base.metadata
         ```
 4. 将ORM模型生成迁移脚本：`alembic revision --autogenerate -m 'message'`。
 5. 将生成的脚本映射到数据库中：`alembic upgrade head`。
@@ -38,6 +41,8 @@ alembic 与sqlalchemy 一样可以独立存在
 3. 执行`upgrade head`时报某个表已经存在的错误：
     * 原因：执行这个命令的时候，会执行所有的迁移脚本，因为数据库中已经存在了这个表。然后迁移脚本中又包含了创建表的代码。
     * 解决办法：（1）删除versions中所有的迁移文件。（2）修改迁移脚本中创建表的代码。
+4. with session and commit but no data in database: 
+	1.  this should in a session scope, even the object is returned by sqlalchemy
 
 
 
