@@ -116,7 +116,7 @@ def fetchone(sql, *args):
 ```
 
 ### 基于类的数据库连接池
-```py
+```python
 import pymysql
 from DBUtils.PooledDB import PooledDB
 

@@ -59,7 +59,7 @@ dc1 为模板，在dc1的卷中创建的文件，在创建dc2时也会创建，�
 4.每条指令都全创建一个新的镜像层，并对镜像进行提交
 
 
-#### 保留字
+### 保留字
 FROM  基础镜像
 MAINTAINER 镜像维护者的姓名，邮箱
 RUN 执行命令
@@ -74,7 +74,7 @@ ENTRYPOINT 指定容器启动时要运行的命令，和CMD一样，但ENTRYPOIN
 ONBUILD 当构建一个被继承的dockerfile时运行命令，父镜像在被子继承后父镜像的Onbuild被触发
 
 
-```
+```shell
 FROM centos
 ENV mypath /tmp
 WORKDIR $mypath

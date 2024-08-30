@@ -37,11 +37,11 @@ group_concat()
 　between 80 and 100 值在80到100之间
 　in(80,90,100)  值是80或90或100
 　like 'egon%'
-   pattern可以是%或_，%表示任意多字符,_表示一个字符
+   pattern可以是%或_，%表示任意多字符, "_ _" 表示一个字符
 　逻辑运算符：在多个条件直接可以使用逻辑运算符 and or not
 
 #### GROUP BY
-如果设置了only_full_group_by这个mode，那么我们在直接分组查询，就无法得到数据了，只能得到字段名。并且设置了sql_mode为only_full_group_by之后，select *，就不行了，会直接报错，只能select post ，post是你分组的那个字段。
+如果设置了only_full_group_by这个mode，那么我们在直接分组查询，就无法得到数据了，只能得到字段名。并且设置了sql_mode为only_full_group_by之后，select `*`，就不行了，会直接报错，只能select post ，post是你分组的那个字段。
 
 注意：
 如果我们用设置了unique约束的字段作为分组的依据，则每一条记录自成一组，这种分组没有意义。多条记录之间的某个字段值相同，该字段通常用来作为分组的依据
@@ -213,7 +213,7 @@ select employee.name,department.name from employee inner join department
     where age > 25;
 ```
 
-以内连接的方式查询employee和department表，并且以age字段的升序方式显示
+以内连接(隐式内连接)的方式查询employee和department表，并且以age字段的升序方式显示
 
 ```sql
 select employee.id,employee.name,employee.age,department.name from employee,department

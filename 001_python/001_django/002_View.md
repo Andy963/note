@@ -5,8 +5,6 @@
 
 DRF中的view分成三个等级，最基本的APIView, 到GenericAPIView,再到GenericViewSet.
 
-![view继承关系](vimages/20200222210632858_13564.png =650x)
-
 Django用“视图”这个概念封装处理用户请求并返回响应的逻辑。视图是一个可调用对象，它不仅可以是基于函数，也可以是基于类的。函数是通过判断request.method来区分不同的请求，而基于类的视图则对它进行了封装，只需要实现对应的方法即可，如get,post. 不管django还是restframework中的视图类都是基于这一点进行的封装。
 
 
@@ -53,6 +51,10 @@ class CreateAPIView(mixins.CreateModelMixin,
 
 ```
 
+这里的create方法来自序列化器的create方法，如果要自定义创建逻辑，则可以：
+- 重写序列化器的 create 方法
+- 重写视图的 perform_create 方法
+
 #### ListAPIView
 实现get方法
 ```python
@@ -64,7 +66,7 @@ class ListAPIView(mixins.ListModelMixin,
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 ```
-
+ilist 方法来自 ListModelMixin
 #### RetrieveAPIView
 实现get方法，它与ListAPIView的不同是它获取单个对象，类似于django中的DetailView
 ```python
@@ -189,7 +191,7 @@ class RetrieveUpdateDestroyAPIView(mixins.RetrieveModelMixin,
 ### Mixins
 知道了这些，当我们需要对通用视图类的行为作定制时，只需要对这些Mixin实现的方法进行重写即可。这一点后面再说，我们先看看restframework实现了哪些Mixin,是不是和上面的视图类能对应上呢？
 
-![Mixin实现的方法](vimages/20200222210811840_7446.png =650x)
+
 
 #### CreateModelMixin
 
@@ -336,7 +338,7 @@ class Order(ListAPIView):
 
 ViewSet其实是对前面内容的更高层的封装，但我们可以看到在ViewSet类中并没有实现任何特殊的内容，它只是继承了两个类ViewSetMixin, APIView.
 
-![ViewSet中的类](vimages/20200222210936163_456.png)
+
 
 #### ViewSetMixin
 ViewSetMixin是viewset的基础，由于代码太多我们就只看看它的最重要的方法：as_view()它将请求方法与对应的Mixin中的方法关联起来，比如‘get' -->'list', 'post'-->'create', 'put'-->'update'

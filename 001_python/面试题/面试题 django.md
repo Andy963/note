@@ -11,7 +11,7 @@ User-Agent，Referer，Host，Content-Type，Cookie，connection,accept,Accept-L
 ```
 ### 列举常见的请求方法。
 ```
-get,post, head,put,delete,option,trace,connect
+get,post,ead,put,delete,option,trace,connect
 ```
 ### 列举常见的状态码。
 ```
@@ -543,19 +543,22 @@ contenttype是django的一个组件(app)，它可以将django下所有app下的�
    - 字段：数据行ID
 应用：路飞表结构优惠券和专题课和学位课关联
 ```
-## falsk
-请手写一个flask 的 Hello World。
-```py
-from flask import Flask
 
-app = Flask(__name__)
-
-@app.route('/index', endpoint='index')
-def index():
-    return 'hello world'
+### 中间件的主要用途（应用场景）
 
 
-if __name__ == '__main__':
-    app.run()
+```
+process_request(request)
+process_view()
+process_exception()
+
+process_response()
+1. 身份验证
+2. 安全检查
+3. 会话管理
+4. 压缩响应
+5. 日志记录
+6. 性能监控
+7. 错误处理(异常处理)
 ```
 

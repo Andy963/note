@@ -109,8 +109,30 @@ user_profile = UserProfile.objects.get(user__username='johndoe')
 user_profile.bio = 'New bio'
 user_profile.save()
 
+
+# 方法二
+obj = MyModel.objects.get(id=1)
+obj.field_name = new_value
+obj.save(update_fields=['field_name'])
+
+# 方法三
+from django.db.models import F
+
+obj = MyModel.objects.get(id=1)
+obj.count = F('count') + 1
+obj.save()
+
+# 方法四
+obj, created = MyModel.objects.update_or_create(
+    id=1,
+    defaults={'field_name': new_value}
+)
+
+MyModel.objects.filter(id=1).update(field_name=new_value)
+
 ```
 
+update方法是针对 orm中的queryset，如果本身是单个对象（如通过get获取到的对象）则没有update方法。
 ### ForeignKey
 
 #### add 
@@ -147,8 +169,17 @@ author.book_set.clear()
 # 查询关联的Author实例
 author = book.author
 
-# 查询关联到某个Author实例的所有Book实例
+# 查询关联到某个Author实例的所有Book实例，模型名小写_set 作为反向关系的名称
 books = author.book_set.all()
+
+如果指定了related_name,related_query_name，则：
+class Book(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books', related_query_name='book')
+
+使用 author.books.all() 获取作者的所有书籍
+# 这里django 默认使用模型小写即book, 所以这里通过related_query_name与默认的book一致
+Author.objects.filter(book__publish_year=2020)
+
 
 ```
 
@@ -293,7 +324,7 @@ def perform_create(self, serializer):
 python提供了六种缓存方式：
 经常使用的有文件缓存和Mencache缓存
 
-> 开发调试缓存
+>开发调试缓存
 内存缓存
 文件缓存
 数据库缓存
@@ -360,6 +391,7 @@ SESSION_COOKIE_AGE=60*30 30分钟。
 SESSION_EXPIRE_AT_BROWSER_CLOSE False：
 SESSION_SAVE_EVERY_REQUEST=True # 这个必须设置，前面的超时失效和关闭浏览器失效二选一。
 ```
+
 在视图函数中
 ```python
 request.session.set_expiry(value) 
