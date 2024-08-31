@@ -112,5 +112,4 @@ GROUP BY customer;
 
 总的来说，ONLY_FULL_GROUP_BY选项通过强制执行更严格的GROUP BY规则，提高了查询结果的可靠性和一致性，但也可能需要开发者调整一些现有的查询逻辑。
 
-From claude-3-5-sonnet@20240620, input:24, output: 704
 ```

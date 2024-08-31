@@ -20,15 +20,25 @@ js中var 定义的变量没法通过{}锁定作用域，而let是块级作用域
 var a; 
 a=3; 
 
-#2、一行可以声明多个变量.并且可以是不同类型 
-var name="andy, age=20, job="geologist"; 
+//2、一行可以声明多个变量.并且可以是不同类型 
+var name="andy", age=20, job="geologist"; 
 
-#3、声明变量时,如果没有使用var 那么它是全局变量 
+// 3、声明变量时,如果没有使用var 那么它是全局变量 
 
-#4、变量命名,首字符只能是字母,下划线,$美元符 三选一，余下的字符可以是下划线、美元符号或任何字母或数字字符且区分大小写，x与X是两个变量. 
+//#4、变量命名,首字符只能是字母,下划线,$美元符 三选一，余下的字符可以是下划线、美元符号或任何字母或数字字符且区分大小写，x与X是两个变量. 
 ```
 
+#### let
+
+let 声明的变量只在 let 命令所在的代码块 **{}** 内有效，在 **{}** 之外不能访问。
+
+```go
+{ 
+    let x = 2;
+}
+```
 #### constant
+
 常量 ：直接在程序中出现的数据值 
 标识符： 
 - 由不以数字开头的字母、数字、下划线(_)、美元符号($)组成 
@@ -43,7 +53,9 @@ boolean    -----  布尔值
 string     -----  字符串 
 undefined  -----  undefined 
 null       -----   null  
-### string
+symbol
+#### string
+
 是由Unicode字符、数字、标点符号组成的序列；字符串常量首尾由单引号或双引号括起；JavaScript中没有字符类型；常用特殊字符在字符串中的表达；字符串中部分特殊字符必须加上右划线\；常用的转义字符 \n:换行 \':单引号 \":双引号 \\:右划线
 
 ```js
@@ -54,7 +66,6 @@ null       -----   null
 
 定义时单双引号都可以，也可以在字符串中使用引号，只要不与最外层产生冲突就和地，这点上与python一致。
 
-
 特殊字符串需要转义
 \'	'	单引号
 \"	"	双引号
@@ -63,168 +74,8 @@ null       -----   null
 x = 'zhou', y = new String('zhou') 是<strong>不完全相等的</strong>，它们是不同类型，前者为字符串，后者为对象
 
 
-#### length
- 返回字符串长度
-```js
-console.log(name.length);
-```
-#### indexOf() 
-indexof方法返回字符串中指定文本首次出现的索引（位置
-```js
-let names = 'zhou wu zheng '
-console.log(names.indexOf('z'));
-console.log(names.lastIndexOf('z'));
+#### number
 
-```
-当未找到指定文本时，两者均返回-1
-通常我们判断字符串中是否有某个字符会通过索引是否为-1,但其实，我们也可以通`includes`
-
-```js
-let name = 'zhou abc'
-console.log(name.includes('zh'))
-// true
-```
-
-#### search() 
-search方法搜索特定值的字符串，并返回匹配的位置
-```js
-let names = 'zhou wu zheng '
-console.log(names.search('u')); // 3
-```
-search 可以使用正则
-```js
-let name = 'zhou abc '
-reg = new RegExp('ab')
-reg.test(name)
-//true
-```
-
-#### slice
-```js
-var str = "Apple, Banana, Mango";
-var res = str.slice(7,13);
-```
-如果某个参数为负，则从字符串的结尾开始计数。
-如果省略第二个参数，则该方法将裁剪字符串的剩余部分
-
-#### substring
-substring方法与slice 类似，但它不能接受负数作为索引
-
-
-#### substr() depricate
-substr与slice 类似，但第二个参数规定提取字符串的长度
-```js
-let names = 'zhou wu zheng '
-console.log(names.substr(3,4));
-//u wu 
-```
-当忽略第二个参数时，会取第一个参数位置之后所有的字符
-当第一个参数 为负，则从结尾开始取
-
-#### replace
-```js
-str = "Please visit Microsoft!";
-var n = str.replace("Microsoft", "W3School");
-```
-默认情况下，replace 只替换第一个匹配的，且默认情况区分大小写
-使用正则的i，使其对大小写不敏感
-```js
-str = "Please visit Microsoft!";
-var n = str.replace(/MICROSOFT/i, "W3School");
-```
-使用正则的g,使其替换所有
-```js
-str = "Please visit Microsoft and Microsoft!";
-var n = str.replace(/Microsoft/g, "W3School");
-console.log(n);
-//Please visit W3School and W3School!
-```
-
-#### toUpperCase()/toLowerCase()
-```js
-var text1 = "Hello World!";       // 字符串
-var text2 = text1.toUpperCase();  // text2 是被转换为大写的 text1
-var text1 = "Hello World!";       // 字符串
-var text2 = text1.toLowerCase();  // text2 是被转换为小写的 text1
-```
-#### concat()
-连接两个或者多个字符串
-```js
-var text1 = "Hello";
-var text2 = "World";
-text3 = text1.concat(" ",text2);
-```
-#### String.trim()
-去掉两边的空格
-```js
-var str = "       Hello World!        ";
-console.log(str.trim());
-```
-
-#### charAt()
-返回字符串中指定下标（位置）的字符串
-```js
-var str = "HELLO WORLD";
-str.charAt(0);            // 返回 H
-```
-#### charCodeAt()
-返回字符串中指定索引的字符 unicode 编码
-```js
-var str = "HELLO WORLD";
-str.charCodeAt(0);         // 返回 72
-```
-#### Property Access
-属性访问
-```js
-var str = "HELLO WORLD";
-str[0];                   // 返回 H
-```
-它让字符串看起来像是数组（其实并不是）
-如果找不到字符，[ ] 返回 undefined，而 charAt() 返回空字符串。
-它是只读的。<u>**str[0] = "A" 不会产生错误（但也不会工作！）**</u>
-
-#### split
-
-将字符串转换成数组
-```js
-var txt = "a,b,c,d,e";   // 字符串
-console.log(txt.split(","));          // 用逗号分隔
-console.log(txt.split(" "));          // 用空格分隔
-console.log(txt.split("|"));          // 用竖线分隔
-
-[ 'a', 'b', 'c', 'd', 'e' ]
-[ 'a,b,c,d,e' ]
-[ 'a,b,c,d,e' ]
-```
-当用于分割的字符不存在时，则将字符串作为整体放在数组中。这与省略分割符相同，这与python语言中不同，python中默认使用空格
-当分割符为“”时，返回是间隔单个字符的数组
-
-```js
-var txt = "a,b,c,d,e";   // 字符串
-console.log(txt.split(""));          // 用逗号分隔
-[
-  'a', ',', 'b',
-  ',', 'c', ',',
-  'd', ',', 'e'
-]
-```
-
-#### string2Number
-there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
-
-```js
-let a = parseInt('90')
-typeof(a) // number
-
-// 浮点数据则是使用parseFloat
-// 与之类似的还有Number
-
-typeof(Number('90')) // number
-```
-
-
-
-### number
 不区分整型数值和浮点型数值; 所有数字都采用64位浮点格式存储，相当于Java和C语言中的double格式.能表示的最大值是±1.7976931348623157 x 10308,能表示的最小值是±5 x 10 -324 
 整数： 
    在JavaScript中10进制的整数由数字的序列组成 
@@ -244,9 +95,8 @@ typeof(Number('90')) // number
    2进制: 1111 0011 1101 0100   <-----> 16进制:0xF3D4 <-----> 10进制:62420 
    2进制: 1 111 001 111 010 100 <-----> 8进制:0171724 
 
+#### Boolean
 
-
-### boolean
 Boolean类型仅有两个值：true和false，也代表1和0，实际运算中true=1,false=0.布尔值也可以看作on/off、yes/no、1/0对应true/false.Boolean值主要用于JavaScript的控制语句，例如： 
 
 ```js
@@ -257,16 +107,18 @@ if (x==1){
       } 
 ```
 
-### null/undefined
+#### null/undefined
+
 Null 与undefined类型： 
 - Undefined类型:Undefined 类型只有一个值，即 undefined。当声明的变量未初始化时，该变量的默认值是 undefined。当函数无明确返回值时，返回的也是值 "undefined"; 
 - Null类型:另一种只有一个值的类型是 Null，它只有一个专用值 null，即它的字面量。值 undefined 实际上是从值 null 派生来的，因此 ECMAScript 把它们定义为相等的。 
 
 尽管这两个值相等，但它们的含义不同。undefined 是声明了变量但未对其初始化时赋予该变量的值，null 则用于表示尚未存在的对象（在讨论 typeof 运算符时，简单地介绍过这一点）。如果函数或方法要返回的是对象，那么找不到该对象时，返回的通常是 null。 
 
+#### NaN
 
-### NaN
 NaN:属于Number类型的一个特殊值,当遇到将字符串转成数字无效时,就会得到一个NaN数据
+
 ```js
 var d="andy"; 
 d=+d; 
@@ -282,18 +134,23 @@ alert(n==3);
 alert(n==NaN); 
 alert(n!=NaN); 
 ```
+
 //NaN参与的所有的运算都是false,除了!= 
 
 ### operator
+
  ` +   -    *    /     %       ++        --`
   
-比较运算符： 
+比较运算符：
+
     >   >=   <    <=    !=    ==    ===   !== 
 
 逻辑运算符：与，或，非 
+
      &&   ||   ！
 
 赋值运算符： 
+
     =  +=   -=  *=   /= 
 
 字符串运算符： 
@@ -304,20 +161,26 @@ alert(n!=NaN);
 递增和递减运算符可以放在变量前也可以放在变量后：--i 
 
 ### compare
+
 ```
  >   >=   <    <=    !=    ==    ===   !==
 ```
+
 用于控制语句时
+
 ```js
 if (2>1){       //  3  0  false null undefined ［］ 
     console.log("条件成立!") 
 }
 ```
+
 等号和非等号的同类运算符是全等号和非全等号。这两个运算符所做的与等号和非等号相同，只是它们在检查相等性前，不执行类型转换。 
+```js
 console.log(2==2); 
 console.log(2=="2"); 
 console.log(2==="2"); 
 console.log(2!=="2"); 
+```
 
 ### alert
 
@@ -333,11 +196,13 @@ var bResult = "25" < "3";
 alert(bResult); //输出 "true" 
 ```
 上面这段代码比较的是字符串 "25" 和 "3"。两个运算数都是字符串，所以比较的是它们的字符代码（"2" 的字符代码是 50，"3" 的字符代码是 51）。 
-不过，如果把某个运算数改为数字，那么结果就有趣了： 
+不过，如果把某个运算数改为数字，那么结果就有趣了：
+
 ```js
 var bResult = "25" < 3; 
 alert(bResult); //输出 "false" 
 ```
+
 这里，字符串 "25" 将被转换成数字 25，然后与数字 3 进行比较，结果不出所料。 
 总结： 
 > 比较运算符两侧如果一个是数字类型,一个是其他类型,会将其类型转换成数字类型. 
@@ -366,8 +231,13 @@ console.log(“星期三”);
 ```
 
 #### condition
+
+^376bba
+
 三目运算：
-console.log(2>1?2:1) 如果前面条件成立返回问号后面的值  如果条件不成立,返回冒号后的 
+console.log(2>1?2:1) 如果前面条件成立返回问号后面的值  如果条件不成立,返回冒号后的
+
+对于Python, golang 中都没有三目运算，而是采用 `if else` 语句
 
 ```js
 if (表达式){ 
@@ -402,6 +272,7 @@ switch(x){
 } 
 ```
 #### loop
+
 ```js
 var i=1; 
 while (i<=7) { 
@@ -427,7 +298,9 @@ finally {
 //注：主动抛出异常 throw Error('xxxx') 
 ```
 
+js中异常处理与python 类似， python[[006_错误与异常#05_错误与异常]]中使用 try , except, finally, 而对于go中[[04_流程控制#exception]],则有更多不同，因为go中异常是作为返回值。
 ### output
+
 ```js
 //这里的输出类似于python的print,意思是输出数据，方便编程时查看： 
 

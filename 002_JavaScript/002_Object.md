@@ -1,4 +1,5 @@
 ## object
+
 在JavaScript中除了null和undefined以外其他的数据类型都被定义成了对象，也可以用创建对象的方法定义变量，String、Math、Array、Date、RegExp都是JavaScript中重要的内置对象，在JavaScript程序大多数功能都是基于对象实现的.
 ```js
 <script language="javascript"> 
@@ -47,6 +48,187 @@ function reverseString(str) {
 reverseString("hello");
 #ref:https://leetcode-cn.com/problems/palindrome-number/submissions/
 ```
+
+##### length
+
+ 返回字符串长度
+```js
+console.log(name.length);
+```
+##### indexOf()
+
+indexof方法返回字符串中指定文本首次出现的索引（位置
+
+```js
+let names = 'zhou wu zheng '
+console.log(names.indexOf('z'));
+console.log(names.lastIndexOf('z'));
+
+```
+
+当未找到指定文本时，两者均返回-1
+通常我们判断字符串中是否有某个字符会通过索引是否为-1,但其实，我们也可以通`includes`
+
+```js
+let name = 'zhou abc'
+console.log(name.includes('zh'))
+// true
+```
+
+##### search() 
+
+search方法搜索特定值的字符串，并返回匹配的位置
+
+```js
+let names = 'zhou wu zheng '
+console.log(names.search('u')); // 3
+```
+
+search 可以使用正则
+
+```js
+let name = 'zhou abc '
+reg = new RegExp('ab')
+reg.test(name)
+//true
+```
+
+##### slice
+
+```js
+var str = "Apple, Banana, Mango";
+var res = str.slice(7,13);
+```
+
+如果某个参数为负，则从字符串的结尾开始计数。
+如果省略第二个参数，则该方法将裁剪字符串的剩余部分
+
+##### substring
+substring方法与slice 类似，但它不能接受负数作为索引
+
+
+##### substr() depricate
+substr与slice 类似，但第二个参数规定提取字符串的长度
+```js
+let names = 'zhou wu zheng '
+console.log(names.substr(3,4));
+//u wu 
+```
+当忽略第二个参数时，会取第一个参数位置之后所有的字符
+当第一个参数 为负，则从结尾开始取
+
+##### replace
+```js
+str = "Please visit Microsoft!";
+var n = str.replace("Microsoft", "W3School");
+```
+默认情况下，replace 只替换第一个匹配的，且默认情况区分大小写
+使用正则的i，使其对大小写不敏感
+```js
+str = "Please visit Microsoft!";
+var n = str.replace(/MICROSOFT/i, "W3School");
+```
+使用正则的g,使其替换所有
+```js
+str = "Please visit Microsoft and Microsoft!";
+var n = str.replace(/Microsoft/g, "W3School");
+console.log(n);
+//Please visit W3School and W3School!
+```
+
+##### toUpperCase()/toLowerCase()
+
+```js
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toUpperCase();  // text2 是被转换为大写的 text1
+var text1 = "Hello World!";       // 字符串
+var text2 = text1.toLowerCase();  // text2 是被转换为小写的 text1
+```
+##### concat()
+
+连接两个或者多个字符串
+```js
+var text1 = "Hello";
+var text2 = "World";
+text3 = text1.concat(" ",text2);
+```
+##### String.trim()
+
+去掉两边的空格
+
+```js
+var str = "       Hello World!        ";
+console.log(str.trim());
+```
+
+##### charAt()
+
+返回字符串中指定下标（位置）的字符串
+```js
+var str = "HELLO WORLD";
+str.charAt(0);            // 返回 H
+```
+##### charCodeAt()
+
+返回字符串中指定索引的字符 unicode 编码
+```js
+var str = "HELLO WORLD";
+str.charCodeAt(0);         // 返回 72
+```
+##### Property Access
+
+属性访问
+```js
+var str = "HELLO WORLD";
+str[0];                   // 返回 H
+```
+
+它让字符串看起来像是数组（其实并不是）
+如果找不到字符，[ ] 返回 undefined，而 charAt() 返回空字符串。
+它是只读的。<u>**str[0] = "A" 不会产生错误（但也不会工作！）**</u>
+
+##### split
+
+将字符串转换成数组
+
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(","));          // 用逗号分隔
+console.log(txt.split(" "));          // 用空格分隔
+console.log(txt.split("|"));          // 用竖线分隔
+
+[ 'a', 'b', 'c', 'd', 'e' ]
+[ 'a,b,c,d,e' ]
+[ 'a,b,c,d,e' ]
+```
+
+当用于分割的字符不存在时，则将字符串作为整体放在数组中。这与省略分割符相同，这与python语言中不同，python中默认使用空格
+当分割符为“”时，返回是间隔单个字符的数组
+
+```js
+var txt = "a,b,c,d,e";   // 字符串
+console.log(txt.split(""));          // 用逗号分隔
+[
+  'a', ',', 'b',
+  ',', 'c', ',',
+  'd', ',', 'e'
+]
+```
+
+##### string2Number
+
+there is a trick that we can convert a string num to real number: `"90" -0` it will convert `"90"` to `90`
+
+```js
+let a = parseInt('90')
+typeof(a) // number
+
+// 浮点数据则是使用parseFloat
+// 与之类似的还有Number
+
+typeof(Number('90')) // number
+```
+
 #### format
 字符串格式化通常有两种方式，用+，以及ES6中的反引号
 ```js
@@ -76,7 +258,9 @@ var arrname = new Array(长度);
     cnweek[1]="星期一";  
     cnweek[6]="星期六"; 
 ```
+
 two demension array
+
 ```js
 var cnweek=new Array(7); 
 for (var i=0;i<=6;i++){ 
@@ -111,6 +295,282 @@ alert(a.toString());  //返回结果为1,2,3
 alert(b.toString());  //返回结果为1,2,3,4,5,相当于+ 
 ```
 
+#### copyWithin
+
+copyWithin(targetIndex, startIndex,endIndex )
+
+```js
+
+const fruits = ["Banana", "Orange", "Apple", "Mango", "Kiwi"];
+fruits.copyWithin(2, 0, 2);
+// 结果：["Banana", "Orange", "Banana", "Orange", "Kiwi"]
+
+
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.copyWithin(2, 0);
+// 结果：["Banana", "Orange", "Banana", "Orange"]
+
+let evenNumbers= [2,4,6,8];
+evenNumbers.copyWithin(-1);
+// 结果：[2, 4, 6, 2]
+```
+
+它的一种应用场景是原地修改数组的元素
+
+#### entries
+返回数组的可迭代对象,该对象包含数组中每个索引的键值对
+
+```js
+const arr = ['a', 'b', 'c'];
+
+const iterator = arr.entries();
+
+for (let e of iterator) {
+  console.log(e);
+}
+
+// [0, 'a']
+// [1, 'b'] 
+// [2, 'c']
+
+```
+
+entries()方法的常见应用场景包括:
+
+1. 遍历数组时获取每个元素的索引。
+2. 将数组转化为Map。例如:
+
+```js
+const map = new Map(arr.entries()); 
+```
+
+3. 遍历对象属性时获取键名。例如:
+
+```js
+const obj = { foo: 'bar' }; 
+
+for (let [key, value] of Object.entries(obj)) {
+  console.log(key, value);
+}
+
+// 'foo' 'bar'
+```
+
+entries与python中的enumerate[[004_函数与类#enumerate]]有相似之处，也有不同之处。
+entries在获取迭代器时会立即计算所有值，且不接受任何参数，无法指定起始索引值。
+
+#### every
+
+用于数组中的所有元素是否都满足某个测试函数
+
+```js
+const numbers = [12, 25, 18, 130, 44];
+const isAllNumbersGreaterThan10 = numbers.every(num => num > 10);
+console.log(isAllNumbersGreaterThan10); // 输出：true
+```
+
+常见使用场景：
+- 检查数组所有元素是否都满足某个条件
+- 判断数组是具有某个统一的格式或者结构
+
+python中有类似的all() [[004_函数与类#all]]方法，两者都可以判断可迭代对象的所有元素是否都计算为True
+但 every 仅可用于数组，但all可用于任意可迭代对象，every,all 都会找到第一个false就短路返回，
+
+#### fill
+
+```js
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.fill("Kiwi");
+// 结果：["Kiwi", "Kiwi", "Kiwi", "Kiwi"]
+
+arr = new Array(8).fill(false)
+//arr [false, false, false,false, false, false,false, false ]
+
+const fruits = ["Banana", "Orange", "Apple", "Mango"];
+fruits.fill("Kiwi", 2, 4);
+// 结果：["Banana", "Orange", "Kiwi", "Kiwi"]
+
+```
+
+#### filter
+
+```js
+let arr = [56, 15, 48, 3, 7];
+let newArr = arr.filter(function (value, index, array) {
+    return value % 2 === 0;
+});
+console.log(newArr)
+
+// 去除空值
+let  newrr = ['','',1,2,3]
+var newArr = newrr.filter(item => item)
+console.log(newArr)
+//[1,2,3]  因为'' 被认为为false 的值
+```
+
+#### find
+
+find 返回符合传入函数条件的第一个数组元素
+
+```js
+arr = [1, 2, 3, 4, 5]
+let result = arr.find(item => item > 3);
+console.log(result);  // 输出：4
+```
+
+注意它是只返回符合条件的第一个元素，而filter会返回所有元素
+
+#### findIndex
+返回符合传入数组条件的数组第一个元素的索引，如果没有返回-1
+
+#### forEach
+
+数组中每个元素都执行一次回调函数, 函数有三个参数
+
+```js
+array.forEach(callbackFn(currentValue, index, arr), thisValue)
+- currentValue - 数组中当前被处理的元素
+- index - 当前元素的索引
+- arr - 数组本身
+```
+
+通常情况下，只会用到第一个参数：
+
+```js
+const numbers = [1, 2, 3, 4];
+
+let sum = 0;
+numbers.forEach(function(n) {
+  sum += n; 
+});
+
+console.log(sum); // 10
+```
+
+#### from
+
+from 从一个类数组或可迭代对象创建一个新的浅拷贝的数组实例 `Array.from(arrayLike, mapFn, thisArg)` 
+- arrayLike - 想要转换成数组的类数组对象或可迭代对象。
+- mapFn - 可选,新数组中的每个元素会执行该回调函数。
+- thisArg - 可选,执行回调函数 mapFn 时 this 对象。
+
+```js
+var myArr = Array.from('RUNOOB');
+console.log(myArr);  // 输出：[ 'R', 'U', 'N', 'O', 'O', 'B' ]
+
+var arr = Array.from([1, 2, 3], x => x * 10);
+console.log(arr);  // 输出：[10, 20, 30]
+
+```
+
+#### includes
+
+判断一个数组是否包含一个指定的值，如果是返回true,否则 返回false
+
+```js
+[1, 2, 3].includes(2); // 返回 true
+[1, 2, 3].includes(4); // 返回 false
+```
+
+#### indexOf
+
+搜索数组中元素，返回它所在的位置。它与findIndex的区别是： indexOf 用于查找 数组中特定的元素，而findIndex则接收一个函数作为参数。但如果不存在的元素，两者都会返回-1
+
+```js
+let arr = [1, 2, 3, 4, 5];
+console.log(arr.indexOf(3));  // 输出：2
+
+```
+
+#### isArray
+
+isarray用于确定传递的数值是否是一个数组，它不检查原型链，也不依赖于它所附加的构造函数，对于使用数组字面量语法或者Array构造函数创建的值，它都返回true
+
+```js
+console.log(Array.isArray([1, 2, 3]));  // 输出：true
+console.log(Array.isArray('Runoob'));  // 输出：false
+```
+
+下面内容来自claude2 未验证
+
+```js
+- instanceof 可以判断对象的类型,但可能由于多窗口而失败
+- Array.isArray() 只检测数组,但不会失败
+
+所以 Array.isArray() 是更可靠地判断数组的方法。
+
+注意,它在存在 iframes 的情况下也可以正常工作,而 instanceof 会失败。
+
+例如:
+
+
+let iframe = document.createElement('iframe');
+document.body.appendChild(iframe);
+let iArray = window.frames[window.frames.length-1].Array;
+
+let arr = [1, 2, 3]; 
+
+// 在 iframe 中创建的数组
+console.log(arr instanceof iArray); // false  
+
+// 正确的方法  
+console.log(Array.isArray(arr)); // true
+```
+
+主要用于数据类型检查，避免出现错误。
+
+#### join
+
+Array.join(sep)
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let result = fruits.join(); // 默认使用逗号作为分隔符
+console.log(result); // 输出 "apple,banana,cherry"
+```
+
+功能上它与Python中字符串的join[[002_数据运算与类型#join]]是一样的，但区别是python中是字符串内建方法
+
+#### keys
+
+返回数组每个索引的迭代对象
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let keys = fruits.keys();
+
+for (let key of keys) {
+  console.log(key); // 输出 "0", "1", "2"
+}
+```
+
+它与[[002_Object#entries]] 的不同之处在于，它只返回索引，而entries会返回索引和值
+
+#### lastIndexOf
+
+它用于从数组的末尾开始向前查找指定元素，并返回它的索引。如果没有找到元素，则返回-1
+
+` array.lastIndexOf(item, start) `  `item`是必需的，指定要搜索的元素。`start`是可选的，指定从哪个位置开始搜索
+
+```js
+let fruits = ['apple', 'banana', 'cherry', 'apple', 'banana'];
+let index = fruits.lastIndexOf('apple'); 
+console.log(index); // 输出 "3"
+```
+
+lastIndexOf 类似python中字符串的 rindex方法[[002_数据运算与类型#rindex]]
+
+#### map
+
+`map()`方法是数组的一个内置方法，它创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果 `array.map(function(currentValue, index, arr), thisValue)
+`
+```js
+let numbers = [1, 2, 3, 4];
+let squares = numbers.map(x => x * x);
+console.log(squares); // 输出 "[1, 4, 9, 16]"
+```
+
+它与forEach的不同在于：forEach不会返回一个新的数组,而python中map[[004_函数与类#map]] 是 一个内建函数
 #### reverse/sort
 
 array sort并不是按数字大小，而是ascii
@@ -144,6 +604,12 @@ start表示开始位置索引 end是结束位置下一数组元素索引编号
 //start、end可为负数，-1代表最后一个数组元素 
 //end省略则相当于从start位置截取以后所有数组元素
 
+```js
+let fruits = ['apple', 'banana', 'cherry', 'date', 'elderberry'];
+let someFruits = fruits.slice(1, 3);
+console.log(someFruits); // 输出 ["banana", "cherry"]
+```
+
 x. splice(start, deleteCount, value, ...) 
 splice的主要用途是对数组指定位置进行删除和插入 start表示开始位置索引 deleteCount删除数组元素的个数 value表示在删除位置插入的数组元素 value参数可以省略  
 
@@ -164,11 +630,80 @@ value可以为字符串、数字、数组等任何值 push是将value值添加�
 
 push 返回新数组的长度， pop返回删除的那个元素
 
+```js
+let fruits = ['apple', 'banana'];
+let newLength = fruits.push('cherry');
+console.log(fruits); // 输出 ["apple", "banana", "cherry"]
+console.log(newLength); // 输出 3
+
+let fruits = ['apple', 'banana', 'cherry'];
+let lastFruit = fruits.pop();
+console.log(fruits); // 输出 ["apple", "banana"]
+console.log(lastFruit); // 输出 "cherry"
+```
+
 #### shift/unshift
 x.unshift(value,...) x.shift() 
 value可以为字符串、数字、数组等任何值 unshift是将value值插入到数组x的开始位置 shift是将数组x的第一个元素删除
 
 unshift 会返回新数组的长度， shift 删除数组的第一个元素
+
+```js
+let fruits = ['banana', 'cherry'];
+let newLength = fruits.unshift('apple');
+console.log(fruits); // 输出 ["apple", "banana", "cherry"]
+console.log(newLength); // 输出 3
+
+let fruits = ['apple', 'banana', 'cherry'];
+let firstFruit = fruits.shift();
+console.log(fruits); // 输出 ["banana", "cherry"]
+console.log(firstFruit); // 输出 "apple"
+```
+
+#### reduce
+
+
+```js
+let numbers = [1, 2, 3, 4];
+let sum = numbers.reduce((total, num) => total + num, 0);
+console.log(sum); // 输出 "10"
+```
+
+#### reduceRight
+
+`reduceRight()`方法与`reduce()`方法类似，但它是从数组的末尾开始向前应用函数，而不是从开始处
+
+#### some
+
+查看是否有满足条件的元素，是则返回true, 否则 返回false
+
+```js
+array.some(function(currentValue, index, arr), thisValue)
+let numbers = [1, 2, 3, 4];
+let hasNegativeNumbers = numbers.some(num => num < 0);
+console.log(hasNegativeNumbers); // 输出 "false"
+
+```
+#### toString
+
+将数组转化成字符串,注意，它把逗号也带上了
+
+```js
+let fruits = ['apple', 'banana', 'cherry'];
+let str = fruits.toString();
+console.log(str); // 输出 "apple,banana,cherry"
+```
+
+#### valueOf
+
+获取数组的原始值
+
+```js
+let numbers = [1, 2, 3, 4];
+let originalValue = numbers.valueOf(); // [1, 2, 3, 4]
+let stringValue = numbers.toString(); // "1,2,3,4"
+let sum = numbers.reduce((total, num) => total + num, 0); // 10
+```
 
 #### Array 解构
 
@@ -195,15 +730,34 @@ d = Array.from(new Set([...a,...b]))
 
 ### Obj
 
+使用花括号`{ }`来创建对象，`{ }`中用来定义对象中的属性。属性是一个个`键:值`对的组合，其中键（属性名称）始终是字符串类型的，而值（属性值）则可以是任意类型，例如字符串、数组、函数或其它对象等.
+
+在定义对象时，属性名称虽然是字符串类型，但通常不需要使用引号来定义，但是以下三种情况则需要为属性名添加引号：  
+
+- 属性名为 JavaScript 中的保留字；
+- 属性名中包含空格或特殊字符（除字母、数字、_ 和 $ 以外的任何字符）；
+- 属性名以数字开头
+
 ```js
 let obj = {'name':'andy', 'age':18}
 
 let {addresss} = obj // 没有的属性，返回undefined
 let {name:a, age:b address:d='花果山'} = obj // 给name 取别名，这样可以通过a访问name, 而address则既有别名，又有默认值
 
+// 访问属性
+obj.name
+
+// 删除属性
+delete obj.name
+
+// 修改对象的属性
+obj.name = "zhou"
+
 ```
 
 #### Obj has key
+
+
 
 ```js
 // in 操作符会查找整个原型链, 如果只想看是否对象本身包含，就使用hasOwnPorperty
@@ -322,14 +876,19 @@ const arr2 = [...set2] // 转加数组
 
 ### Date
 #### create
+JavaScript 中提供了四种不同的方法来创建 Date 对象
+
 ```js
 //方法1：不指定参数 
 var nowd1=new Date(); 
+// Fri Sep 15 2023 13:48:10 GMT+0800 (China Standard Time)
 alert(nowd1.toLocaleString( )); 
 
 //方法2：参数为日期字符串 
 var nowd2=new Date("2004/3/20 11:12"); 
-alert(nowd2.toLocaleString( )); 
+alert(nowd2.toLocaleString( )); // '3/20/2004, 11:12:00 AM'
+nowd2.toLocalDateString() // '3/20/2004'
+nowd2.toLocalTimeString() // '11:12:00 AM'
 var nowd3=new Date("04/03/20 11:12"); 
 alert(nowd3.toLocaleString( )); 
 
@@ -343,9 +902,96 @@ var nowd4=new Date(2004,2,20,11,12,0,300);
 alert(nowd4.toLocaleString( ));//毫秒并不直接显示 
 ```
 
+#### property
+
+Date中主要包含两个属性：constructor， prototype
+
+##### constructor
+
+返回构造函数
+
+```js
+d = new Date()
+d.constructor
+ƒ Date() { [native code] }
+```
+
+##### prototype
+
+通过该属性您可以向对象中添加属性和方法,通过prototype添加的方法可以被所有实例共享
+
+```js
+// 定义一个构造函数
+function Person(name) {
+    this.name = name;
+}
+
+// 给Person的原型添加一个方法
+Person.prototype.sayHello = function() {
+    console.log("Hello, my name is " + this.name);
+}
+
+// 创建一个Person的实例
+var alice = new Person("Alice");
+
+// 调用原型中的方法
+alice.sayHello();  // 输出：Hello, my name is Alice
+```
+
+在对象上直接添加方法,它会在所有实例上进行拷贝，从而占用更多内存。
+
+```js
+let obj = {};
+obj.sayHello = function() {
+    console.log("Hello, world!");
+};
+obj.sayHello();  // 输出："Hello, world!"
+```
+
+在构造函数内部添加方法, 这种与直接在对象上添加方法一样，新添加的方法会在所有实例上拷贝。
+
+```js
+function Person(name) {
+    this.name = name;
+    this.sayHello = function() {
+        console.log("Hello, my name is " + this.name);
+    };
+}
+
+let alice = new Person("Alice");
+alice.sayHello();  // 输出："Hello, my name is Alice"
+```
+
 #### method
 
-getDate()                 获取日 
+```js
+function getDate(sep = '-') {
+    let today = new Date();
+    let y = today.getFullYear();
+    let m = today.getMonth() + 1;
+    let d = today.getDate();
+    if (m >= 1 && m <= 9) {
+        m = '0' + m;
+    }
+
+    if (d >= 0 && d <= 9) {
+        d = '0' + d;
+    }
+
+    return `${y}${sep}${m}${sep}${d}`;
+
+}
+```
+
+##### getDate()  
+获取日 
+
+```js
+var date = new Date();
+var day = date.getDate();
+console.log(day); // 15
+```
+
 getDay ()                 获取星期 
 getMonth ()               获取月（0-11） 
 getFullYear ()            获取完整年份 

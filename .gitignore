@@ -2,8 +2,6 @@
 _v_recycle_bin/*
 vx_recycle_bin/*
 *vimages/*
-*.jpg
-*.png
 *.db
 .idea
 .obsidian
