@@ -156,3 +156,93 @@ inputMethodEvent() 输入切换
 
 如果要阻止事件向父组件传递，此时可以在对应的事件中，通过event.accept() 就不会向父组件传递。类似js中的preventDefault(), 但是如何使用event.ignore() 事件会继续上传。
 
+父子关系：
+childAt(x,y) 获取在指定坐标的控件
+parentWidget() 获取指定控件的父控件
+childrenRect() 所有子控件组成的边界矩形
+
+
+层级控制：
+lower()将控件降低到最底层
+raise_()将控件提升到最上层
+a.stackUnder(b) 让a放在b 下面
+
+图标i：
+setWindowIcon() 设置图标
+windowIcon()
+
+标题：
+setWindowTitle('标题')
+windowTitle() 获取标题
+
+不透明度：
+setWindowOpacity(float)
+windowOpacity() 获取透明度
+
+窗口状态：
+setWindowState():
+	Qt.WindowNoState 无状态
+	Qt.WindowMinimized 最小化
+	Qt.WindowMaximized 最大化
+	Qt.WindowFullScreen 全屏
+	Qt.WindowActive 活动窗口
+windowState() 获取状态
+
+最大化最小化：
+showFullScreen()
+showMaximized()
+showMinimized()
+showNormal()
+判定状态：
+isMinimized()
+isMaximized()
+isFullScreen()
+
+## 控件交互
+是否可用：
+setEnabled(bool) 设置控件禁用状态
+isEnabled() 获取是否可用状态
+
+显示与隐藏：
+setVisible(bool)  对应的有setHidden(bool), show(), hide() 但其实都是调用setVisible(bool)
+isHidden()
+isVisible()
+isVisibleTo(widget) 是否随widget显示而显示
+
+注意：
+visible 代表控件最终的状态，是否被我们所见(被其他控件遮挡也属于可见)
+hide: 可理解为相对于父组件是否可见，隐藏的一定是不可见的，反之不一定成立
+
+
+是否编辑：
+setWindowModified(bool) 在标题中添加 "[*]"  编辑时会显示星号，否则不会显示
+isWindowModified()
+
+关闭：
+setAttribute(Qt.WA_DeleteOnClose, True) 关闭时将控件删除
+close() 关闭时只是不显示了，但控件没有被销毁。
+
+状态提示：涉及到懒加载
+statusTip()
+setStatusTip(str) 当鼠标停留在窗口控件上时，在状态栏显示文本
+
+工具提示：
+toolTip()
+setToolTip(str) 鼠标放在控件上一小段时间之后显示文本
+	toolTipDuration()
+	setToolTipDuration(msec)
+
+焦点控件：
+setFocus()
+setFocusPolicy() 
+	Qt.TabFocus
+	Qt.ClickFocus
+	Qt.StrongFocus  上面两种方式均可以获得焦点
+	Qt.NoFocus 不能通过上面两种方式
+clearFocus() 清空焦点
+
+focusWidget() 获取子控件中当前聚集的控件
+focusNextChild() 聚集下一个子控件
+focusPreviousChild() 聚集上一个子控件
+focusNextPrevChild(bool) 下一个：True，False:上一个
+setTabOrder(pre_widget, next_widget) 设置获得焦点的顺序 
