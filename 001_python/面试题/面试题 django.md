@@ -9,17 +9,8 @@
 常用请求头：
 User-Agent，Referer，Host，Content-Type，Cookie，connection,accept,Accept-Language
 ```
-### 列举常见的请求方法。
-```
-get,post,ead,put,delete,option,trace,connect
-```
-### 列举常见的状态码。
-```
-200
-300 301
-404
-500
-```
+
+
 ### http 和https 的区别？
 ```
 http:
@@ -71,35 +62,14 @@ websocket协议额外做的一些操作
 客户端向服务端发送消息时，会有一个'sec-websocket-key'和'magic string'的随机字符串(魔法字符串)
 #服务端接收到消息后会把他们连接成一个新的key串，进行编码、加密，确保信息的安全性
 ```
-### django 中如何实现websocket？
-```
-django 中使用channels
-```
-### Python web 开发中, 跨域问题的解决思路是?
-```
-跨域指由于浏览器同源策略的限制，不同端口，域名，协议的请求会被拦截响应。
-解决办法是：服务器设置响应头
-jsonp是json用来跨域的一个东西。原理是通过script标签的跨域特性来绕过同源策略
-```
+
 
 ### 请简述http 缓存机制。
 ```
 强制缓存，服务器通知浏览器一个缓存时间，在缓存时间内，下次请求，直接用缓存，不在时间内，执行比较缓存策略。
 比较缓存，将缓存信息中的Etag和Last-Modified通过请求发送给服务器，由服务器校验，返回304状态码时，浏览器直接使用缓存。
 ```
-### 谈谈你所知道的Python web 框架。
-```
-django, flask,
-```
-### django、flask、tornado 框架的比较？
-```
-django 大而全，flask 小而轻
-```
 
-### 什么是wsgi？
-```
-web server gateway interface. web服务器与web应用程序（框架）之间通信的一种通用接口
-```
 ### 列举django 的内置组件？
 ```
 paginator, form, model, admin, cookie,session, contentType,middleware, signal, orm
@@ -107,7 +77,7 @@ paginator, form, model, admin, cookie,session, contentType,middleware, signal, o
 
 ### 简述django 下的(內建的)缓存机制
 ```
-缓存是将一些常用的数据保存内存或者memcache中,在一定的时间内有人来访问这些数据时,则不再去执行数据库及渲染等操作,而是直接从内存或memcache的缓存中去取得数据,然后返回给用户.django提供了6中内存缓存机制，分别为：
+缓存是将一些常用的数据保存内存或者memcache中,在一定的时间内有人来访问这些数据时,则不再去执行数据库及渲染等操作,而是直接从内存或memcache的缓存中去取得数据,然后返回给用户.django提供了6种缓存机制，分别为：
 
 开发调试缓存（为开发调试使用，实际上不使用任何操作）；
 
@@ -121,21 +91,8 @@ memcache缓存（包含两种模块，python-memcached或pylibmc.）。
 
 以上缓存均提供了三种粒度的应用。
 ```
-### django 中model 的SlugField 类型字段有什么用途
-```
-url中不能有空格，会被转化成%20，这样比较难看，slugfield用来保存语义化的url：全部转小写，空格转下划线
-```
 
-### django 常见的线上部署方式有哪几种？
-```
-Nginx + uWSGI 
-Nginx + Gunicorn 
-```
 
-16 django 对数据查询结果排序怎么做, 降序怎么做？
-```python
-order_by() 降序在字段前面加 -
-```
 ### django 中使用memcached 作为缓存的具体方法? 优缺点说明?
 ```
 在settings中的CACHES中设置缓存，是Django目前原生支持的最快最有效的缓存系统。
