@@ -495,6 +495,811 @@ process_response()
 7. 错误处理(异常处理)
 ```
 
+### uwsgi、uWSGI和WSGI的区别
+[[概念#uwsgi]]
+[[概念#uWSGI]] 
+[[概念#WSGI (Web Server Gateway Interface)]]
+
+```
+ WSGI是一种通信协议规范。uWSGI是实现了这个WSGI协议的Web服务器。uwsgi是uWSGI服务器实现的自有传输协议。
+
+⦁ WSGI是抽象的通信规范。uWSGI是具体的软件实现。uwsgi是具体的协议实现。
+
+⦁ WSGI规定了Web服务器和Python应用的通信方式。uWSGI除了WSGI,还实现了uwsgi、http等多种协议。uwsgi协议则专用于uWSGI服务器与其他服务器的通信。
+
+⦁ 任何遵循WSGI规范的Python Web应用都可以在任何兼容WSGI的服务器上运行。而uwsgi协议则是uWSGI服务器特有的。
+
+⦁ WSGI是Python特有的规范。uWSGI虽然最初是为Python设计,但现在也支持其他语言。uwsgi协议理论上可用于任何语言。
+
+总的来说,WSGI是规范,uWSGI是实现,uwsgi是具体协议。它们在层次和用途上有所不同,但都致力于提高Python Web应用的部署和服务效率。
+
+```
+
+### Django的HttpRequest对象是在什么时候创建的？
+
+```
+⦁ 当一个请求到达时，WSGI服务器调用Django的application对象（通常是一个WSGIHandler实例）。
+   ⦁ WSGIHandler的__call__方法被调用，它接收environ和start_response参数。
+   ⦁ 在__call__方法内，会调用get_response()方法。
+   ⦁ get_response()方法会创建一个WSGIRequest对象，这个对象就是我们通常所说的request。
+   ⦁ WSGIRequest在初始化时使用environ来填充它的各个属性。
+
+所以，总的来说，您的理解是正确的主要方向。请求确实经过WSGIHandler，environ确实被用来创建request对象。只是具体的创建过程是由WSGIRequest类完成的，而不是直接在WSGIHandler的__call__方法中完成。
+```
+
+### 什么是中间件并简述其作用
+
+```
+它是一个轻量、低级别的插件系统，用于在全局范围内改变Django的输入和输出。每个中间件组件都负责做一些特定的功能。
+
+1. 请求预处理：
+   ⦁ 在视图处理请求之前执行某些操作
+   ⦁ 例如：添加一些通用数据到请求对象中
+
+2. 响应后处理：
+   ⦁ 在视图返回响应后修改或处理响应
+   ⦁ 例如：添加额外的HTTP头
+
+3. 异常处理：
+   ⦁ 捕获处理过程中的异常并进行相应处理
+   ⦁ 例如：记录错误日志或返回自定义错误页面
+
+4. 安全相关：
+   ⦁ 实现安全检查或认证
+   ⦁ 例如：CSRF保护、用户认证等
+
+5. 会话管理：
+   ⦁ 处理用户会话
+   ⦁ 例如：添加自定义会话处理逻辑
+
+6. 缓存：
+   ⦁ 实现缓存机制
+   ⦁ 例如：对某些请求结果进行缓存
+
+7. 压缩响应：
+   ⦁ 对响应内容进行压缩以减少传输数据量
+
+8. 日志记录：
+   ⦁ 记录请求和响应的详细信息
+
+9. 性能监控：
+   ⦁ 记录请求处理时间等性能指标
+
+10. 国际化和本地化：
+    ⦁ 根据用户的语言偏好设置来处理内容
+
+中间件的工作流程：
+
+1. 在请求阶段，中间件按照MIDDLEWARE设置中的顺序从上到下执行。
+2. 在响应阶段，中间件按照相反的顺序从下到上执行。
+
+使用中间件的优点：
+
+1. 可重用性：中间件可以在多个项目中重复使用。
+2. 灵活性：可以轻松添加或移除中间件，而不影响其他部分的代码。
+3. 全局性：中间件作用于所有的请求/响应，无需在每个视图中重复编写相同的代码。
+
+总之，中间件是Django中一个强大的特性，它提供了一种优雅的方式来全局性地处理请求和响应，使得代码更加模块化和可维护。
+```
+
+
+### 列举django中间件的5个方法，以及django中间件的应用场景
+
+```
+1. process_request(self, request)
+   ⦁ 在Django决定使用哪个视图之前被调用
+   ⦁ 返回None或HttpResponse对象
+
+2. process_view(self, request, view_func, view_args, view_kwargs)
+   ⦁ 在Django调用视图之前被调用
+   ⦁ 返回None或HttpResponse对象
+
+3. process_template_response(self, request, response)
+   ⦁ 在视图函数执行完毕后被调用
+   ⦁ 必须返回一个实现了render方法的响应对象
+
+4. process_response(self, request, response)
+   ⦁ 在Django执行视图函数并生成响应之后被调用
+   ⦁ 必须返回HttpResponse对象
+
+5. process_exception(self, request, exception)
+   ⦁ 当视图抛出异常时调用
+   ⦁ 返回None或HttpResponse对象
+
+Django中间件的应用场景：
+
+1. 身份认证和授权
+   ⦁ 实现用户认证，检查用户是否已登录
+   ⦁ 基于用户角色或权限控制访问
+   通常使用: process_request
+   原因: 这个方法在视图处理之前被调用,可以早早地检查用户身份,如果未授权可以立即返回响应,避免不必要的处理。
+   
+
+2. 安全增强
+   ⦁ 实现CSRF保护
+   ⦁ 添加安全headers（如X-Frame-Options）
+   ⦁ 实现IP黑名单/白名单
+   通常使用: process_response
+   原因: 安全headers通常需要添加到响应中,process_response 可以在返回响应之前修改或添加这些headers。
+
+
+3. 性能优化
+   ⦁ 压缩响应内容
+   ⦁ 实现缓存机制
+   压缩: process_response
+   缓存: process_request 和 process_response
+   原因: 压缩需要在响应生成后进行。而缓存可能需要在请求开始时检查缓存(process_request),在响应生成后保存缓存(process_response)。
+
+4. 日志和监控
+   ⦁ 记录请求和响应信息
+   ⦁ 性能监控和统计
+   通常使用: process_request 和 process_response
+   原因: 可以在请求开始和结束时记录信息,从而计算处理时间等指标。
+
+5. 跨域资源共享(CORS)
+   ⦁ 添加必要的CORS headers
+   通常使用: process_response
+   原因: CORS headers需要添加到响应中,这在响应生成后、返回客户端前完成。
+
+6. 会话管理
+   ⦁ 自定义会话处理逻辑
+   通常使用: process_request 和 process_response
+   原因: 在请求开始时读取会话,在响应返回前保存会话变更。
+
+7. 多语言支持
+   ⦁ 根据用户偏好或请求头设置语言
+   通常使用: process_request
+   原因: 需要在视图处理之前设置语言,以便整个请求过程使用正确的语言设置。
+
+8. URL重写或重定向
+   ⦁ 实现URL重写规则
+   ⦁ 处理旧URL到新URL的重定向
+    通常使用: process_request
+   原因: 在决定使用哪个视图之前,可以检查并修改URL或进行重定向。
+
+9. 异常处理
+   ⦁ 自定义错误页面
+   ⦁ 记录异常信息
+   通常使用: process_exception
+   原因: 这个方法专门用于处理视图中抛出的异常。
+
+10. 请求/响应修改
+    ⦁ 修改请求或响应的内容
+    ⦁ 添加自定义headers
+    请求修改: process_request
+    响应修改: process_response
+    原因: 分别在处理开始前修改请求,在返回响应前修改响应。
+```
+
+### 简述Django对http请求的执行流程
+
+```
+在接受一个Http请求之前的准备，需要先配置Django项目，包括设置URLs、安装应用等。然后启动一个支持WSGI网关协议的服务器（如uWSGI或Gunicorn）来监听端口，等待外界的Http请求。Django自带的开发者服务器也可以用于开发环境。
+
+当一个http请求到达服务器时，WSGI服务器会根据WSGI协议从Http请求中提取出必要的参数，组成一个字典（environ），并调用Django的application对象（通常在wsgi.py中定义）。
+
+Django的application对象负责处理请求，其流程如下：
+1. 创建请求对象（HttpRequest）
+2. 应用请求中间件
+3. 通过URL配置进行路由分发
+4. 调用匹配的视图函数
+5. 视图函数返回响应对象（HttpResponse）
+6. 应用响应中间件
+7. 返回最终的HttpResponse对象
+
+在这个过程中，Django会加载配置的中间件，进行URL路由匹配，调用相应的视图函数等。最后，Django返回一个可以被浏览器解析的、符合Http协议的HttpResponse对象。
+
+WSGI服务器接收到这个响应后，将其发送回客户端，完成整个请求-响应周期。
+```
+
+### 请简述Django下的（内建）缓存机制
+
+```
+当浏览器首次请求时,Django会处理请求并生成响应,然后将响应内容缓存到配置的存储介质中,同时设置响应头包含缓存控制信息。在后续请求中,浏览器会带上"If-Modified-Since"头部,Django接收到请求后会检查这个头部,并与缓存中内容的最后修改时间进行比较。如果缓存内容已过期,Django会重新获取并处理数据,更新缓存,然后返回新的响应;如果缓存内容未过期,Django会直接从缓存中获取数据,返回304 Not Modified响应,告诉浏览器使用本地缓存。这种机制能有效减少服务器负载,提高响应速度,同时确保客户端获取最新数据。
+```
+
+### 什么是ASGI，简述WSGI和ASGI的关系与区别
+
+```
+1. ASGI 是 WSGI 的精神继承者，旨在解决 WSGI 的一些限制。
+2. ASGI 保留了 WSGI 的许多设计理念，但进行了扩展以支持异步操作和更多协议。
+
+WSGI 和 ASGI 的主要区别：
+
+1. 同步 vs 异步：
+   ⦁ WSGI 是同步的，一次只能处理一个请求。
+   ⦁ ASGI 是异步的，可以同时处理多个请求，提高并发性能。
+
+2. 协议支持：
+   ⦁ WSGI 主要支持 HTTP 协议。
+   ⦁ ASGI 支持多种协议，包括 HTTP、WebSocket、HTTP/2 等。
+
+3. 性能：
+   ⦁ ASGI 通常在处理大量并发连接时表现更好，特别是对于长连接和实时应用。
+   ⦁ WSGI 在处理简单的 HTTP 请求时可能更轻量级。
+
+4. 编程模型：
+   ⦁ WSGI 使用同步编程模型，更简单直观。
+   ⦁ ASGI 使用异步编程模型，需要使用 async/await 语法。
+
+5. 兼容性：
+   ⦁ 许多现有的 WSGI 应用可以在 ASGI 服务器上运行（通过适配器）。
+   ⦁ ASGI 应用通常不能直接在 WSGI 服务器上运行。
+
+6. 生态系统：
+   ⦁ WSGI 有更成熟的生态系统，许多传统 Web 框架都基于 WSGI。
+   ⦁ ASGI 生态系统正在快速发展，新的异步框架和工具不断涌现。
+
+7. 使用场景：
+   ⦁ WSGI 适合传统的 Web 应用和 REST API。
+   ⦁ ASGI 更适合需要实时功能、WebSocket 或高并发的应用。
+
+```
+
+### Django本身提供了runserver，为什么不能用来部署
+
+```
+Django本身提供了runserver,但它不适合用来部署生产环境。runserver是Django自带的WSGI Server,主要用于测试和开发。它以单进程方式运行,性能有限,缺乏安全性和稳定性考虑,不支持高并发,也不具备静态文件服务等生产环境所需的功能。
+
+相比之下,uWSGI是一个功能强大的Web服务器,它实现了WSGI、uwsgi、http等多种协议。需要注意的是,uwsgi是一种通信协议,而uWSGI是实现该协议的Web服务器。uWSGI具有超快的性能、低内存占用和多app管理等优点。它支持多进程、多线程,能够更好地发挥多核优势,提升性能和并发处理能力。
+
+在生产环境中,uWSGI通常与Nginx配合使用,形成一个强大的部署方案。这种组合能够将用户访问请求与应用程序隔离,提供更好的安全性和可靠性。uWSGI还提供了缓存、负载均衡等高级特性,使其更适合处理生产环境的复杂需求。
+
+此外,uWSGI提供了更强大的配置选项和更可靠的进程管理,使得它在可扩展性和稳定性方面都优于runserver。值得一提的是,Gunicorn是另一个常用的WSGI服务器选择,也适用于生产环境部署。
+
+总的来说,使用uWSGI(或类似的专业WSGI服务器)而不是runserver进行部署,可以获得更高的并发处理能力、更好的性能、更强的安全性和更灵活的配置选项,这些都是生产环境所必需的。
+
+安全性：
+
+1. 请求处理：
+   ⦁ runserver: 所有请求都由 Django 直接处理，包括静态文件。这可能导致不必要的资源消耗和潜在的安全风险。
+   ⦁ 生产环境：Nginx 可以处理静态文件请求，仅将动态请求传递给 Django，减少了暴露面。
+
+2. 缓冲和请求大小限制：
+   ⦁ runserver: 缺乏对请求大小的严格控制。
+   ⦁ 生产环境：Nginx 可以设置请求大小限制，防止大量数据导致的 DoS 攻击。
+
+3. 错误处理：
+   ⦁ runserver: 可能暴露详细的错误信息。
+   ⦁ 生产环境：可以配置自定义错误页面，避免泄露敏感信息。
+
+4. 安全头部：
+   ⦁ runserver: 不提供额外的安全头部。
+   ⦁ 生产环境：Nginx 可以添加各种安全头部，如 X-XSS-Protection, X-Frame-Options 等。
+
+5. SSL/TLS 配置：
+   ⦁ runserver: 虽然可以配置 SSL，但选项有限。
+   ⦁ 生产环境：Nginx 提供更灵活、更安全的 SSL/TLS 配置选项。
+
+稳定性：
+
+1. 并发处理：
+   ⦁ runserver: 单线程，一次只能处理一个请求。
+   ⦁ 生产环境：可以处理大量并发连接，uWSGI 可以配置多进程和多线程。
+
+2. 资源管理：
+   ⦁ runserver: 不会自动重启失败的进程。
+   ⦁ 生产环境：uWSGI 可以监控并自动重启失败的工作进程。
+
+3. 负载均衡：
+   ⦁ runserver: 不支持负载均衡。
+   ⦁ 生产环境：Nginx 可以实现负载均衡，分发流量到多个后端服务器。
+
+4. 内存泄漏处理：
+   ⦁ runserver: 长时间运行可能导致内存泄漏。
+   ⦁ 生产环境：可以配置定期重启工作进程，避免长时间运行导致的问题。
+
+5. 优雅关闭：
+   ⦁ runserver: 关闭时可能直接中断正在处理的请求。
+   ⦁ 生产环境：uWSGI 支持优雅关闭，确保正在处理的请求完成。
+
+6. 静态文件服务：
+   ⦁ runserver: 效率较低，可能影响应用性能。
+   ⦁ 生产环境：Nginx 高效处理静态文件，减轻 Django 负担。
+
+```
+
+### urlpatterns中的name与namespace的区别
+
+```
+name:给路由起一个别名  
+  
+namespace:防止多个应用之间的路由重复
+```
+
+
+### 外键有什么用，什么时候合适使用外接，外键一定需要索引吗？
+
+```
+- 程序很难100％保证数据的完整性,而用外键即使在数据库服务器宕机或异常的时候,也能够最大限度的保证数据的一致性和完整性。
+- 如果项目性能要求不高,安全要求高,建议使用外键，如果项目性能要求高,安全自己控制，不用外键，因为外键查询比较慢。
+- 加入外键的主要问题就是影响性能,因此加入索引能加快关联查询的速度。
+
+   class Book(models.Model):
+       author = models.ForeignKey(Author, on_delete=models.CASCADE, db_index=True)
+   
+   class Book(models.Model):
+       author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+       class Meta:
+           indexes = [
+               models.Index(fields=['author']),
+           ]
+   
+
+```
+
+### `Primary Key`和`Unique Key`的区别
+
+```
+- Primary key与Unique Key都是唯一性约束。
+- Primary key是主键，一个表只能由一个，Unique key是唯一键，一个表可以有多个唯一键字段。
+- Primary key 必须不能为空，Unique Key 可为空。
+```
+
+### django中怎么写原生SQL
+
+```
+1. 使用extra
+# 查询人民邮电出版社出版并且价格大于50元的书籍  
+Book.objects.filter(publisher__name='人民邮电出版社').extra(where=['price>50'])
+
+2. 使用raw
+books=Book.objects.raw('select * from hello_book')    
+  
+for book in books:    
+   print book
+
+3. 使用游标
+from django.db import connection    
+cursor = connection.cursor()   
+cursor.execute("insert into hello_author(name) values ('特朗普')"）  
+cursor.execute("update hello_author set name='普京' WHERE name='特朗普'")    
+cursor.execute("delete from hello_author where name='普京'")    
+cursor.execute("select * from hello_author")    
+cursor.fetchone()    
+cursor.fetchall()
+```
+
+
+### 谈一谈你对ORM的理解
+[[概念#ORM]]
+
+```
+**ORM**是“对象-关系-映射”的简称。
+
+ORM是MVC或者MVC框架中包括一个重要的部分，它实现了数据模型与数据库的解耦，即数据模型的设计不需要依赖于特定的数据库，通过简单的配置就可以轻松更换数据库，这极大的减轻了开发人员的工作量，不需要面对因数据库变更而导致的无效劳动。
+```
+
+### Django ORM如何取消级联
+
+```
+1. 使用 on_delete=models.DO_NOTHING
+
+这个选项会完全取消级联操作。当关联的对象被删除时，不会对当前模型的实例做任何操作。
+
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
+
+
+2. 使用 on_delete=models.SET_NULL
+
+这个选项会在关联对象被删除时，将外键字段设置为NULL。注意，你需要将外键字段设置为可空（null=True）。
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
+
+
+3. 使用 on_delete=models.SET_DEFAULT
+
+这个选项会在关联对象被删除时，将外键字段设置为一个默认值。你需要指定一个默认值。
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.SET_DEFAULT, default=1)
+
+
+4. 使用 on_delete=models.SET()
+
+这个选项允许你指定一个函数，在关联对象被删除时调用该函数来设置新的值。
+
+def get_default_author():
+    return Author.objects.get_or_create(name='Unknown')[0].id
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.SET(get_default_author))
+
+
+5. 使用 on_delete=models.PROTECT
+
+这个选项会阻止删除操作，如果尝试删除被引用的对象，会引发 ProtectedError。
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.PROTECT)
+
+
+注意事项：
+
+1. 更改 on_delete 选项可能需要数据库迁移。
+
+2. 取消级联可能会导致数据一致性问题，请确保你的应用程序能够正确处理这些情况。
+
+3. 如果你使用 SET_NULL 或 SET_DEFAULT，确保相关字段允许为空或有合适的默认值。
+
+4. 在某些情况下，你可能需要手动处理关联数据的清理，以避免出现孤立数据。
+```
+
+### Django 查询集的2大特性？什么是惰性执行
+
+```
+1. 惰性执行(Lazy Evaluation)
+2. 缓存机制(Caching)
+
+惰性执行是指 Django 查询集在创建、过滤、切片等操作时不会立即执行实际的数据库查询。只有当你真正需要结果时，Django 才会访问数据库。
+
+惰性执行的主要特点:
+
+1. 创建查询集不会触发数据库查询。
+2. 对查询集进行过滤、排序等操作也不会立即执行查询。
+3. 查询集可以被重复使用，每次使用时都会重新生成 SQL。
+4. 只有在实际需要结果时才执行查询，如:
+   ⦁ 迭代查询集
+   ⦁ 对查询集进行切片
+   ⦁ 调用 len() 或 list() 等方法
+
+5. 一旦查询执行后，结果会被缓存，后续使用相同查询集不会重复查询数据库。
+惰性执行的优势:
+
+1. 性能优化: 避免不必要的数据库查询，减少数据库负载。
+2. 灵活性: 可以构建复杂的查询，而不用担心性能问题。
+3. 链式操作: 可以方便地组合多个过滤条件。
+示例:
+
+# 这行代码不会执行查询
+queryset = Book.objects.filter(author="John")
+
+# 这行也不会执行查询
+queryset = queryset.filter(published_date__year=2021)
+
+# 此时才会执行实际的数据库查询
+for book in queryset:
+    print(book.title)
+
+
+总之，惰性执行是 Django ORM 的一个重要特性，它通过延迟执行数据库查询来优化性能，同时提供了构建复杂查询的灵活性。理解并善用这一特性可以帮助开发者编写更高效的 Django 应用。
+```
+
+### Django查询集返回的列表过滤器有哪些
+
+```
+all()：返回所有数据  
+filter()：返回满足条件的数据  
+exclude()：返回满足条件之外的数据，相当于sql语句中where部分的not关键字  
+order_by()：排序
+```
+
+
+### selected_related与prefetch_related有什么区别
+
+```
+在查询对象集合的时候，把指定的外键对象也一并完整查询加载，避免后续的重复查询。使用 select_related() 和 prefetch_related() 可以很好的减少数据库请求的次数，从而提高性能。
+
+1. **select_related**适用于一对一字段（OneToOneField）和外键字段（ForeignKey）查询；
+2. **prefetch_related**适用多对多字段（ManyToManyField）和一对多字段的查询。（或许你会有疑问，没有一个叫OneToManyField的东西啊。实际上 ，ForeignKey就是一个多对一的字段，而被ForeignKey关联的字段就是一对多字段了）
+
+1. select_related:
+
+   ⦁ 用于处理一对一(OneToOne)和多对一(ForeignKey)的关系。
+   ⦁ 通过JOIN操作在单个数据库查询中获取相关对象。
+   ⦁ 减少数据库查询的次数，适合于"正向"关系查询。
+   ⦁ 直接将关联的对象数据加载到内存中。
+
+   示例：
+   
+   # 不使用select_related
+   book = Book.objects.get(id=1)
+   author = book.author  # 这里会触发额外的数据库查询
+
+   # 使用select_related
+   book = Book.objects.select_related('author').get(id=1)
+   author = book.author  # 不会触发额外的查询，因为author已经被预先加载
+   
+
+2. prefetch_related:
+
+   ⦁ 用于处理多对多(ManyToMany)和一对多(反向ForeignKey)的关系。
+   ⦁ 执行单独的查询来获取相关对象，然后在Python中进行连接。
+   ⦁ 可以减少数据库查询的次数，适合于"反向"关系和多对多关系查询。
+   ⦁ 允许对预取的对象进行过滤和自定义。
+
+   示例：
+   
+   # 不使用prefetch_related
+   books = Book.objects.all()
+   for book in books:
+       print(book.authors.all())  # 每本书都会触发一次额外的查询
+
+   # 使用prefetch_related
+   books = Book.objects.prefetch_related('authors').all()
+   for book in books:
+       print(book.authors.all())  # 不会触发额外的查询
+   
+
+主要区别：
+
+1. 查询方式：
+   ⦁ select_related 使用SQL的JOIN操作。
+   ⦁ prefetch_related 执行单独的查询，然后在Python中进行连接。
+
+2. 适用关系：
+   ⦁ select_related 适用于一对一和多对一关系。
+   ⦁ prefetch_related 适用于多对多和一对多（反向）关系。
+
+3. 数据加载：
+   ⦁ select_related 在单个查询中加载所有相关数据。
+   ⦁ prefetch_related 执行额外的查询来加载相关数据。
+
+4. 灵活性：
+   ⦁ select_related 不太灵活，因为它依赖于数据库的JOIN操作。
+   ⦁ prefetch_related 更灵活，允许对预取的对象进行过滤和自定义。
+
+5. 性能影响：
+   ⦁ select_related 可能会导致大量数据被一次性加载，特别是在多层级关系中。
+   ⦁ prefetch_related 可能会执行多个查询，但每个查询通常更小更快。
+
+1. select_related（使用 JOIN）：
+
+假设我们有 Book 和 Author 两个模型，它们是多对一的关系（一本书有一个作者，一个作者可以写多本书）。
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+
+使用 select_related 的查询：
+
+books = Book.objects.select_related('author').all()
+
+
+这将生成类似下面的 SQL 查询：
+
+SELECT book.id, book.title, author.id, author.name
+FROM book
+INNER JOIN author ON book.author_id = author.id;
+
+
+这是一个单一的查询，通过 JOIN 操作一次性获取了书籍和作者的信息。
+
+2. prefetch_related（单独查询）：
+
+现在假设我们有一个多对多的关系，比如一本书可以有多个类别，一个类别可以包含多本书：
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    categories = models.ManyToManyField(Category)
+
+
+使用 prefetch_related 的查询：
+
+books = Book.objects.prefetch_related('categories').all()
+
+
+这将生成两个单独的查询：
+
+第一个查询获取所有书籍：
+SELECT id, title FROM book;
+
+
+第二个查询获取相关的类别：
+SELECT book_categories.book_id, category.id, category.name
+FROM category
+INNER JOIN book_categories ON category.id = book_categories.category_id
+WHERE book_categories.book_id IN (1, 2, 3, ...);
+
+
+这里的 "IN (1, 2, 3, ...)" 包含了第一次查询中获取的所有书籍的 ID。
+
+prefetch_related 的"单独查询"就是指它会执行额外的查询来获取相关对象，而不是在一个查询中通过 JOIN 获取所有数据。这种方法在处理多对多关系或者可能返回大量数据的查询时特别有用，因为它可以更好地控制查询的规模和复杂度。
+
+在 Python 中，Django ORM 会自动将这两个查询的结果组合在一起，使得你可以轻松地访问每本书的类别，而不会触发额外的数据库查询。
+```
+
+### Django QueryDict和dict区别
+
+```
+
+Django的QueryDict和Python的普通dict虽然都是字典类型的数据结构,但它们有一些重要的区别:
+
+1. 多值支持:
+
+   ⦁ QueryDict可以存储同一个key对应多个value。
+   ⦁ 普通dict一个key只能对应一个value。
+
+2. 不可变性:
+
+   ⦁ QueryDict默认是不可变的(immutable)。
+   ⦁ 普通dict是可变的(mutable)。
+
+3. 获取值的方法:
+
+   ⦁ QueryDict使用get()方法获取单个值,getlist()获取多个值。
+   ⦁ 普通dict只用get()或[]来获取值。
+
+4. 创建方式:
+
+   ⦁ QueryDict通常由Django自动创建(如request.GET, request.POST)。
+   ⦁ 普通dict由Python直接创建。
+
+5. 特殊方法:
+
+   ⦁ QueryDict有一些特殊方法如urlencode()。
+   ⦁ 普通dict没有这些特殊方法。
+
+6. 复制:
+
+   ⦁ QueryDict的copy()方法返回一个可变的副本。
+   ⦁ 普通dict的copy()返回一个浅拷贝。
+
+7. 数据来源:
+
+   ⦁ QueryDict通常用于处理HTTP请求参数。
+   ⦁ 普通dict用途更加广泛。
+
+8. 默认值行为:
+
+   ⦁ QueryDict的get()方法在key不存在时默认返回None。
+   ⦁ 普通dict的get()可以指定默认值,不指定则返回None。
+
+9. 类型:
+
+   ⦁ QueryDict是django.http.QueryDict类的实例。
+   ⦁ 普通dict是Python内置的dict类的实例。
+
+示例:
+
+# QueryDict
+from django.http import QueryDict
+q = QueryDict('a=1&a=2&b=3')
+print(q.getlist('a'))  # ['1', '2']
+print(q.get('a'))      # '1'
+
+# 普通dict
+d = {'a': 1, 'b': 3}
+print(d.get('a'))      # 1
+print(d.get('c', 'default'))  # 'default'
+
+
+了解这些区别可以帮助你在Django开发中更好地处理请求参数和其他字典类型的数据。
+
+From claude-3-5-sonnet@20240620, input:15, output: 630
+```
+
+
+### Django中查询Q和F的区别
+
+```
+Q对象:
+1. 用途: 用于构建复杂的查询条件,特别是涉及OR操作或者嵌套条件的查询。
+2. 功能: 允许你组合多个查询条件,使用&(AND)、|(OR)、~(NOT)等操作符。
+3. 使用场景: 当你需要执行复杂的过滤操作,如多条件组合查询时。
+4. 示例:
+   from django.db.models import Q
+
+   # 查找名字为'John'或年龄大于30的用户
+   User.objects.filter(Q(name='John') | Q(age__gt=30))
+   
+
+F对象:
+1. 用途: 用于直接引用数据库字段的值,进行字段值的比较或运算。
+2. 功能: 允许你在不实际获取对象的情况下,直接在数据库层面进行字段操作。
+3. 使用场景: 当你需要比较同一个模型的不同字段,或者进行字段值的计算时。
+4. 示例:
+   from django.db.models import F
+
+   # 查找价格大于折扣价的商品
+   Product.objects.filter(price__gt=F('discounted_price'))
+
+   # 将所有商品的价格增加10%
+   Product.objects.update(price=F('price') * 1.1)
+   
+
+主要区别:
+1. Q主要用于构建复杂的查询条件,而F用于引用和操作数据库字段。
+2. Q对象更多地用于过滤(filter)操作,F对象既可用于过滤,也常用于更新(update)操作。
+3. Q对象可以组合多个条件,F对象主要用于单个字段的操作或比较。
+4. Q对象可以处理跨关系的复杂查询,F对象通常用于同一个模型内的字段操作。
+```
+
+
+### 如何给CBV添加装饰器
+
+```
+1. 使用method_decorator装饰器
+
+这是最常用的方法。你可以在类上使用method_decorator来装饰特定的方法:
+
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
+class MyView(View):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+2. 在urls.py中使用
+
+你可以在URL配置中直接应用装饰器:
+
+from django.contrib.auth.decorators import login_required
+from .views import MyView
+
+urlpatterns = [
+    path('my-view/', login_required(MyView.as_view())),
+]
+
+```
+
+### 在视图函数中，常用的验证装饰器有哪些？
+
+| 装饰器                   | 用途                           |
+| --------------------- | ---------------------------- |
+| @login_required()     | 检查用户是否通过身份验证                 |
+| @group_required()     | 检查用户是否属于有权限的用户组访问            |
+| @anonymous_required() | 检验用户是否已经登录                   |
+| @superuser_only()     | 它只允许超级用户才能访问视图               |
+| @ajax_required        | 用于检查请求是否是AJAX请求              |
+| @timeit               | 用于改进某个视图的响应时间，或者只想知道运行需要多长时间 |
+
+
+### 如何提高Django应用程序的性能
+
+```
+**前端优化：**
+
+1. 减少 http 请求，减少数据库的访问量，比如使用雪碧图。
+2. 使用浏览器缓存，将一些常用的 css，js，logo 图标，这些静态资源缓存到本地浏览器，通过设置 http 头中的 cache-control 和 expires 的属性，可设定浏览器缓存，缓存时间可以自定义。
+3. 对 html，css，javascript 文件进行压缩，减少网络的通信量。
+
+**后端优化：**
+
+1. 合理的使用缓存技术，对一些常用到的动态数据，比如首页做一个缓存，或者某些常用的数据做个缓存，设置一定得过期时间，这样减少了对数据库的压力，提升网站性能。
+2. 使用 celery 消息队列，将耗时的操作扔到队列里，让 worker 去监听队列里的任务，实现异步操作，比如发邮件，发短信。
+3. 就是代码上的一些优化，补充：nginx 部署项目也是项目优化，可以配置合适的配置参数，提升效率，增加并发量。
+4. 如果太多考虑安全因素，服务器磁盘用固态硬盘读写，远远大于机械硬盘，这个技术现在没有普及，主要是固态硬盘技术上还不是完全成熟， 相信以后会大量普及。
+5. 服务器横向扩展
+```
+
+
+### 谈谈对Celery的理解,有哪些应用场景
+
+```
+Celery是一个用Python开发的分布式任务队列系统，基于生产者-消费者模型。它允许生产者将任务发送到消息队列，由消费者处理这些任务.
+
+1. 简单：配置和使用相对简单。
+2. 可靠：具有任务重试机制，能够处理执行失败或连接中断的情况。
+3. 高性能：单进程可以每分钟处理大量任务。
+4. 灵活：支持多种消息代理和结果后端，组件可扩展和自定义。
+5. 实时处理：主要用于实时操作，但也支持任务调度。
+
+
+1. 异步任务：当用户在网站进行某个操作需要很长时间完成时，我们可以将这种操作交给Celery执行，直接返回给用户，等到Celery执行完成以后通知用户，大大提好网站的并发以及用户的体验感。例如：发送验证邮件
+2. 定时任务：向定时清除沉余数据或批量在几百台机器执行某些命令或者任务，此时Celery可以轻松搞定。
+```
 ## DRF
 
 ### 谈谈你对restfull 规范的认识？
