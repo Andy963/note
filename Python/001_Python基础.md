@@ -385,46 +385,8 @@ def divideBy2(decNumber, base=2):
     return binString
 ```
 
-## 流程控制
 
-python中没有三元运算，但可用if else 代替
-
-```python
-rs = 'yes' if True else 'no'
-rs
-Out[4]: 'yes'
-```
-
-注意这种简化版与js中三目运算 [[001_Basic#^376bba]]是有区别的,与golang中[[04_流程控制#^znroy7]]也是有区别的
-### 循环
-while循环，当条件成立，就会一直执行，即死循环。
-
-```python
-n = 100
-sum = 0
-counter = 1
-while counter <= n:
-    sum = sum + counter
-    counter += 1
-print("1 到 %d 之和为: %d" % (n,sum))
-```
-while 循环中可以使用else,即条件不成立，循环无法继续时会执行：
-> 1. while循环的else子句会在循环正常结束时执行。
-2. "正常结束"指的是循环条件变为False，而不是通过break语句跳出循环。
-3. 如果循环是因为break语句而终止的，else子句不会执行。
-4. 如果while循环的条件一开始就是False，else子句仍然会执行。
-
-```python
-count = 0
-while count < 5:
-   print (count, " 小于 5")
-   count = count + 1
-else:
-   print (count, " 大于或等于 5")
-```
-
-
-### 可迭代对象
+## 可迭代对象
 从代码角度来说，对象内部实现了__iter__()方法或者实现了__getitem__()的方法,主要包括:列表、元组、字典、集合字符串和open()打开的文件
 
 enumerate的一个优点：
@@ -495,7 +457,7 @@ print(fruits)
 - **iter**(): 返回迭代器对象本身
 - **next**(): 返回容器中的下一个元素,如果没有更多元素则抛出 StopIteration 异常
 
-2. 迭代器的特点:
+ 迭代器的特点:
 
 - 惰性计算: 只有在需要时才会计算下一个元素,节省内存
 - 单向遍历: 只能向前遍历,不能后退
@@ -571,13 +533,14 @@ def fun():
 ret = fun()
 print(ret.__next__())
 ```
+
 当代码执行时，首先会打印one,然后将第一个yield的值交给ret（可以理解为return）,此时它会保留状态，下次再取则从第一个yield之后取。如果再次执行`print(ret.__next__())`则会取到第二个yield之后 的值，即 22。
 
 总结：yield与return的区别：
         return一般在函数中只设置一个，他的作用是终止函数，并且给函数的执行者返回值。
         yield在生成器函数中可设置多个，他并不会终止函数，next会获取对应yield生成的元素
 
-####send
+### send
 send用来向生成器中传值，它本身包含next方法，看下面的例子：
 
 ```python
@@ -669,6 +632,7 @@ ref:https://blog.csdn.net/HUSTHY/article/details/106882669
 
 
 ## 函数
+
 定义在函数内部的函数，该函数引用外部作用域而不是全局作用域的变量，该函数称为闭包函数。该函数可以在其定义环境外执行。
 闭包函数私有化了变量,完成了数据的封装,类似于面向对象. 闭包因为保存了变量,如果大量使用,对内存是有消耗的.
 
@@ -735,8 +699,11 @@ product = reduce(lambda total, num: total * num, numbers, 1)
 print(product)  # 输出 "24"
 ```
 ### 装饰器:
-本质是一个函数，它接受一个函数作为输入，并返回另一个函数.装饰器通常使用闭包来记住原始函数，并在新函数中调用它.
+
+本质是一个函数或一个类，它接受一个函数作为输入，并返回另一个函数.装饰器通常使用闭包来记住原始函数，并在新函数中调用它.
 不影响原有函数的功能,还能添加新的功能
+
+#### 函数装饰器
 
 ```python
 
@@ -818,8 +785,9 @@ Decorator 2
 Hello, world!
 ```
 
-上面是使用函数作为装饰器的情形，下面看看使用类作为装饰器的情形：
-使用为作为装饰器本质上还是使用的函数，只不过形式上是类
+#### 类装饰器
+
+使用类作为装饰器本质上还是使用的函数，只不过形式上是类
 
 ```python
 class ClsDecorator:
@@ -882,9 +850,10 @@ this is my func
 exit
 ```
 
-我们在装饰时是使用的实例化对象，这样有一点好处是方便传入参数
+我们在装饰时是使用的实例化对象，这样有一点好处是方便传入参数。当有参数时：`ClsDecorator('andy',30)` 已经完成了类的实例化，此时将 `fun` 参数 传给 ClsDecorator的实例对外，此时 `call` 方法就不能是简单的函数，而应该是闭包，否则就直接执行了。
 
-#### 案例
+
+#### 应用场景
 
 1. 类装饰器可以用于计算函数的运行时间，示例代码如下
 
@@ -1129,176 +1098,6 @@ eat
 eat
 ```
 
-#### 内置方法 
-
-###### __call__ 
-让对象具备被调用的能力
-
-```python
-class Person:
-	def __call__(self):
-		print("run")
-
-p = Person()
-p()
-run
-```
-
-flask orm中的 sessionmaker 就用到了__call__ [[005_SqlAlchemy#用session做数据的增删改查操作：]]  源码如下：
-
-```python
-class sessionmaker(_SessionClassMethods):
-    
-
-	def __call__(self, **local_kw):  
-	    """Produce a new :class:`.Session` object using the configuration  
-	    established in this :class:`.sessionmaker`.  
-	    In Python, the ``__call__`` method is invoked on an object when    it is "called" in the same way as a function::  
-	        Session = sessionmaker()        session = Session()  # invokes sessionmaker.__call__()  
-	    """    for k, v in self.kw.items():  
-	        if k == "info" and "info" in local_kw:  
-	            d = v.copy()  
-	            d.update(local_kw["info"])  
-	            local_kw["info"] = d  
-	        else:  
-	            local_kw.setdefault(k, v)  
-	    return self.class_(**local_kw)
-```
-
-应用场景:类似偏函数
-
-```python
-def create_pen(p_type,p_color):
-	print(f"create a {p_color}-{p_type}")
-
-
-create_pen('钢笔','红色')
-create_pen('钢笔','黑色')
-
-from functools import partial
-
-def create_pen(p_color,p_type):
-	print(f"create a {p_color}-{p_type}")
-
-
-# create_pen('钢笔','红色')
-# create_pen('钢笔','黑色')
-
-# 这种情况会导致出错,可以将p_type参数换到后面的位置
-# gangPen = partial(create_pen,p_type="钢笔")
-# gangPen('黄色')
-# gangPen('绿色')
-
-
-# 针对上面的偏函数,可以通过面向对象的方式实现
-class PenFactory:
-	def __init__(self,p_type):
-		self.p_type = p_type
-
-	def __call__(self,p_color):
-		print(f"create a {p_color} - {self.p_type}")
-
-pencilFac = PenFactory('铅笔')
-pencilFac('红色')
-pencilFac('黄色')
-#create a 红色 - 铅笔
-#create a 黄色 - 铅笔
-```
-
-###### 切片
-
-```python
-
-class Person:
-	def __init__(self):
-		self.items = [1,2,3,4,5,5,6,7]
-
-	def __setitem__(self,key,value):
-		# print(key.start)
-		# print(key.stop)
-		# print(key.step)
-		# print(value)
-		# 防止传入的key为字符串类型的情况
-		# slice为内置类,直接用即可
-		if isinstance(key,slice):
-			self.items[key.start:key.stop:key.step] = value
-
-	def __getitem__(self,item):
-		print("getitem",item)
-
-	def __delitem__(self,key):
-		print("delete item",key)
-
-p = Person()
-p[0:3:1] = ['a','b']
-print(p.items)
-# 只能修改,否则为空,无法修改
-# ['a', 'b', 4, 5, 5, 6, 7]
-```
-
-###### 遍历操作
-
-1. __iter__() 方法：
-   ⦁ 这是实现迭代的首选方法。
-   ⦁ 如果一个类定义了 __iter__() 方法，Python 会优先使用它来进行遍历。
-   ⦁ __iter__() 方法应该返回一个迭代器对象。
-
-2. __getitem__() 方法：
-   ⦁ 如果一个类没有定义 __iter__() 方法，但定义了 __getitem__() 方法，Python 会尝试使用 __getitem__() 来进行遍历。
-   ⦁ Python 会从索引 0 开始，连续调用 __getitem__() 方法，直到抛出 IndexError 异常。
-
-3. 遍历的优先顺序：
-   ⦁ Python 首先查找 __iter__() 方法。
-   ⦁ 如果 __iter__() 不存在，则查找 __getitem__() 方法。
-   ⦁ 如果两者都不存在，则该对象被认为是不可迭代的。
-
-```python
-class Person:
-    def __init__(self, age):
-        self.age = age
-
-    def __getitem__(self, item):
-        self.age += 1
-        if self.age > 18:
-            raise StopIteration("成年了")
-        return self.age
-
-
-p = Person(1)
-for i in p:
-    print(i)
-
-
-class Person:
-    def __init__(self, age):
-        self.age = age
-
-    def __getitem__(self, item):
-        self.age += 1
-        if self.age > 18:
-            raise StopIteration("成年了")
-        return self.age
-
-    def __iter__(self):
-        # 如果定义了本方法,本方法优先级比__getitem__高
-        # 在遍历时,本方法返回一个迭代器对象,并不断调用 __next__方法来获取下一个值
-        print('iter')
-        # return iter([1,2,3])
-        return self
-
-    def __next__(self):
-        self.age += 1
-        if self.age > 18:
-            raise StopIteration("成年了")
-        return self.age
-
-
-p = Person(1)
-for i in p:
-    print(i)
-
-```
-
 ### 属性访问及顺序
 
 针对三种方法，对实例属性，类属性的访问问题：
@@ -1424,7 +1223,7 @@ print(foo.descriptor)
 
 ```
 
-#### 描述器
+### 描述器
 
 ```python
 
@@ -1600,177 +1399,8 @@ __set__ <__main__.Person object at 0x7f1673ce2ac8> 30
 如果一个对象定义了 __set__() 或 __delete__()，则它会被视为数据描述器。 仅定义了 __get__() 的描述器称为非数据描述器（它们经常被用于方法，但也可以有其他用途）
 
 
-#### 调用类对象
 
-要想达到调用函数一样调用类对象，应得在类中实现__call__方法。这类可以当作函数来调用的对象，称为可调用对象。
-
-```python
-#!/usr/bin/env python
-# coding: utf-8 
-# Create by Andy963 @2020-07-12 13:37:23
-
-class A:
-    def go(self):
-        return object()
-    
-class B:
-    def run(self):
-        return object()
-    
-def func():
-    return object()
-
-def main(params:
-    params()
-    # a.go
-    # b.run
-    # fun()
-    pass
-
-#在上面的情况中，如果是传入的A的对象，在main中我得调用a.go方法，而如果是B的对象，则需要调用run方法，对于不同的类，要调用不同的方法，显示在main函数中我们
-#无法知道这个具体方法，而__call__方法让这一切成为可能。只要类实现了__call__方法。
-
-
-class Person:
-    def __init__(self,name):
-        self.name = name
-
-    def __call__(self):
-        print(self.name,'hello,world')
-
-if __name__ == '__main__':
-    andy = Person('andy')
-    andy() # 可调用对象
-
-
-#因为实现了__call__方法，我只需要调用类对象（就像调用函数一样）
-```
-
-
-#### 描述器
-
-只要是定义了__get__()、__set()__  、 __delete()__中任意一个方法的对象都叫描述符
-通常情况下，类P的属性x,我们获取时obj.x 是从 p.__dict__中取值，而如果定义了相应的描述符，就可以改变这种行为.
-
-如果我们要对类的某种行为做一定的限制，下面的方式可以达到目的，但这种方式显然是不合适的。
-
-```python
-class Person:
-
-    def __init__(self, name, age):
-        self.name = name
-        if not isinstance(age, int):
-            raise TypeError('Expected an int!')
-        self.age = age
-
-
-p = Person('andy', 10)
-print(p.name, p.age)
-p1 = Person('andy', '10')
-print(p1.name, p1.age)
-
-```
-
-下面用property装饰器来实现：
-
-```python
-class Person:
-    def __init__(self, name):
-        self.__name = name
-
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise TypeError('Expected a str!')
-        self.__name = value
-
-    @name.deleter
-    def name(self):
-        del self.__name
-
-
-p = Person('andy')
-print(p.name)
-p.name = 10 # TypeError: Expected a str!
-print(p.name)
-```
-
-假如我们想在对类属性进行操作时，对它做一定的限制，比如类型检查，可以用上面的方式实现。
-但通常情况下，类有多个属性，不太合适每个属性都这么写一遍，那有没有更好的方法呢？
-
-```python
-class String:
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return instance.__dict__[self.name]
-
-    def __set__(self, instance, value):
-        if not isinstance(value, str):
-            raise TypeError('Expected a string')
-
-        instance.__dict__[self.name] = value
-
-    def __delete__(self, instance):
-        del instance.__dict__[self.name]
-
-
-class Integers:
-    def __init__(self, age):
-        self.age = age
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return instance.__dict__[self.age]
-
-    def __set__(self, instance, value):
-        if not isinstance(value, int):
-            raise TypeError('Expected an int')
-        instance.__dict__[self.age] = value
-
-    def __delete__(self, instance):
-        del instance.__dict__[self.age]
-
-
-class Person:
-    name = String('name')
-    age = Integers('age')
-
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-
-p = Person('andy', 10)
-print(p.name, p.age)
-p.name = 10 # TypeError: Expected a string
-print(p.name)
-```
-
-表面看，上面这种做法更麻烦了。但考虑到重用性，这种方式更合适。
-针对属性定一个类，这样类可以重用，且不同属性可以定制不同的验证规则。
-
-
-
-## 模块
-一组特定功能的类，函数的打包
-
-模块内的`__init__.py` 在python3.3之后的版本非必须，但仍建议加上。当导入一个包时，会自动执行`__init__.py`中的代码，例如，在django项目中使用pymysql模块时需要在配置文件所在包的`__init__.py`中添加如下语句：
-
-```python
-import pymysql
-pymysql.install_as_MySQLdb() 
-```
-
-### 导入模块后发生了什么？
+## 模块导入
 
  第一次导入时
 - 在自己当下的命名空间中，执行所有的代码
@@ -1809,12 +1439,12 @@ pymysql.install_as_MySQLdb()
 
 对于.pth文件的优先级，安装路径下的.pth文件>site-package>site-packge路径中的.pth文件
 
-##### 覆盖导入
+### 覆盖导入
 
 当自定义的模块与内置模块同名时，我们导入的是内置模块，因为内置模块优先级最高上。
 当自定义的模块与与非内置标准模块同名，这种两种情况都可能，两者路径都在sys.path中，谁在前就会导入谁，并覆盖后者。这种情况下，我们可以使用`from my_module import my_func`这种指定从哪个模块导入的方式，如果你写过celery可能会遇到这种情况，在celery中的一种解决方式是`from __future__ import absolute_import`
 
-##### 局部导入
+### 局部导入
 在某个局部范围内导入,因为模块，函数，类等都会产生自己的命名空间，当我们在某个局部才导入模块，那么此模块的生命周期也仅仅在此范围
 另一方面，导入模块也会消耗内存，耗时，有些模块只有某种特定情况下才需要，那么只要当那种情况发生时需要导入。
 
@@ -1824,10 +1454,10 @@ def main():
     pass
 ```
 
-##### 循环导入
+### 循环导入
 循环导入要把握的要点：当遇到import时，会跳转到要导入的文件，然后把该文件内容全部执行一遍，并在导入的地方产生对应的命名空间，绑定导入的模块中的所有对象。这咱遇到import跳转的情况不仅仅发生在第一次导入时，当在要导入的文件中又遇到import时会再次跳转，当完成该次导入后再跳转回来，继续执行剩下的代码。如果已经有该模块的命名空间，则不会重复导入，但会绑定该模块中的还没有绑定的对象。
 
-延迟导入
+### 延迟导入
 q.py
 ```python
 
@@ -1852,7 +1482,7 @@ def foo():
 
 此时在b中执行foo则没有问题
 
-##### 可选导入
+### 可选导入
 当两个模块api相同，我们想优先导入m1,如果m1导入失败再导入m2时，可以考虑可选导入的方式
 ```python
 try:
@@ -1864,7 +1494,8 @@ m1.run()
 ```
 我们导入后，将两个模块都取相同的别名，因为api一样，这样我们就可以在导入后使用统一的调用
 
-##### 包内导入
+### 包内导入
+
 ```
 ├── mod1
 │   ├── __init__.py
@@ -1945,173 +1576,8 @@ Out[2]: ['lib.plugin', 'board']
 
 我们将所有的模块都放在lib.plugin包下，这样module_path = lib.plugin, class_name=board, 这样通过importlib.import_module就获取到了对象。接着去模块中找类：getattr(module, class_name). 得到类，通过加括号的方式实例化类对象，此时执行类对象的处理方法。
 
-### 时间（time）
-
-#### asctime
-
-```python
-time.asctime() // 'Fri Sep 15 14:46:37 2023' 
-```
-
-它不接受任何参数，也就是它只能返回上面样式的字符串，比较鸡肋
-
-#### ctime
-
-将一个指定的秒数转成上面的asctime 样式的字符串格式，如果没有指定秒数，默认使用time.time() 返回值。
-
-```python
->>> time.ctime()
-'Fri Sep 15 14:53:17 2023'
-```
-#### gmtime
-将一个指定秒数转成结构化时间
-
-```python
->>> time.gmtime()
-time.struct_time(tm_year=2023, tm_mon=9, tm_mday=15, tm_hour=6, tm_min=54, tm_sec=44, tm_wday=4, tm_yday=258, tm_isdst=0)
-
-- `tm_year`：年份，例如2023
-- `tm_mon`：月份，范围从1（一月）到12（十二月）
-- `tm_mday`：一个月中的第几天，范围从1到31
-- `tm_hour`：小时，范围从0（午夜）到23
-- `tm_min`：分钟，范围从0到59
-- `tm_sec`：秒，范围从0到61（60和61用于闰秒）
-- `tm_wday`：一周中的第几天，范围从0（星期一）到6（星期日）
-- `tm_yday`：一年中的第几天，范围从1到366
-- `tm_isdst`：夏令时标志，值为0表示标准时间，为1表示夏令时。如果信息不可用，则为-1
-```
-
-#### localtime
-与上面的gmtime 一样，但是会转为本地时间，目前就发现小时显示不一样，对于gmtime 会显示6， 而localtime则显示14
-
-
-### socket
-wrap_socket 旧的接口不能用，改为使用context
-
-```python
-cert_file = str('')
-key_file = str('')
-context = ssl.SSLContext(ssl.ProTocol_SSLv23)
-context.check_hostname = False
-context.verify_mode = ssl.CERT_NONE
-context.load_cert_chain(cert,key)
-_socket = context.wrap_socket()
-```
-
-### datetime to timezone
-```python
-import pytz
-from datetime import datetime
-unware_time = datetime.strptime(time_str,'%Y-%d-%d %H:%M:%s')
-unware_time.replace(tzinfo=pytz.UTC)
-```
-
-### re模块
-
-#### look around:
-
-- look forward
-
-```python
-
-In [12]: txt = "i love python, i love regex"
-# 后面是python的Love
-In [13]: pattern = re.compile("love\s(?=python)")
-# 所以这里只能匹配出第一个love, 因为第二个love后面接的regex
-In [14]: pattern.search(txt)
-Out[14]: <re.Match object; span=(2, 7), match='love '>
-# 后面不是python的Love
-In [15]: pattern = re.compile("love\s(?!python)")
-# 通过索引可以看到，匹配的是第二个love, 因为第一个Love后面接的是python
-In [16]: pattern.search(txt)
-Out[16]: <re.Match object; span=(17, 22), match='love '>
-# 后面既不能是python也不能是love
-In [17]: pattern = re.compile("love\s(?!python|regex)")
-
-In [18]: pattern.search(txt)
-```
-
-the word after "?=" or "?!" will not consuming characters. the first one `love\s(?=python)` means only match the word love which is followed by python.
-if i change the "?=" to "?!" means not match, so the result is the "love" folled by regex
-
-- look back/behind
-
-```python
-# 肯定型后视断言，这里的<= 可以理解为在当前位置回退几个字符，看是否能匹配上内部的模式
-# 这里的内部的模式即pattern in the brackets, but remmber the pattern lenght is
-# accurate, but not variable(a.*, a{3,4} is not allowed)
-In [72]: text = "love regex or hate regex, can't ignore regex"
-
-In [73]: pattern = re.compile("(?<=(love|hate)\s)regex")
-
-In [74]: pattern.findall(text)
-Out[74]: ['love', 'hate']
-
-# negetive look back, which is oppoiste to the up one
-In [94]: pattern = re.compile("(?<!love\s)regex")
-
-In [95]: pattern.findall(text)
-Out[95]: ['regex', 'regex']
-
-# i don't known why this negetive lookbehind not work even if i change the 
-# the inside mode to a or anything else.
-In [96]: pattern = re.compile("(?<!(love|hate)\s)regex")
-In [97]: pattern.findall(text)
-Out[97]: ['']
-
-```
-
-the word after ?<= will only match the word  has hate or love before regex.  and ?<! not match. but there is sth confusing: when i use "love|hate" why it return "" ? 
-
-### argparse
- argparse example
-```python
-#!/usr/bin/env python
-# coding: utf-8 
-# Create by Andy963 @2021-01-10 10:50:27
-
-
-import argparse
-
-
-def fib(n):
-    a, b = 0, 1
-    for i in range(n):
-        a, b = b, a + b
-    return a
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("-v", "--verbose", action="store_true")
-    group.add_argument("-q", "--quite", action="store_true")
-
-    parser.add_argument("num", help="The fibonacci number you wish to calculate.", type=int)
-    parser.add_argument('-o', "--output", help="Output result to a file", action="store_true")
-    args = parser.parse_args()
-
-    result = fib(args.num)
-    if args.verbose:
-        print("The " + str(args.num) + "th fib number is " + str(result))
-    elif args.quite:
-        print(result)
-    else:
-        print("fib(" + str(args.num) + ") =" + str(result))
-
-    if args.output:
-        f = open("fib.txt", "a")
-        f.write(str(result) + "\n")
-
-
-if __name__ == '__main__':
-    main()
-```
-
-
-
-
 ## 错误与异常
+
 主要的异常类：
 ZeroDevisionError
 NameError
@@ -2188,6 +1654,7 @@ def ze():
 ```
 
 代码会走到try,然后执行，然后是捕获except 这样在需要使用的地方变成了：
+
 ```python
 with ze():
     a/b
@@ -2195,7 +1662,7 @@ with ze():
 这样就能捕获异常
 
 #### contextlib.closing
-contextlib.closing会默认调用对象内部的closing方法：
+contextlib.closing会默认调用对象内部的close方法：
 ```python
 import contextlib
 
@@ -2240,9 +1707,10 @@ with open('src.txt', 'r') as source, open('tar.txt','w') as target:
 
 进程是计算机中的程序执行实例，是操作系统分配资源的和调度基本单位。
 
-#### 进程创建的两种方式
+#### 进程创建的方式
 
-**方式1**(推荐)
+**multiprocessing**(推荐)
+
 ```python
 from multiprocessing import Process
 
@@ -2253,36 +1721,7 @@ if __name__ == '__main__':
     p = Process(target=func,) 
     p.start() 
     print('*' * 10) 
-```
-
-**方式2**
-```python
-class MyProcess(Process): 
-    def __init__(self,person):
-        super().__init__()
-        self.person=person
-    def run(self):
-        print(os.getpid())
-        print(self.pid)
-        print(self.pid)
-        print('%s 正在和女主播聊天' %self.person)
-
-if __name__ == '__main__':
-    p1=MyProcess('Jedan')
-    p2=MyProcess('太白')
-    p3=MyProcess('alexDSB')
-
-    p1.start() 
-    p2.start()
-    # p2.run()
-    p3.start()
-```
-
- 方式3 进程池
- 
-```python
-import multiprocessing
-
+#########################################################
 def worker(num):
     return f"Result: {num * num}"
 
@@ -2290,110 +1729,36 @@ if __name__ == '__main__':
     with multiprocessing.Pool(processes=4) as pool:
         results = pool.map(worker, range(10))
         print(results)
-
 ```
 
-#### 子进程和主进程
+也可以继承Process类
 
-我们通过主进程创建的子进程是异步执行的，那么我们就验证一下，并且看一下子进程和主进程(也就是父进程)的ID号，来看看是否是父子关系。
+**concurrent.futures**
+concurrent.futures 提供了一个高层次的接口，可方便地启动和管理多进程及多线程。使用 ProcessPoolExecutor 可以快速创建多个进程
 
 ```python
-import time
-import os
+from concurrent.futures import ProcessPoolExecutor
 
-#os.getpid()  获取自己进程的ID号
-#os.getppid() 获取自己进程的父进程的ID号
-
-from multiprocessing import Process
-
-def func():
-    print('aaaa')
-    time.sleep(1)
-    print('子进程>>',os.getpid())
-    print('该子进程的父进程>>',os.getppid())
-    print(12345)
-
-if __name__ == '__main__': 
-    #首先我运行当前这个文件，运行的这个文件的程序，那么就产生了主进程
-
-    p = Process(target=func,) 
-    p.start() 
-    print('*' * 10) 
-    print('父进程>>',os.getpid())
-    print('父进程的父进程>>',os.getppid())
-```
-
-结果
-```
-#********** 首先打印出来了出进程的程序，然后打印的是子进程的，也就是子进程是异步执行的，相当于主进程和子进程同时运行着，如果是同步的话，我们先执行的是func()，然后再打印主进程最后的10个*号。
-#父进程>> 3308
-#父进程的父进程>> 5916 #我运行的test.py文件的父进程号，它是pycharm的进程号，看下面的截图
-
-#aaaa
-#子进程>> 4536
-#该子进程的父进程>> 3308 #是我主进程的ID号，说明主进程为它的父进程
-
-#12345
-```
-
-####  进程之间是空间隔离的
-进程之间的数据是隔离的，也就是数据不共享
-
-```python
-
-from multiprocessing import Process
-
-n=100 #全局变量
-def work():
-    global n
-    n += 1
-    print('子进程内: ',n)
+def worker(name):
+   return f'Worker: {name}'
 
 if __name__ == '__main__':
-    p=Process(target=work)
-    p.start()
-    p.join() 
-    print('主进程内: ',n)
-```
-**结果**
-```
-#看结果：
-# 子进程内:  101
-# 主进程内:  100
+   with ProcessPoolExecutor() as executor:
+	   futures = [executor.submit(worker, f'Alice-{i}') for i in range(5)]
+	   for future in futures:
+		   print(future.result())
+   
 ```
 
-原因是子进程在创建时会复杂父进程的整个内存空间，然后两个内存空间是独立的，所以子进程中修改了n的值并不会影响父进程中
-####  进程对象的其他方法
 
-name和pid的用法
+**subprocess**
 
 ```python
-import time
-import random
-from multiprocessing import Process
+   import subprocess
 
-class Piao(Process):
-    def __init__(self,name):
-        #为我们开启的进程设置名字的做法
-        super().__init__()
-        self.name=name
-
-    def run(self):
-        print('%s is piaoing' %self.name)
-        time.sleep(random.randrange(1,3))
-        print('%s is piao end' %self.name)
-
-p=Piao('egon')
-p.start()
-print('开始')
-print(p.pid) #查看pid
-```
-**结果 **
-```
-开始
-934
-egon is piaoing
-egon is piao end
+   result = subprocess.run(['ls', '-l'], capture_output=True, text=True)
+   print(result.stdout)
+   
 ```
 
 #### 守护进程
@@ -2627,69 +1992,6 @@ if __name__ == '__main__':
 姑娘，多少钱~
 ```
 
-#### 生产者和消费者模型
-
-在并发编程中使用生产者和消费者模式能够解决绝大多数并发问题。该模式通过平衡生产线程和消费线程的工作能力来提高程序的整体处理数据的速度。
-
-**为什么要使用生产者和消费者模式**
-在线程世界里，生产者就是生产数据的线程，消费者就是消费数据的线程。在多线程开发当中，如果生产者处理速度很快，而消费者处理速度很慢，那么生产者就必须等待消费者处理完，才能继续生产数据。同样的道理，如果消费者的处理能力大于生产者，那么消费者就必须等待生产者。为了解决这个问题于是引入了生产者和消费者模式。
-
-**什么是生产者消费者模式**
-
-​	生产者消费者模式是通过一个容器来解决生产者和消费者的强耦合问题。生产者和消费者彼此之间不直接通讯，而通过阻塞队列来进行通讯，所以生产者生产完数据之后不用等待消费者处理，直接扔给阻塞队列，消费者不找生产者要数据，而是直接从阻塞队列里取，阻塞队列就相当于一个缓冲区，平衡了生产者和消费者的处理能力，并且我可以根据生产速度和消费速度来均衡一下多少个生产者可以为多少个消费者提供足够的服务，就可以开多进程等等，而这些进程都是到阻塞队列或者说是缓冲区中去获取或者添加数据。
-
-
-**通过队列实现一个生产者和消费者模型**
-
-```python
-import time,random,os
-from multiprocessing import Process,Queue
-
-def consumer(q):
-    while True:
-        res=q.get()
-        time.sleep(random.randint(1,3))
-        print('\033[45m%s 吃 %s\033[0m' %(os.getpid(),res))
-
-def producer(q):
-    for i in range(10):
-        time.sleep(random.randint(1,3))
-        res='包子%s' %i
-        q.put(res)
-        print('\033[44m%s 生产了 %s\033[0m' %(os.getpid(),res))
-
-if __name__ == '__main__':
-    q=Queue()
-    #生产者们:即厨师们
-    p1=Process(target=producer,args=(q,))
-
-    #消费者们:即吃货们
-    c1=Process(target=consumer,args=(q,))
-
-    #开始
-    p1.start()
-    c1.start()
-    print('主')
-```
-
-上述模型解释
-```
-#生产者消费者模型总结
-
-    #程序中有两类角色
-        一类负责生产数据（生产者）
-        一类负责处理数据（消费者）
-        
-    #引入生产者消费者模型为了解决的问题是：
-        平衡生产者与消费者之间的工作能力，从而提高程序整体处理数据的速度
-        
-    #如何实现：
-        生产者<-->队列<——>消费者
-    #生产者消费者模型实现类程序的解耦和
-    
-缓冲和解耦
-```
-
 
 #### 进程间共享数据
 
@@ -2777,56 +2079,15 @@ if __name__ == '__main__':
 
 同样的，Manager 并不能保证数据安全，也需要用锁。
 
-#### 进程管理
-
-多个进程之间的管理是操作系统和分布式系统中的重要话题。以下是一些常用的进程管理方法和技术：
-
-1. 进程调度
-
-操作系统的进程调度器负责决定哪个进程在某一时刻运行。常见的调度算法包括：
-
-⦁ 先来先服务（FCFS）
-⦁ 最短作业优先（SJF）
-⦁ 优先级调度
-⦁ 轮转调度（Round Robin）
-⦁ 多级队列调度
-
-2. 进程间通信（IPC）
-
-进程间通信允许进程相互交换数据和信息。常见的IPC方法包括：
-
-⦁ 管道（Pipes）
-⦁ 消息队列
-⦁ 共享内存
-⦁ 信号量
-⦁ 套接字（Sockets）
-
-3. 同步机制
-
-为了协调进程间的活动，可以使用以下同步机制：
-
-⦁ 互斥锁（Mutex）
-⦁ 信号量（Semaphores）
-⦁ 条件变量（Condition Variables）
-⦁ 读写锁（Read-Write Locks）
-
-4. 资源管理
-
-操作系统负责管理和分配系统资源，如CPU时间、内存、I/O设备等。这包括：
-
-⦁ 内存管理（如分页、分段）
-⦁ CPU时间片分配
-⦁ I/O设备分配
-
 ### 线程
 
 线程是进程内的执行单元，是操作系统调度的最小单位
 
 threading模块的完全模仿了multiprocess模块的接口，二者在使用层面，有很大的相似性，因而不再详细介绍（[官方链接](https://docs.python.org/3/library/threading.html?highlight=threading#)）
 
-#### 线程创建的两种方式
+#### 线程创建的方式
 
-**方式1**
+**threading**
 
 ```python
 import time
@@ -2842,24 +2103,21 @@ if __name__ == '__main__':
     print('主线程')
 ```
 
-**方式2**
+也可以继承Thread类
+
+**concurrent.futures**
+concurrent.futures模块提供了一个更高级的接口，可以方便地管理线程池
+   
 ```python
-import time
-from threading import Thread
+   from concurrent.futures import ThreadPoolExecutor
 
-class Sayhi(Thread):
-    def __init__(self,name):
-        super().__init__()
-        self.name=name
-        
-    def run(self):
-        time.sleep(2)
-        print('%s say hello' % self.name)
+   def task(n):
+       print(f"Task {n} running")
 
-if __name__ == '__main__':
-    t = Sayhi('太白')
-    t.start()
-    print('主线程')
+   with ThreadPoolExecutor(max_workers=5) as executor:
+       for i in range(5):
+           executor.submit(task, i)
+   
 ```
 
 同一进程中的线程是资源共享的
@@ -2983,9 +2241,10 @@ False
 True
 alex say hello
 ```
+
 join会让主线程等待子线程结束，才继续执行主线程的代码，可能全程序变成线性执行。如果主线程中有死循环或者阻塞会等待（即确定不会比子线程更早结束，例如阻塞等待子线程的结果）的情况，则无需join.
 
-守护线程
+#### 守护线程
 
 **无论是进程还是线程，都遵循：守护xx会等待主xx运行完毕后被销毁。需要强调的是：运行完毕并非终止运行**
 
@@ -3001,6 +2260,7 @@ join会让主线程等待子线程结束，才继续执行主线程的代码，�
 ```
 
 **守护线程使用示例**
+
 ```python
 from threading import Thread
 import time
@@ -3021,214 +2281,6 @@ if __name__ == '__main__':
     '''
 ```
 
-#### 线程同步
-
-互斥锁(同步锁)
-
-多个线程抢占资源时会造成数据混乱的问题，可以通过加锁来解决，看代码：
-
-```python
-import os,time
-
-from threading import Thread,Lock
-
-def work():
-    global n
-    lock.acquire() #加锁
-    temp=n
-    time.sleep(0.1)
-    n=temp-1
-    lock.release()
-    
-    with lock:
-        temp=n
-        time.sleep(0.1)
-        n=temp-1
-if __name__ == '__main__':
-    lock=Lock()
-    n=100
-    l=[]
-    for i in range(100):
-        t=Thread(target=work)
-        l.append(t)
-        t.start()
-    for t in l:
-        t.join()
-
-    print(n) #结果肯定为0，由原来的并发执行变成串行，牺牲了执行效率保证了数据安全
-```
-加锁之后，数据不会出现混乱的问题了，这种情况称之为线程安全。
-
-锁的单例模式
-
-创建锁的时候，我们还可以采用单例模式，看下面的示例：
-
-```python
-from threading import Thread,Lock
-
-class SingleTon:
-    __instance = None
-    lock = Lock()
-
-    def __new__(cls, *args, **kwargs):
-        if cls.__instance:
-            return cls.__instance
-        with cls.lock:
-            if not cls.__instance:
-                cls.__instance = super().__new__(cls)
-            return cls.__instance
-
-def fun():
-    s = SingleTon()
-    print(id(s))
-
-for i in range(20):
-    t1 = Thread(target=fun,)
-    t1.start()
-```
-
-#### 死锁
-
-​	进程也有死锁与递归锁，进程的死锁和线程的是一样的，而且一般情况下进程之间是数据不共享的，不需要加锁，由于线程是对全局的数据共享的，所以对于全局的数据进行操作的时候，要加锁。
-
-​	所谓死锁： 是指两个或两个以上的进程或线程在执行过程中，因争夺资源而造成的一种互相等待的现象，若无外力作用，它们都将无法推进下去。此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进程称为死锁进程，如下就是死锁：
-
-**现象1：将自己锁死**
-```python
-
-import time
-from threading import Lock
-
-mutexA=Lock()
-mutexA.acquire()
-mutexA.acquire()
-print(123)
-mutexA.release()
-mutexA.release()
-```
-
-**现象2：锁嵌套引起的死锁**
-
-``` python
-import time
-from threading import Thread,Lock
-
-mutexA=Lock()
-mutexB=Lock()
-
-class MyThread(Thread):
-    def run(self):
-        self.func1()
-        self.func2()
-        
-    def func1(self):
-        mutexA.acquire()
-        print('\033[41m%s 拿到A锁>>>\033[0m' %self.name)
-        mutexB.acquire()
-        print('\033[42m%s 拿到B锁>>>\033[0m' %self.name)
-        mutexB.release()
-        mutexA.release()
-
-    def func2(self):
-        mutexB.acquire()  
-        print('\033[43m%s 拿到B锁???\033[0m' %self.name)
-        time.sleep(2)
-        #分析：当线程1执行完func1，然后执行到这里的时候，拿到了B锁，线程2执行func1的时候拿到了A锁，那么线程2还要继续执行func1里面的代码，再去拿B锁的时候，发现B锁被人拿了，那么就一直等着别人把B锁释放，那么就一直等着，等到线程1的sleep时间用完之后，线程1继续执行func2，需要拿A锁了，但是A锁被线程2拿着呢，还没有释放，因为他在等着B锁被释放，那么这俩人就尴尬了，你拿着我的老A，我拿着你的B，这就尴尬了，俩人就停在了原地
-
-        mutexA.acquire()
-        print('\033[44m%s 拿到A锁???\033[0m' %self.name)
-        mutexA.release()
-
-        mutexB.release()
-
-if __name__ == '__main__':
-    for i in range(10):
-        t=MyThread()
-        t.start()
-```
-
-#### 递归锁
-
-死锁的解决方法：递归锁，在Python中为了支持在同一线程中多次请求同一资源，python提供了可重入锁RLock。
-这个RLock内部维护着一个Lock和一个counter变量，counter记录了acquire的次数，从而使得资源可以被多次require。直到一个线程所有的acquire都被release，其他的线程才能获得资源。上面的例子如果使用RLock代替Lock，则不会发生死锁：
-
-**现象1的解决**
-
-```python
-import time
-from threading import RLock as Lock
-
-mutexA=Lock()
-mutexA.acquire()
-mutexA.acquire()
-print(123)
-mutexA.release()
-mutexA.release()
-```
-
-**现象2的解决**
-
-```python
-import time
-from threading import Thread,RLock
-fork_lock = noodle_lock = RLock()
-
-def eat1(name):
-    noodle_lock.acquire()
-    print('%s 抢到了面条'%name)
-    fork_lock.acquire()
-    print('%s 抢到了叉子'%name)
-    print('%s 吃面'%name)
-    fork_lock.release()
-    noodle_lock.release()
-
-def eat2(name):
-    fork_lock.acquire()
-    print('%s 抢到了叉子' % name)
-    time.sleep(1) 
-    noodle_lock.acquire()
-    print('%s 抢到了面条' % name)
-    print('%s 吃面' % name)
-    noodle_lock.release()
-    fork_lock.release()
-
-for name in ['taibai','wulaoban']:
-    t1 = Thread(target=eat1,args=(name,))
-    t1.start()
-for name in ['alex','peiqi']:
-    t2 = Thread(target=eat2,args=(name,))
-    t2.start()
-```
-
-#### GIL锁和锁的区别
-
-```
-GIL VS Lock
-
-  机智的同学可能会问到这个问题，就是既然你之前说过了，Python已经有一个GIL来保证同一时间只能有一个线程来执行了，为什么这里还需要lock? 
-
-  首先我们需要达成共识：锁的目的是为了保护共享的数据，同一时间只能有一个线程来修改共享的数据
-
-  然后，我们可以得出结论：保护不同的数据就应该加不同的锁。
-
-  最后，问题就很明朗了，GIL 与Lock是两把锁，保护的数据不一样，前者是解释器级别的（当然保护的就是解释器级别的数据，比如垃圾回收的数据），后者是保护用户自己开发的应用程序的数据，很明显GIL不负责这件事，只能用户自定义加锁处理，即Lock
-
-  过程分析：所有线程抢的是GIL锁，或者说所有线程抢的是执行权限
-
-  线程1抢到GIL锁，拿到执行权限，开始执行，然后加了一把Lock，还没有执行完毕，即线程1还未释放Lock，有可能线程2抢到GIL锁，开始执行，执行过程中发现Lock还没有被线程1释放，于是线程2进入阻塞，被夺走执行权限，有可能线程1拿到GIL，然后正常执行到释放Lock。。。这就导致了串行运行的效果
-
-　　既然是串行，那我们执行
-
-　　t1.start()
-
-　　t1.join
-
-　　t2.start()
-
-　　t2.join()
-
-  这也是串行执行啊，为何还要加Lock呢，需知join是等待t1所有的代码执行完，相当于锁住了t1的所有代码，而Lock只是锁住一部分操作共享数据的代码。
-```
 
 #### 线程队列
 
@@ -3365,20 +2417,6 @@ def main():
 
 [python - Python3.10 下为什么没有多线程自增安全问题了？ - SegmentFault 思否](https://segmentfault.com/q/1010000041987131)
 
-#### 锁，条件变量，信号量
-
-```from chatgpt
-1.  锁（Lock）：一种基本的同步原语，用于在多个线程之间提供独占访问。只有获取锁的线程可以修改共享资源，其他线程必须等待锁被释放后才能获取锁。Python 中常用的锁包括 `RLock` 和 `Semaphore`。
-2.  条件变量（Condition）：一种高级同步原语，用于在线程之间共享复杂状态的情况下进行同步。条件变量提供了一个线程等待的机制，可以等待某个状态变为满足条件时才继续执行。Python 中的条件变量通过 `threading.Condition` 类实现。
-3.  信号量（Semaphore）：一种计数器，用于在多个线程之间控制并发访问的数量。当一个线程需要访问某个共享资源时，它需要先获取一个信号量，如果没有可用的信号量，则线程会被阻塞。Python 中的信号量通过 `threading.Semaphore` 类实现。
-
-锁、条件变量和信号量都是线程同步的工具，但是它们的使用场景不同，需要根据具体的情况进行选择。例如，当多个线程需要互斥访问某个共享资源时，可以使用锁来实现；当线程需要等待某个事件或条件时，可以使用条件变量；当需要控制并发访问数量时，可以使用信号量。
-```
-
-Ref: 
-
-[Threading Semaphore in Python](https://superfastpython.com/thread-semaphore/)
-
 
 ### 协程
 
@@ -3394,7 +2432,7 @@ cpu正在运行一个任务，会在两种情况下切走去执行其他的任�
 
 **协程就是告诉Cpython解释器，不是搞了个GIL锁吗，那好，我就自己搞成一个线程让你去执行，省去你切换线程的时间，我自己切换比你切换要快很多，避免了很多的开销，对于单线程下，我们不可避免程序中出现io操作，但如果我们能在自己的程序中（即用户程序级别，而非操作系统级别）控制单线程下的多个任务能在一个任务遇到io阻塞时就切换到另外一个任务去计算，这样就保证了该线程能够最大限度地处于就绪态，即随时都可以被cpu执行的状态，相当于我们在用户程序级别将自己的io操作最大限度地隐藏起来，从而可以迷惑操作系统，让其看到：该线程好像是一直在计算，io比较少，从而更多的将cpu的执行权限分配给我们的线程。**
 
-#### yield实现协程
+#### yield | async 实现协程
 
 上述的情况并不能提升效率，只是为了让cpu能够雨露均沾，实现看起来所有任务都被“同时”执行的效果，如果多个任务都是纯计算的，这种切换反而会降低效率。为此我们可以基于yield来验证。yield本身就是一种在单线程下可以保存任务运行状态的方法。
 
@@ -3420,6 +2458,25 @@ def func2():
 #不写yield，下面两个任务是执行完func1里面所有的程序才会执行func2里面的程序，有了yield，我们实现了两个任务的切换+保存状态
 func1()
 func2()
+
+######################################################################
+
+import asyncio
+
+# 定义一个协程
+async def say_hello():
+    print("Hello")
+    await asyncio.sleep(1)  # 模拟耗时操作
+    print("World!")
+
+# 运行协程
+async def main():
+    await say_hello()
+
+# 执行主协程
+if __name__ == "__main__":
+    asyncio.run(main())
+
 ```
 
 总结协程特点：
@@ -3600,1396 +2657,4 @@ while True:
     msg=client.recv(1024)
 ```
 
-## 上下文管理器
 
-### 一般的上下文管理器
-通常情况下，上下文管理器是这样的
-```python
-class MyResource:
-    def __enter__(self):
-        print('connect to resource')
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        print('close resource connection')
-
-    def query(self):
-        print('query data')
-
-with MyResource() as r:
-    r.query()
-```
-
-它的执行流程是：enter,返回实例对象，即我们的r,然后执行r.query(), 最后退出 执行exit方法。用一种函数表示就是这种样的：(显然这是行不通的)
-
-```python
-def make_myresource():
-    print('connect to resource')
-    return MyResource()# 跳出去执行查找方法
-    print('close resource connection')
-
-with make_myresource() as r
-    r.query()
-```
-
-原因是return会中止程序，不再执行后面的代码，那么，如果我们使用的是yield呢？因为yield会保存状态，并且再下一次执行时接着从上一次执行的地方继续执行，我们改造一下：
-
-### contextmanager
-
-```python
-# encoding:utf-8
-from contextlib import contextmanager
-
-
-class MyResource:
-    def query(self):
-        print('query data')
-
-
-@contextmanager
-def make_myresource():
-    print('connect to resource')
-    yield MyResource()
-    print('close resource connection')
-    
-with make_myresource() as r:
-    r.query()
-```
-
-执行
-
-```python
-connect to resource
-query data
-close resource connection
-```
-
-### 应用
-
-#### 改造print
-假设我们在打印一本书名是，想自动给书名前后加上书名号《》,类似这样的，即输出的结果是：《活着》
-```python
-with book_mark():
-    print("《")
-    print("活着")
-    print("》")
-```
-我们先用一般的上下文管理的方式实现：
-```python
-class BookMark:
-    def __enter__(self):
-        print("《", end='')
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        print("》", end='')
-
-with BookMark():
-    print('活着',end='')
-```
-
-现在我们来改造它：
-
-```python
-from contextlib import contextmanager
-@contextmanager
-def make_mark():
-    print("《",end='')
-    yield
-    print("》",end='')
-
-with make_mark():
-    print('活着', end='')
-```
-
-简单总结一下：我们要编写的这个需要contextmanager装饰的函数中yield之前会执行enter中的操作，而yield之后 则是执行exit中的操作。而真正的动作则是在with语句中执行即可。
-
-伪代码：
-```python
-@contextmanager
-def func():
-    enter (进入时的操作)
-    yield  （跳出，执行我们的核心动作）
-    exit (退出前的操作）
-
-with func as f:
-     核心动作
-```
-
-#### 数据库提交
-下面看更实际的例子：在数据据库提交数据使用事务来保证它原子性操作，要怎么改造呢
-未修改前：
-```python
-class DB:  
-    def __init__(self, url="sqlite:///db.sqlite3"):  
-        self.engine = create_engine(  
-            url=url,  
-            connect_args={"check_same_thread": False},  
-            pool_size=10,  
-            max_overflow=20,  
-            pool_recycle=3600,  # 连接在连接池中的回收时间  
-            pool_pre_ping=True,  # 在使用前检查连接是否有效  
-        )  
-        self.Session = scoped_session(sessionmaker(bind=self.engine))  
-  
-    @contextmanager  
-    def get_session(self, method_name=None):  # autocommit=True  
-        session = self.Session()  
-        try:  
-            yield session  # enter 处理的逻辑
-            session.commit()  # exit 时处理的逻辑， 提交事务  
-        except Exception as e:  
-            session.rollback()  # 回滚事务  
-            if method_name:  
-                db_logger.error(f"Error in method {method_name}: {e}", exc_info=True)  
-            raise e  
-        finally:  
-            session.close()  # 关闭会话
-```
-
-
-总结：
-在我们定定义的需要contextmanager装饰的函数中我们只需要写，前戏和事后回味两部分内容。这两部分内容用yield分隔开。
-而在我们调用with语句中则是执行真正的战斗部分。
-
-
-
-## 内存管理机制
- python中垃圾回收机制主要有三方面:引用记数为主,标记清除,分代回收为辅
-
-### 引用计数(没有人记得你时,才是真正的死亡)
-
-在python中一切皆为对象,每个对象都维护一个引用次数,如果次数为零,即没有任何引用,它将被回收机制无情的收割(没有人赢得你时,才是真正的死亡.鲁迅也曾说:有的人死了,但他仍活着,我想也有此意思).下面看看具体代码:
-
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-p = Person() # p被创建,指向Person对象,记数 +1
-
-print("p ref count:", sys.getrefcount(p)) # p作为实参传给函数,记数 +1,总次数为 2
-p1 = p  # p1引用 ,记数 +1 总次数为 3
-print("p ref count", sys.getrefcount(p)) 
-del p1 # 删除 p1对p的引用,次数-1, 总次数为2
-print("p ref count", sys.getrefcount(p)) # 2
-
-#输出:
-p ref count: 2
-p ref count 3
-p ref count 2
-```
-
-#### 第一次打印为什么是2?
-我们来看源码
-```python
-def getrefcount(): # real signature unknown; restored from __doc__
-    """
-    Return the reference count of object.
-    
-    The count returned is generally one higher than you might expect,
-    because it includes the (temporary) reference as an argument to
-    getrefcount().
-    """
-    pass
-```
-
-可以清楚的看到,结果比我们预想的要高一个,是因为变量本身作为getrefcount的临时引用,所以会+1,所以结果为2
-
-#### 函数为什么会引用+2?
-我们先看看下面这种情况:
-- 创建 +1
-- getrefcount +1
-那也只有2才对,可是结果为什么是4呢?
-
-```python
-import sys
-
-
-class Person:
-    pass
-
-def log_ref(var):
-    print(sys.getrefcount(var))
-
-p = Person()
-# 输出:
-4
-```
-
-在对象传给函数时,函数内部有两个属性`func_globals, __globals__`都会引用该参数,所以此时该对象的引用计数会 +2. 需要注意的是在python3中我们通过dir无法查看到 `func_globals`.
-在python2中,函数包含两个属性:`func_globals, __globals__`,在python3中前者的命名发生了改变,具体可以参考: https://docs.python.org/3.1/whatsnew/3.0.html
-Operators And Special Methods:
-> The function attributes named func_X have been renamed to use the __X__ form, freeing up these names in the function attribute namespace for user-defined attributes. To wit, func_closure, func_code, func_defaults, func_dict, func_doc, func_globals, func_name were renamed to __closure__, __code__, __defaults__, __dict__, __doc__, __globals__, __name__, respectively.
-
-
-#### 既然对象作为参数传递给函数引用会+2,那么下面这段代码为结果为什么是2?
-很明显 getrefcount也是函数,那打印结果应该是3才对,这是因为getrefcount会自动处理这种情况
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-p = Person()
-print("p ref count:", sys.getrefcount(p))
-```
-
-#### 作为容器的元素的场景
-这里的容器以列表为例:
-
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-p = Person()
-
-l = [p, ]
-
-print(sys.getrefcount(p))
-# 输出3
-```
-
-#### +1场景总结:
-引用记数+1场景:
-- 对象被创建
-- 对象被引用
-- 对象作为参数,传入函数中
-- 对象作为对象存储在容器中
-
-#### 对象被显式销毁
-主动将你忘记.但此时你已经不存在,无法通过`getrefcount()`来测试引用数量
-
-#### 对象的引用被指新的对象
-没错,你被绿了.你对象移情别恋了,她心里只有另一个人了,记得你的人就少了一个
-
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-you = Person()
-your_gf = you
-print(sys.getrefcount(you))  # 你对象还爱你的时候
-another_handsome_boy = Person()
-your_gf = another_handsome_boy
-print(sys.getrefcount(you))  # 你对象爱上高富帅的时候
-#输出:
-3
-2
-```
-
-#### 离开作用域
-在getrefcount函数中,记数会+1,那如果这样,我不停打印不会就不断增加吗?但离开了getrefcount的世界,它就把你忘记了
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-you = Person()
-print(sys.getrefcount(you))
-print(sys.getrefcount(you))
-#输出
-2
-2
-```
-#### 销毁容器
-当你的世界被销毁时:
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-p = Person()
-
-l = [p, ]
-del l
-print(sys.getrefcount(p))
-# 输出2
-```
-
-#### -1场景总结
-- 显式销毁
-- 引用被指向新的对象
-- 离开作用域
-- 容器被销毁
-
-### 标记清除
-引用记数无法解决的问题:
-```python
-import sys
-
-
-class Person:
-    pass
-
-
-you = Person()
-your_gf = Person()
-you.gf = your_gf
-your_gf.bf = you
-print(sys.getrefcount(you))
-print(sys.getrefcount(your_gf))
-# 输出
-3
-3
-```
-除去你getrefcount引用,你和你对象相亲相爱,所以每人有两个引用.此时即出现了循环引用.
-我们看官方文档: 只有容器类型,会存在这种循环引用,而对于简单原子数据类型如 数字,字符串不支持垃圾回收,或者不存储对其它对象引用的容器也不支持.
-
-> Python’s support for detecting and collecting garbage which involves circular references requires support from object types which are “containers” for other objects which may also be containers. Types which do not store references to other objects, or which only store references to atomic types (such as numbers or strings), do not need to provide any explicit support for garbage collection.
-
-ref: https://docs.python.org/3.1/c-api/gcsupport.html?highlight=circular%20reference
-
-如果我们显式删除,会导致无法查看getrefcount, 我们借助第三方库来查看对对象的引用数,注意count的参数为字符串:
-```python
-pip install objgraph
-
-import sys
-import objgraph
-
-
-class Person:
-    pass
-
-
-you = Person()
-your_gf = Person()
-print(objgraph.count("Person"))
-
-
-del your_gf
-print(objgraph.count("Person"))
-# 输出
-2
-1
-```
-
-#### 循环引用
-彼此相爱的两人,任谁也分不开
-
-```python
-import sys
-import objgraph
-
-
-class Person:
-    pass
-
-
-you = Person()
-your_gf = Person()
-print(objgraph.count("Person"))
-
-you.gf = your_gf
-your_gf.bf = you
-
-del you
-del your_gf
-print(objgraph.count("Person"))
-
-# 输出
-2
-2
-```
-
-借助objgraph 打印出这种节点图:
-
-```python
-import sys
-import objgraph
-
-
-class Boy:
-    pass
-
-
-class Girl:
-    pass
-
-
-you = Boy()
-your_gf = Girl()
-print(objgraph.count("Boy"))
-print(objgraph.count("Girl"))
-you.gf = your_gf
-your_gf.bf = you
-# del you
-# del your_gf
-print(objgraph.count("Boy"))
-print(objgraph.count("Girl"))
-objgraph.show_backrefs([you,your_gf])
-```
-上面的代码中虽然在最后的print语句时仍能打印,但如果我们删除了`you, your_gf`则也无法打印出图形,会报错
-我们通过引用图:
-
-![](https://github.com/Andy963/notePic/blob/main/circular_ref.png?raw=true)
-![](https://github.com/Andy963/notePic/blob/main/circular_ref.png)
-
-#### python的解决办法
-python会收集所有的容器对象,放在一个双向链表中,将一个对象和它引用的对象的引用数都-1,如果它们的引用数变成0,则说明它们之间存在循环引用,那么这两个对象将标记出来,并被无情清除. 如果你和你的对象私定终生,他们总有办法发现的,尤其是他们不同意的时候.
-
-### 分代回收
-Python解释器在垃圾回收时，会遍历链表中的每个对象，如果存在循环引用，就将存在循环引用的对象的引用计数器 -1，同时Python解释器也会将计数器等于0（可回收）和不等于0（不可回收）的一分为二，把计数器等于0的所有对象进行回收，把计数器不为0的对象放到另外一个双向链表表（即：分代回收的下一代）
-分代回收的代，有三代，按年轻到老的顺序为：0代，1代，2代 
-门限，有三个门限 ，门限0，门限1，门限2，默认情况下为700，10，10 
-
-```python
-import gc
-
-print(gc.get_threshold())
-# (700, 10, 10)
-```
-第一个参数表示:垃圾回收器中新增的对象个数-消亡的对象个数,当这个值达到700以上时,会触发检测机制.
-简单点讲:当新生儿出生数,减去死亡人数大于700,将导致这种检测(这时候就该计划生育了),然后开始检测,当0代的检测10次后(你只生了一胎,不信,检测10次,确定你只生了一胎),才会检测1代(此时0代的检测到第11次了),然后1代检测10次后才会检测2代(此时0代已经检测到101次).
-
-> The GC classifies objects into three generations depending on how many collection sweeps they have survived. New objects are placed in the youngest generation (generation 0). If an object survives a collection it is moved into the next older generation. Since generation 2 is the oldest generation, objects in that generation remain there after a collection. In order to decide when to run, the collector keeps track of the number object allocations and deallocations since the last collection. When the number of allocations minus the number of deallocations exceeds threshold0, collection starts. Initially only generation 0 is examined. If generation 0 has been examined more than threshold1 times since generation 1 has been examined, then generation 1 is examined as well. Similarly, threshold2 controls the number of collections of generation 1 before collecting generation 2. 
-
-如果要修改这些门限: 调用`set_threshold()`即可
-
-#### 启用回收
-垃圾回收机制默认是开启的:
-```python
-import gc
-
-print(gc.isenabled()) # True
-gc.disable()
-```
-
-#### 手动回收
-我们以前面的循环引用为例:
-```python
-import gc
-import objgraph
-
-
-class Boy:
-    pass
-
-
-class Girl:
-    pass
-
-
-you = Boy()
-your_gf = Girl()
-print(objgraph.count("Boy"))
-print(objgraph.count("Girl"))
-you.gf = your_gf
-your_gf.bf = you
-del you
-del your_gf
-gc.collect()
-print(objgraph.count("Boy"))
-print(objgraph.count("Girl"))
-```
-在未手动触发垃圾回收时,两次都输出
-```
-1
-1
-1
-1
-```
-启用后则是:
-```python
-1
-1
-0
-0
-```
-
-
-## 测试（unittest）
-
-```python
-import unittest
-
-class MyTestCase(unittest.TestCase):
-    def test_upper(self):
-        self.assertEqual('andy'.upper(), 'ANDY')
-
-    def test_is_upper(self):
-        self.assertTrue('ANDY'.isupper())
-        self.assertFalse('Andy'.isupper())
-
-if __name__ == '__main__':
-    unittest.main()
-```
-
-通过继承unittest.TestCase来实现一个测试用例，在这个类中，定义的以test开关的方法，测试框架将把它当作独立的测试来执行。
-
-如果我们希望在测试前做一些准备工作，在测试之后做一些清理工作，我们就用到了fixtures(固定装置)，指的测试开始前的准备工作setUp和测试完成后的清理工作tearDown
-#### 方法级别的fixtures
-
-```python
-class MyTestCase(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def test_sth(self):
-        pass
-
-    def tearDown(self):
-        pass
-```
-
-#### 类级别的fixtures
-
-```python
-class MyTestCase(unittest.TestCase):
-    def setUpClass(self):
-        pass
-
-    def tearDownClass(self):
-        pass
-```
-#### 模块级别的fixtures
-```python
-def setUpModule():
-    pass
-
-def tearDownModule():
-    pass
-```
-
-### 跳过测试和预计失败
-unittest 支持直接跳过或按条件跳过测试，也支持预计测试失败：
-
-通过 skip 装饰器或 SkipTest 直接跳过测试
-通过 skipIf 或 skipUnless 按条件跳过或不跳过测试
-通过 expectedFailure 预计测试失败
-```python
-class MyTestCase(unittest.TestCase):
-
-    @unittest.skip("直接跳过")
-    def test_nothing(self):
-        self.fail("shouldn't happen")
-
-    @unittest.skipIf(mylib.__version__ < (1, 3),"满足条件跳过")
-    def test_format(self):
-        # Tests that work for only a certain version of the library.
-        pass
-
-    @unittest.skipUnless(sys.platform.startswith("win"), "满足条件不跳过")
-    def test_windows_support(self):
-        # windows specific testing code
-        pass
-
-    def test_maybe_skipped(self):
-        if not external_resource_available():
-            self.skipTest("跳过")
-        # test code that depends on the external resource
-        pass
-
-    @unittest.expectedFailure
-    def test_fail(self):
-        self.assertEqual(1, 0, "这个目前是失败的")
-
-```
-
-### 子测试
-用不同的参数来测试同一段逻辑，但又不希望被视作同一个测试。就可以使用子测试
-示例中使用了 with self.subTest(i=i) 的方式定义子测试，这种情况下，即使单个子测试执行失败，也不会影响后续子测试的执行。这样，我们就能看到输出中有三个子测试不通过
-```python
-class NumbersTest(unittest.TestCase):
-
-    def test_even(self):
-        """
-        Test that numbers between 0 and 5 are all even.
-        """
-        for i in range(0, 6):
-            with self.subTest(i=i):
-                self.assertEqual(i % 2, 0)
-
-```
-
-## 异步
-### asyncIo使用
-
-我们先看下面的例子：
-
-```python
-import time
-from datetime import datetime
-
-
-def print_message_periodical(interval_seconds, message='keep alive'):
-    while True:
-        print(f'{datetime.now()} - {message}')
-        start = time.time()
-        end = start + interval_seconds
-        while True:
-            yield
-            now = time.time()
-            if now >= end:
-                break
-
-
-if __name__ == "__main__":
-    a = print_message_periodical(3, 'three')
-    b = print_message_periodical(10, 'ten')
-    stack = [a, b]
-    while True:
-        for task in stack:
-            next(task)
-```
-因为yield的存在，当print_message_periodical函数执行到这里时会中断，返回yield的值（yield类似return但不会结束函数)， 这样再次执行next时，就会执行另一个task，达到了切换的目的。中断，切换即异步的核心。
-
-那么asyncIo是怎么做的呢？
-```python
-import asyncio
-import time
-from math import sqrt
-from datetime import datetime
-
-async def print_message_periodical(interval_seconds, message='keep alive'): # p定义函数时使用async
-    while True:
-        print(f'{datetime.now()} - {message}')
-        start = time.time()
-        end = start + interval_seconds
-        while True:
-            await asyncio.sleep(0) # 需要中断的地方使用await
-            now = time.time()
-            if now >= end:
-                break
-
-if __name__ == "__main__":
-    scheduler = asyncio.get_event_loop() # 获取 event_loop对象
-    scheduler.create_task(
-        print_message_periodical(3, 'three')
-    )
-    scheduler.create_task(
-        print_message_periodical(10, 'ten')
-    )
-    scheduler.run_forever()
-```
-
-### 事件循环
-
-伪代码：
-```
-任务列表 = [任务1，任务2，任务3]
-
-while True:
-    可执行任务列表，已完成任务列表 = 去任务列表中检查所有任务，将可执行/已完成的返回
-
-    for 就绪任务 in 可执行任务列表：
-        执行已经就绪任务
-
-    for 已经完成任务 in 已经完成任务列表
-        在任务列表中移除已经完成任务
-
-    如果 任务列表 中的任务都已经完成  终止循环
-```
-import asyncio
-#去生成或者获取一个事件循环
-loop = asyncio.get_evnet_loop()
-
-#将任务添加到 '任务列表'
-loop.run_until_complete(任务)
-
-### 使用流程
-- 定义协程函数
-- 得到协程对象
-- 执行
-
-```python
-import asyncio
-
-async def func():  # 使用async def 来定义协程函数
-    print('来了，来了')
-
-result = func()  # 返回是一个协程对象
-
-# 执行
-loop = asyncio.get_event_loop()
-loop.run_until_complete(result)
-
-# asyncio.run(result) python3.7才有
-```
-
-
-
-### await
-
-**示例1**
-```python
-await + 可等待对象 (协程对象，Future对象,Task对象 -> IO等待)
-
-import asyncio
-
-async def func():
-    print('hello')
-    result = await asyncio.sleep(2)
-    print('finish', result)
-
-asyncio.run(func())
-
-执行流程： 
-func添加到列表中后，先执行print, 此时遇到IO,如果有其他任务，就会切换到其他任务，当其他任务完成或者也遇到IO,切换回来，如果有返回值，交给result,再执行
-print语句
-```
-
-**示例2**
-```python
-import asyncio
-
-async def others():
-    print('start')
-    await asyncio.sleep(2)
-    print('end')
-    return '返回值'
-
-async def func():
-    print('执行协程函数内部代码')
-    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
-    # 当前协程挂起时，事件循环就会去执行其他协程任务
-
-    result = await others()
-
-    print('IO操作完成，结果为：',result)
-# asyncio.run(func())
-loop = asyncio.get_event_loop()
-loop.run_until_complete(func())
-```
-**执行结果**
-执行协程函数内部代码
-start
-end
-IO操作完成，结果为： 返回值
-
-**示例3**
-多个await对象
-```python
-import asyncio
-
-async def others():
-    print('start')
-    await asyncio.sleep(2)
-    print('end')
-    return '返回值'
-
-async def func():
-    print('执行协程函数内部代码')
-    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
-    # 当前协程挂起时，事件循环就会去执行其他协程任务
-
-    result = await others()
-
-    print('IO操作完成，结果为：',result)
-
-    result1 = await others()
-
-    print('IO操作完成，结果为：',result1)
-# asyncio.run(func())
-loop = asyncio.get_event_loop()
-loop.run_until_complete(func())
-
-```
-
-### Task对象
-task对象在事件循环中添加多个任务，用于并发调度协程，通过asyncio.create_task(协程对象)的方式创建task对象，这样可以让协程加入事件循环中等待被调度执行，除了使用asyncio.create_task(),函数以外，还可以用低层级的loop.create_task(),ensure_future()函数，不建议手动实例化Task对象。
-**示例1**
-```python
-import asyncio
-
-async def fun():
-    print('start')
-    await asyncio.sleep(2)
-    print('end')
-    return '返回值'
-
-async def main():
-    print('执行协程函数内部代码')
-    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
-    # 当前协程挂起时，事件循环就会去执行其他协程任务
-
-    # task1 = asyncio.create_task(fun())
-    # task2 = asyncio.create_task(fun())
-    task1 = asyncio.ensure_future(fun())
-    task2 = asyncio.ensure_future(fun())
-
-    print('main finish')
-
-    result1 = await task1
-    result2 = await task2
-
-    print('IO操作完成，结果为：',result1,result2)
-# asyncio.run(main())
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-
-```
-**结果**
-执行协程函数内部代码
-main finish
-start
-start
-end
-end
-IO操作完成，结果为： 返回值 返回值
-
-**示例2**
-```python
-import asyncio
-
-async def fun():
-    print('start')
-    await asyncio.sleep(2)
-    print('end')
-    return '返回值'
-
-async def main():
-    print('执行协程函数内部代码')
-    #遇到IO操作，挂起当前协程(任务）等IO操作完成之后再继续往下执行
-    # 当前协程挂起时，事件循环就会去执行其他协程任务
-
-    # task1 = asyncio.create_task(fun()) create_task可以添加name参数指定名字
-    # task2 = asyncio.create_task(fun())
-    task1 = asyncio.ensure_future(fun())
-    task2 = asyncio.ensure_future(fun())
-
-    task_list = [task1,task2] # 定义一个task对象列表
-
-    print('main finish')
-
-    done,pending = await asyncio.wait(task_list,timeout=2) #timeout参数为可选，如果超出时间那么就没执行完，此时done为空，pending为未执行完的对象
-
-
-    print('IO操作完成，结果为：',done)
-# asyncio.run(main())
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-```
-
-**结果**
-执行协程函数内部代码
-main finish
-start
-start
-IO操作完成，结果为： set()
-end
-
-可以看到done为一个集合。
-
-**示例3**
-```python
-import asyncio
-
-async def fun():
-    print('start')
-    await asyncio.sleep(2)
-    print('end')
-    return '返回值'
-
-task_list = [fun(),fun()] # 定义一个task对象列表
-
-done,pending = asyncio.run(asyncio.wait(task_list,timeout=2))
-print(done)
-```
-
-### future对象
-Task继承Future,Task对象内部await 结果的处理基于Future对象来的
-**示例1**
-```python
-import asyncio
-
-async def main():
-    # 获取当前事件循环
-    loop = asyncio.get_running_loop()
-
-    # 创建一个任务（future对象） 这个任务什么也不干
-    fut = loop.create_future()
-
-    # 等待任务最终结果（Future对象）没有结果会一直等下去
-    await fut
-
-asyncio.run(main())
-```
-
-**示例2**
-```python
-import asyncio
-
-async def set_after(fut):
-    await asyncio.sleep(2)
-    fut.set_result('0')
-
-async def main():
-    # 获取当前事件循环
-    loop = asyncio.get_running_loop()
-
-    # 创建一个任务（future对象） 没绑定任何行为，则这个任务永远不知道什么时候结束 
-    fut = loop.create_future()
-
-    # 创建一个任务（Task对象）绑定了set after函数，函数内部在2s后给fut赋值
-    # 即手动设置future任务的结果，那么fut就结束了
-    await loop.create_task(set_after(fut))
-    data = await fut
-    
-asyncio.run(main())
-```
-
-### concurrent.futures.Future对象
-
-```python
-import time
-from concurrent.futures import future 
-from concurrent.futures.thread import ThreadPoolExecutor
-from concurrent.futures.process import processPoolExecutor
-
-
-def func(value):
-    time.sleep(1)
-    print(value)
-    return
-pool = ThreadPoolExecutor(max_workers=5)
-
-# pool = processPoolExecutor(max_workers=5)
-
-for i in range(10):
-    fut = pool.submit(func,i)
-    print(fut)
-    
-```
-线程池一次只能创建5个连接，但实际它创建了10个，后面的一个只是在等待前面的执行完成。
-可能会存在交叉使用的情况：如异步编程+mysql(不支持异步）这时就可能使用Concurrent.futures
-
-```python
-import time
-from concurrent.futures import future 
-from concurrent.futures.thread import ThreadPoolExecutor
-from concurrent.futures.process import processPoolExecutor
-
-
-def func1(value):
-    time.sleep(1)
-    print(value)
-    return
-
-
-async def main():
-    loop = asyncio.get_runing_loop()
-
-    # run in the deafult executor(ThreadPoolExecutor)
-    # 第一步先调用ThreadPoolExecutor的submit方法去线程池中申请一个线程 执行func1函数 
-    # 并返回一个concurrent.futures.Future对象
-    # 第二步 调用asyncio.wrap_future将concurrent.futures.Future对象包装成asyncio.Future对象
-    # 因为concurrent.futures.Future对象不支持await语法，所以需要包装为asyncio.Future对象才能使用
-    fut = loop.run_in_executor(None,func1)
-    result = await fut
-    print('default thread pool', result)
-
-    # 2 run in custom thread pool
-    with concurrent.futures.ThreadPoolExecutor() as pool:
-        result = await loop.run_in_executor(pool, func1)
-        print('custom thread pool',result)
-    # 3 run in a custom process pool
-    with concurrent.futures.processPoolExecutor() as pool:
-        result = await loop.run_in_executor(pool, func1)
-        print('custom process pool',result)
-
-asyncio.run(main())
-```
-
-**实例**
-```python
-import asyncio
-import requests
-
-async def download_images(url):
-    # 发送网络请求，下载图片，遇到网络IO,自动切换到其它任务
-    print('开始下载', url)
-    loop = asyncio.get_event_loop()
-
-    # requests 默认不支持异步操作，所以使用线程池来配合实现
-    future = loop.run_in_executor(None, requests.get, url)
-
-    response = await future
-    print('下载完成')
-    file_name = url.rsplit('-')[-1]
-
-    with open(file_name, mode='wb') as file_obj:
-        file_obj.write(response.content)
-
-
-if __name__ == '__main__':
-    url_list = []
-    tasks = [download_images(url) for url in url_list]
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(asyncio.wait(tasks))
-```
-
-### 异步迭代器
-```python
-import asyncio
-
-
-class Reader:
-    def __init__(self):
-        self.count = 0
-
-    async def read_count(self):
-        # await asyncio.sleep(1)
-        self.count += 1
-        if self.count == 100:
-            return None
-        return self.count
-
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        val = await self.read_count()
-        if val == None:
-            raise StopAsyncIteration
-        return val
-
-
-async def func():
-    obj = Reader()
-    # async for 必须写在一个协程函数中
-    async for item in obj:
-        print(item)
-
-
-asyncio.run(func())
-
-```
-
-### 异步上下文管理器
-```python
-import asyncio
-
-
-class AsyncContextManager:
-    def __int__(self):
-        self.conn = conn
-
-    async def do_something(self):
-        # 异步操作
-        return
-
-    async def __aenter__(self):
-        # 异步
-        self.conn = await asyncio.sleep(1)
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        # 异步关闭
-        await asyncio.sleep(1)
-
-
-obj = AsyncContextManager()
-
-
-async def func():
-    # async with 必须放在协程函数中
-    async with obj as f:
-        result = await f.do_something()
-        pass
-```
-
-### 异步redis
-pip install aioredis
-```python
-import asyncio
-import aioredis
-
-async def execute(address,password):
-    print('开始执行',address)
-    # 网络io操作，创建redis连接
-    redis=await aioredis.create_redis(address,password=password)
-    # 网络IO操作，在redis中设置哈希值
-    await = redis.hmset_dict('car',key=1,key2=2,key3=3)
-    # 网络IO操作，去redis中获取值
-    result = await redis.hgetall('car',encoding='utf-8')
-
-    print(result)
-    # 网络IO操作，关闭redis连接
-    redis.close()
-    print('结束')
-
-asyncio.run(func)
-```
-
-### 异步mysql
-```python
-import asyncio
-import aiomysql
-
-async def execute():  
-    conn = await aiomysql.connct(host='127.0.0.1',port=3306,usr='root',password='123',db='mysql')
-
-    # 网络IO 创建cursor
-    cur = await conn.cursor
-    # 网络IO 执行sql
-    await cur.execute('Select * from user')
-    # 网络IO 获取结果 
-    result = await cur.fetchall()
-    print(result)
-    # 网络IO 关闭连接
-    await cur.close()
-    conn.close()
-
-asyncio.run(execute)
-
-```
-
-**多个连接**
-```python
-import asyncio
-import aiomysql
-
-async def execute():  
-    conn = await aiomysql.connct(host='127.0.0.1',port=3306,usr='root',password='123',db='mysql')
-
-    # 网络IO 创建cursor
-    cur = await conn.cursor
-    # 网络IO 执行sql
-    await cur.execute('Select * from user')
-    # 网络IO 获取结果 
-    result = await cur.fetchall()
-    print(result)
-    # 网络IO 关闭连接
-    await cur.close()
-    conn.close()
-task_list = [
- execute('1.1.1.1','password1'),
- execute('1.2.3.4','password2')
-]
-asyncio.run(asyncio.wait(task_list))
-
-```
-
-### FastAPi
-```shell
-pip install fastapi
-pip install uvicorn
-```
-
-**示例**
-```python
-import asyncio
-
-import uvicorn
-from fastapi import FastAPI 
-
-app = FastAPI()
-
-REDIS_POOL = aioredis.ConnectionsPool('redis://ip:port',password='password',minsize=1,maxsize=10)
-
-@app.get('/')
-def index():
-    # 普通接口
-    return {"msg":'hello world'}
-
-async def read():
-    # 异步接口
-    print('请求来了')
-    await asyncio.sleep(3)
-    # 连接
-    conn = await REDIS_POOL.acquire()
-    redis = redis(conn)
-
-    # 设置值
-    await redis.hmset_dict('car',key1=1,key2=2)
-
-    # 取值
-    result = await redis.hgetall('car',encoding='utf-8')
-
-    # REDIS_POOL.release(conn)
-    return result
-
-if __name__ == '__main__':
-    uvicorn.run('code:app',host='127.0.0.1',port=5000,log_level='info')
-
-```
-
-### 爬虫
-```shell
-pip install aiohttp
-```
-
-```python
-import aiohttp
-import asyncio
-
-
-async def fetch(session,url):
-    print('发送请求',url)
-    async with session.get(url, verify_ssl=False) as response:
-        text = await response.text
-        print('得到结果',url,len(text))
-
-async def main():
-    async with aiohttp.ClientSession() as session:
-        url_list = [
-        'https://python.org',
-        'https://www.baidu.com'
-        ]
-        tasks = [asyncio.create_task(fetch(session,url) for url in url_list)]
-
-        await asyncio.wait(tasks)
-
-if __name__ == '__main__':
-    asyncio.run(main())
-```
-
-### 同步与阻塞的关系
-
-#### 状态
-在程序运行的过程中，由于被操作系统的调度算法控制，程序会进入几个状态：就绪，运行和阻塞。
-
-（1）就绪(Ready)状态
-当进程已分配到除CPU以外的所有必要的资源，只要获得处理机便可立即执行，这时的进程状态称为就绪状态。
-（2）执行/运行（Running）状态当进程已获得处理机，其程序正在处理机上执行，此时的进程状态称为执行状态。
-（3）阻塞(Blocked)状态正在执行的进程，由于等待某个事件发生而无法执行时，便放弃处理机而处于阻塞状态。引起进程阻塞的事件可有多种，例如，等待I/O完成、申请缓冲区不能满足、等待信件(信号)等。
-
-#### 同步与异步
-所谓同步就是一个任务的完成需要依赖另外一个任务时，只有等待被依赖的任务完成后，依赖的任务才能算完成，这是一种可靠的任务序列其实就是一个程序结束才执行另外一个程序，串行的，不一定两个程序就有依赖关系。
-
-所谓异步是不需要等待被依赖的任务完成，只是通知被依赖的任务要完成什么工作，依赖的任务也立即执行，只要自己完成了整个任务就算完成了。至于被依赖的任务最终是否真正完成，依赖它的任务无法确定，所以它是不可靠的任务序列。
-
-举例
-> 比如我们去楼下的老家肉饼吃饭，饭点好了，取餐的时候发生了一些同步异步的事情。同步：我们都站在队里等着取餐，前面有个人点了一份肉饼，后厨做了很久，但是由于同步机制，我们   还是要站在队里等着前面那个人的肉饼做好取走，我们才往前走一步。
-
-> 异步：我们点完餐之后，点餐员给了我们一个取餐号码，跟你说，你不用在这里排队等着，去找个地方坐着玩手机去吧，等饭做好了，我叫你。这种机制(等待别人通知)就是异步等待消息通知。在异步消息处理中，等待消息通知者(在这个例子中等着取餐的你)往往注册一个回调机制，在所等待的事件被触发时由触发机制(点餐员)通过某种机制(喊号，‘250号你的包子好了‘)找到等待该事件的人。
-> 
-#### 阻塞和非阻塞
-
-阻塞和非阻塞这两个概念与程序（线程）等待消息通知(无所谓同步或者异步)时的状态有关。也就是说阻塞与非阻塞主要是程序（线程）等待消息通知时的状态角度来说的
-
-**阻塞和非阻塞举例**
-
-> 继续上面的那个例子，不论是排队还是使用号码等待通知，如果在这个等待的过程中，等待者除了等待消息通知之外不能做其它的事情，那么该机制就是阻塞的，表现在程序中,也就是该程序一直阻塞在该函数调用处不能继续往下执行。相反，有的人喜欢在等待取餐的时候一边打游戏一边等待，这样的状态就是非阻塞的，因为他(等待者)没有阻塞在这个消息通知上，而是一边做自己的事情一边等待。阻塞的方法：input、time.sleep，socket中的recv、accept等等。
-
-#### 比较
-**同步阻塞形式**
-效率最低。拿上面的例子来说，就是你专心排队，什么别的事都不做。
-
-**异步阻塞形式**
-如果在排队取餐的人`采用的是异步的方式去等待消息被触发（通知）`，也就是领了一张小纸条，假如在这段时间里他不能做其它的事情，就在那坐着等着，不能玩游戏等，那么很显然，这个人被阻塞在了这个等待的操作上面；
-**异步操作是可以被阻塞住的，只不过它不是在处理消息时阻塞，而是在等待消息通知时被阻塞。**
-
-**同步非阻塞形式**
-实际上是效率低下的。
-想象一下你一边打着电话一边还需要抬头看到底队伍排到你了没有，如果把打电话和观察排队的位置看成是程序的两个操作的话，`这个程序需要在这两种不同的行为之间来回的切换`，效率可想而知是低下的。
-
-**异步非阻塞形式**
-效率更高，
-因为打电话是你(等待者)的事情，而通知你则是柜台(消息触发机制)的事情，`程序没有在两种不同的操作中来回切换`。
-比如说，这个人突然发觉自己烟瘾犯了，需要出去抽根烟，于是他告诉点餐员说，排到我这个号码的时候麻烦到外面通知我一下，那么他就没有被阻塞在这个等待的操作上面，自然这个就是异步+非阻塞的方式了。
-
-很多人会把同步和阻塞混淆，是`因为很多时候同步操作会以阻塞的形式表现出来`，同样的，很多人也会把异步和非阻塞混淆，`因为异步操作一般都不会在真正的IO操作处被阻塞`。
-
-
-## 算法时间复杂度
-
-- 找出基本操作
-- 计算基本操作执行的次数
-- 去掉低阶项，常数项
-
-基本操作：常数 用加法
-顺序结构：常数 用加法
-循环结构：乘法 
-分支结构：取最大值
-
-
-### 举例说明：
-
-```python
-def bubble(arr):
-    n = len(arr)	 # 基本操作 1次
-	for i in range(n): # 循环结构 用乘法  n 
-		for j in range(n-i-1):  # 循环结构 用乘法 n
-			if arr[j] < arr[j+1]: # 分支结构 取最大值 ：
-				arr[j],arr[j+1] = arr[j+1], arr[j] # 基本操作1次
-	return arr
-```
-
-最坏的情况下，内层循环会执行n-1，n-2,n-3 .... 1次
-计算过程 ： n  * （n-1+1)*(n-1)/2 * 3   在这里的3属于常数项，去掉，剩下结果为n*n
-
-### 常见算法复杂度：
-
-#### 常数复杂度：O(1)
-
-```python
-def f(item):
-	return item[0]
-```
-
-#### 线性时间复杂度O(n)
-
-```python
-def f(arr, target):
-	for i in range(len(arr)): # 循环结构 n
-		if arr[i] == target:  # 分支结构 最坏的情况下，每次循环都会执行这个判断 
-			return i
-```
-
-计算过程：n * 2  , 去掉常数项，O(n)
-
-#### 二次时间复杂度
-
-[[Python基础#举例说明：]]
-
-#### 对数时间复杂度
-
-```python
-def binary_search(arr, target):
-    left, right = 0, len(arr) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-```
-
-这里主体部分是while 循环，即循环结构，其它的都是常数项，那么循环执行多少次呢？
-第一次执行时后，需要查找的数组长度为n/2, 依次为：
-- n
-- n/2
-- n/ 2 * 2
-- n/ 2 * 2 * 2
-- n/ 2 * (k-1)
-
-假如第k次找到了目标，那么 n/ 2 * (k-1) = 1, k = 1 + log2n, 去掉常数项，则复杂度为 O(log2n)
-
-#### 线性对数时间
-
-```python
-def merge_sort(arr):
-    if len(arr) <= 1:
-        return arr
-
-    mid = len(arr) // 2
-    left = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
-
-    return merge(left, right)
-
-```

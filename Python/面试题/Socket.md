@@ -1,5 +1,17 @@
 ## 网络
 
+### 简述http 协议及常用请求头。
+
+```
+具体：
+　　Http协议是建立在tcp之上的，是一种规范，它规定了发送的数据的数据格式，这个数据格式是通过\r\n 进行分割的，请求头与请求体也是通过2个\r\n分割的，响应的时候，响应头与响应体也是通过\r\n分割，并且还规定已请求已响应就会断开链接
+浏览器本质,socket客户端遵循Http协议
+　　HTTP协议本质：通过\r\n分割的规范+ 请求响应之后断开链接   ==  >  无状态、 短连接
+常用请求头：
+User-Agent，Referer，Host，Content-Type，Cookie，connection,accept,Accept-Language
+```
+
+
 ### python 的底层网络交互模块有哪些？
 ```
 socket, urllib,urllib3 , requests, grab, pycurl

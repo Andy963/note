@@ -1,15 +1,16 @@
-notebook 快捷键：
+Jupyter Notebook 快捷键：
 * a,b在上/下添加插入cell
 * x删除cell
 * shift enter 执行cell
 * tab 补全
 * 切换模式 y,m
 * 打开帮助文档shift + tab
-### Series
+## Series
 Series是一个类似一维数组的结构，有两部分组成：index,values
 Series创建由列表或者numpy数组创建，也可以由字典创建
 
-#### Series创建
+### Series创建
+
 ```python
 #Series数据源必须为一维
 #列表
@@ -34,8 +35,10 @@ a    1
 b    2
 dtype: int64
 ```
-#### Series索引与切片
+### Series索引与切片
+
 Series索引分为隐式索引，显式索引，它的索引可以是字符串
+
 ```python
 s =Series(data=[1,2,3],index=['数学','语文','英语'])
 数学    1
@@ -45,6 +48,7 @@ dtype: int64
 ```
 
 索引与切片操作：
+
 ```
 s[-1]
 3
@@ -53,8 +57,9 @@ s[1:] # 切片操作
 英语    3
 dtype: int64
 ```
-#### Series属性
+### Series属性
 shape,size,index.values
+
 ```python
 s.shape
 (3,)
@@ -65,17 +70,21 @@ Index(['数学', '语文', '英语'], dtype='object')
 s.values
 array([1, 2, 3], dtype=int64)
 ```
-#### Series常用方法
+### Series常用方法
+
 head,tail,unique,isnull,notnull,add,sub, mul,div
+
 ```python
 s.head(2)  # 显示前两条数据
 数学    1
 语文    2
 dtype: int64
+
 s.tail(2)  # 显示后两条数据
 语文    2
 英语    3
 dtype: int64
+
 s.unique（）  # 去重
 s =Series(data=[1,2,2,1])
 s.unique()
@@ -93,6 +102,7 @@ s1.add(s2)
 dtype: float64
 s3=Series(data=[1,2,3,4],index=['a','b','c','d'])
 s4=Series(data=[1,2,3,4],index=['a','e','c','f'])
+
 s3.mul(s4)
 a    1.0
 b    NaN
@@ -117,6 +127,7 @@ c    False
 d    False
 dtype: bool
 将这组bool值作为索引，用来清洗数据
+
 s5[s5.notnull()]
 s5=s3.mul(s4)
 s5
@@ -133,16 +144,24 @@ c    9.0
 dtype: float64
 ```
 
-### DataFrame
+## DataFrame
 DataFrame是一个表格型数据，将Series从一维扩展到多维，有行索引，也有列索引
 行索引：index
 列索引：columns
 值：values
 
-#### DataFrame创建
+### DataFrame创建
 numpy，字典两种创建方式
 
 ```python
+
+data = [('Andy',18),('Lisa', 19),('Bob',27)]  
+df = pd.DataFrame(data=data, columns = ['Name', 'Age'])
+  Name Age
+0,Andy,18
+1,Lisa,19
+2,Bob,27
+
 df=DataFrame(data=np.random.randint(1,50,size=(3,4))) # size只能指定2维，可以通过index,columns指定行，列索引
 	0	1	2	3
 0	8	30	43	32
@@ -158,6 +177,7 @@ df
 	name	age
 0	andy	20
 1	zhou	30
+
 显式指定行索引：
 df = DataFrame(data=dic,index=['a','b'])
 	name	age
@@ -165,8 +185,9 @@ a	andy	20
 b	zhou	30
 ```
 
-#### DataFrame属性
+### DataFrame属性
 values,columns,index,shape
+
 ```python
 df.values
 array([['andy', 20],
@@ -174,17 +195,19 @@ array([['andy', 20],
        
 df.columns
 Index(['name', 'age'], dtype='object')
+
 df.index
 Index(['a', 'b'], dtype='object')
+
 df.shape
 (2, 2)
 ```
 
-#### DataFrame索引与切片
+### DataFrame索引与切片
 对行/列进行索引，对元素进行索引
 当设定了显式索引，就不能用隐式索引
 
-##### 获取某列的数字索引
+#### 索引
 
 ```python
 import pandas as pd
@@ -196,8 +219,9 @@ col_index = df.columns.to_list().index('随访时间')
 col_index = df.columns.get_indexer_for(['随访时间'])[0]
 ```
 
-##### 取列
+#### 取列
 直接通过括号取的不是行，而是列：
+
 ```python
 df
 	name	age
@@ -210,7 +234,9 @@ a    andy
 b    zhou
 Name: name, dtype: object
 ```
+
 取一列时直接写列索引即可，如果取多列，为了表示多列，用一个列表
+
 ```python
 df[['name','age']]
 	name	age
@@ -218,8 +244,9 @@ a	andy	20
 b	zhou	30
 ```
 
-##### 取行
-loc,iloc
+#### 取行
+loc,iloc, loc是基于label, 而iloc是基于整数位置（integer)
+
 df.loc['a'] 这里面是取索引为 'a'的行，取的一是一行数据，而不是列:
 
 |  | 0 |
@@ -255,15 +282,19 @@ df.iloc[[0,1]]
 a	andy	20
 b	zhou	30
 ```
-##### 取元素
+#### 取元素
+
 取单个元素
+
 ```python
 df.loc['a','name']  # 括号内分别表示 行列
 'andy'
 df.iloc[0,1]  # 使用iloc时行列都得使用隐式索引
 20
 ```
+
 取多个元素：记住逗号左边为行，右边为列
+
 ```python
 df.loc[['a','b'],['name']]
 	name
@@ -275,8 +306,10 @@ df.iloc[[0,1],[0]]
 a	andy
 b	zhou
 ```
-##### 切片
+#### 切片
+
 一个中括号表示 切行,切列一定要用loc/iloc
+
 ```python
 df[0:1]
 	name	age
@@ -342,3 +375,57 @@ df1.loc[(df1['姓名'] == name) & (df1['性别'] == gender) & (df1['年龄'] == 
 ```
 
 ref:https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
+
+### concat 
+axis=0表示按行拼接，axis=1表示按列拼接
+
+```python
+data1 = [('Andy', 18),('Lisa', 19),('Bob', 27)]  
+data2 = [('安迪', 81),('丽莎', 91),('鲍博', 72)]  
+df1 = pd.DataFrame(data=data1, columns = ['Name', 'Age'])  
+df2 = pd.DataFrame(data=data2, columns = ['Name', 'Age'])  
+# df1  
+# df2  
+# 按行拼接  
+result = pd.concat([df1, df2], axis=0, ignore_index=True)
+
+   Name  Age
+0  Andy   18
+1  Lisa   19
+2   Bob   27
+3    安迪   81
+4    丽莎   91
+5    鲍博   72
+
+# 按行拼接  
+result = pd.concat([df1, df2], axis=1, ignore_index=True)
+      0   1   2   3
+0  Andy  18  安迪  81
+1  Lisa  19  丽莎  91
+2   Bob  27  鲍博  72
+```
+
+
+### merge
+
+```python
+df1 = pd.DataFrame({'key': ['K0', 'K1', 'K2'],  
+                    'A': ['A0', 'A1', 'A2']})  
+  key A  
+0,K0,A0
+1,K1,A1
+2,K2,A2
+
+df2 = pd.DataFrame({'key': ['K0', 'K1', 'K3'],  
+                    'B': ['B0', 'B1', 'B3']})
+  key B
+0,K0,B0
+1,K1,B1
+2,K3,B3
+
+# 基于 'key' 列进行合并，默认 how='inner'  
+result = pd.merge(df1, df2, on='key')
+  key   A   B
+0  K0  A0  B0
+1  K1  A1  B1
+```

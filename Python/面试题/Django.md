@@ -1,104 +1,297 @@
 
 ## django
-### 简述http 协议及常用请求头。
-```
-具体：
-　　Http协议是建立在tcp之上的，是一种规范，它规定了发送的数据的数据格式，这个数据格式是通过\r\n 进行分割的，请求头与请求体也是通过2个\r\n分割的，响应的时候，响应头与响应体也是通过\r\n分割，并且还规定已请求已响应就会断开链接
-浏览器本质,socket客户端遵循Http协议
-　　HTTP协议本质：通过\r\n分割的规范+ 请求响应之后断开链接   ==  >  无状态、 短连接
-常用请求头：
-User-Agent，Referer，Host，Content-Type，Cookie，connection,accept,Accept-Language
-```
 
-
-### http 和https 的区别？
-```
-http:
-
-超文本传输协议,明文传输
-80端口
-连接简单且是无状态的
-https:
-
-需要到ca申请证书,要费用
-具有安全性的ssl加密传输协议
-端口是443
-https协议是有ssl+http协议构建的可进行加密传输,身份认证的网络协议,安全
-```
-### 简述websocket 协议及实现原理
+### django 的生命周期：
 
 ```
-websocket是给浏览器新建的一套（类似与http，基于Html5）协议，协议规定：（\r\n分割）浏览器和服务器连接之后不断开，以此完成：服务端向客户端主动推送消息。
-全双工：可以同时双向发送数据
+- **请求 (Request)**：
+    
+    - 用户在浏览器中发出一个 HTTP 请求，例如通过访问一个 URL。
+    - 请求通过网络传输到 Django 服务器。
+- **WSGI/ASGI 服务器处理**：
+    
+    - Django 通过 WSGI (Web Server Gateway Interface) 或 ASGI (Asynchronous Server Gateway Interface) 服务器接收请求。常见的服务器是 Gunicorn、uWSGI 等。
+    - WSGI/ASGI 服务器将请求转交给 Django 应用。
+- **中间件 (Middleware)**：
+    
+    - 请求首先经过中间件层。中间件是处理请求和响应的钩子，允许你在请求到达视图之前、或者在响应发送回用户之前对其进行处理。
+    - 常见的中间件包括认证、会话管理、缓存、CSRF 保护等。
+- **URL 路由系统 (URL Routing)**：
+    
+    - Django 将请求发送到 `urls.py` 文件中的 URL 路由系统。
+    - 路由系统通过 URL 模式匹配，确定哪个视图函数或类应该处理这个请求。如果找到匹配的 URL，Django 将请求传递给相应的视图；如果没有找到匹配的 URL，Django 返回一个 404 错误响应。
+- **视图处理 (View Processing)**：
+    
+    - 视图是 Django 中处理请求的核心部分。视图可以是函数视图（function-based view，FBV）或者类视图（class-based view，CBV）。
+    - 视图会执行相关的业务逻辑，例如从数据库中获取数据、验证用户输入等。
+    - 视图可以返回不同的响应类型，如 HTML 模板、JSON 数据、重定向等。
+- **模型和数据库交互 (Model & ORM)**：
+    
+    - 如果视图需要从数据库获取或保存数据，它会通过 Django 的 ORM（对象关系映射）系统与数据库进行交互。
+    - ORM 会将 Python 对象和数据库表映射起来，使得查询和操作数据库变得更加直观和简单。
+- **模板渲染 (Template Rendering)**：
+    
+    - 如果视图返回 HTML 页面，通常会使用 Django 的模板系统来渲染响应。
+    - 视图将数据上下文传递给模板，模板根据上下文数据生成最终的 HTML 页面。
+- **响应 (Response)**：
+    
+    - 视图将生成的响应返回给 Django 框架，响应可以是 HTML、JSON、XML 或文件等。
+    - 在响应返回之前，响应会再次经过中间件层，允许对响应进行处理或修改。
+- **发送响应给 WSGI/ASGI 服务器**：
+    
+    - Django 将响应发送回 WSGI/ASGI 服务器。
+    - WSGI/ASGI 服务器将响应传递给客户端（通常是用户的浏览器），从而完成整个请求-响应周期。
 
-websocket协议额外做的一些操作
-握手  ---->  连接线进行校验
-加密  ----> payload_len=127/126/<=125   --> mask key 
+用户请求  --->  WSGI/ASGI 服务器  --->  中间件  --->  URL 路由  --->  视图
+                                                             ↓
+                                                         数据库/模板
+                                                             ↓
+             用户响应  <---  WSGI/ASGI 服务器  <---  中间件  <---  响应
 
-传统socket是单相思，websocket是两情相悦
-##本质
-创建一个连接后不断开的socket
-当连接成功之后：
-    客户端（浏览器）会自动向服务端发送消息，包含： Sec-WebSocket-Key: iyRe1KMHi4S4QXzcoboMmw==
-    服务端接收之后，会对于该数据进行加密：base64(sha1(swk + magic_string))
-    构造响应头：
-            HTTP/1.1 101 Switching Protocols\r\n
-            Upgrade:websocket\r\n
-            Connection: Upgrade\r\n
-            Sec-WebSocket-Accept: 加密后的值\r\n
-            WebSocket-Location: ws://127.0.0.1:8002\r\n\r\n        
-    发给客户端（浏览器）
-建立：双工通道，接下来就可以进行收发数据
-    发送数据是加密，解密，根据payload_len的值进行处理
-        payload_len <= 125
-        payload_len == 126
-        payload_len == 127
-    获取内容：
-        mask_key
-        数据
-        根据mask_key和数据进行位运算，就可以把值解析出来。
-
-什么是魔法字符串：
-客户端向服务端发送消息时，会有一个'sec-websocket-key'和'magic string'的随机字符串(魔法字符串)
-#服务端接收到消息后会把他们连接成一个新的key串，进行编码、加密，确保信息的安全性
 ```
 
+### django drf中视图有哪几种类型
 
-### 请简述http 缓存机制。
-```
-强制缓存，服务器通知浏览器一个缓存时间，在缓存时间内，下次请求，直接用缓存，不在时间内，执行比较缓存策略。
-比较缓存，将缓存信息中的Etag和Last-Modified通过请求发送给服务器，由服务器校验，返回304状态码时，浏览器直接使用缓存。
-```
-
-### 简述django 下的(內建的)缓存机制
-```
-缓存是将一些常用的数据保存内存或者memcache中,在一定的时间内有人来访问这些数据时,则不再去执行数据库及渲染等操作,而是直接从内存或memcache的缓存中去取得数据,然后返回给用户.django提供了6种缓存机制，分别为：
-
-开发调试缓存（为开发调试使用，实际上不使用任何操作）；
-
-内存缓存（将缓存内容缓存到内存中）；
-
-文件缓存（将缓存内容写到文件 ）；
-
-数据库缓存（将缓存内容存到数据库）；
-
-memcache缓存（包含两种模块，python-memcached或pylibmc.）。
-
-以上缓存均提供了三种粒度的应用。
+```python
+APIView, 到GenericAPIView,再到ViewSet.
 ```
 
+APIView是drf中所有view的父类，本身继承于Django的View. 。最直接封装的是对request,response都进行了封装，response里面做了一些认证，权限，限流之类处理。而response返回的结果是经过系列化的json.
 
-### django 中使用memcached 作为缓存的具体方法? 优缺点说明?
+GenericAPIView这里都是通用的APIView,所谓通用就是常用的增删改查，也就是restframework已经帮你封装好了。比如django的GenericView封装了ListView, DetailView，CreateView, UpdateView, DeleteView等通用视图类。drf中则封装得更多。
+
+ViewSet其实是对前面内容的更高层的封装，但我们可以看到在ViewSet类中并没有实现任何特殊的内容，它只是继承了两个类ViewSetMixin, APIView. VIewSet常常配合router使用，router可以自动将常用的 get绑定list，post绑定create这些操作完成，而不需要你在as_view中指定对应的关系了，连这个都省去了。
+
+### django 给类视图加装饰器的方法有哪些
+
+```python
+from django.shortcuts import render,redirect,HttpResponse
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+
+def wrapper(fn):
+    def inner(request,*args,**kwargs):
+        ret = fn(request)
+        print('xsssss')
+        return ret
+    return inner
+
+# @method_decorator(wrapper,name='get')#CBV版装饰器方式一
+class BookList(View):
+    @method_decorator(wrapper) #CBV版装饰器方式二
+    def dispatch(self, request, *args, **kwargs):
+        print('请求内容处理开始')
+        res = super().dispatch(request, *args, **kwargs)
+        print('处理结束')
+        return res
+        
+    def get(self,request):
+        print('get内容')
+        # all_books = models.Book.objects.all()
+        return render(request,'login.html')
+        
+    @method_decorator(wrapper) #CBV版装饰器方式三
+    def post(self,request):
+        print('post内容')
+        return redirect(reverse('book_list'))
+# @wrapper
+def book_list(request):
+    return HttpResponse('aaa')
 ```
-在settings中的CACHES中设置缓存，是Django目前原生支持的最快最有效的缓存系统。
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+ref： https://www.cnblogs.com/clschao/articles/10409764.html
+
+总结：1.给整个视图函数指定装饰器，但是需要指定请求方法。2.给dispatch使用装饰器，会对所有请求方法生效。3.对某个指定请求方法使用装饰器。
+
+### django认证的流程
+
+中间件认证处理
+视图函数中authenticate_classes中的认证类依次处理（类似责任链）
+authenticate(每个认识类都有)，返回结果有三种：
+- （user,auth)  --> request.user = user, request.auth = auth
+- None
+- AuthenticationFailed
+权限检查
+视图函数执行
+
+```python
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.authentication import get_authorization_header
+from apps.api import models
+from rest_framework import exceptions
+
+
+class GeneralAuthentication(BaseAuthentication):
+    """ 通用认证（所有页面都可以应用）
+    如果用户已登录，则在request.user和request.auth中赋值；未登录则做任何操作。
+    用户需要在请求头Authorization中传递token，格式如下：
+        Authorization: token 401f7ac837da42b97f613d789819ff93537bee6a
+
+    建议：配合和配置文件一起使用，未认证的用户request.user和request.auth的值为None
+
+    REST_FRAMEWORK = {
+        "UNAUTHENTICATED_USER":None,
+        "UNAUTHENTICATED_TOKEN":None
     }
-}
-由于Memcached是基于内存的缓存，数据只存储在内存中，如果服务器死机的话数据会丢失，所以不要把内存缓存作为唯一的数据存储方法
+    """
+    keyword = "token"
+
+    def authenticate(self, request):
+        auth_tuple = get_authorization_header(request).split()
+
+        # 1.如果没有传token，则通过本次认证，进行之后的认证
+        if not auth_tuple:
+            return None
+
+        # 2.如果传递token，格式不符，则通过本次认证，进行之后的认证
+        if len(auth_tuple) != 2:
+            return None
+
+        # 3.如果传递了token，但token的名称不符，则通过本次认证，进行之后的认证
+        if auth_tuple[0].lower() != self.keyword.lower().encode():
+            return None
+
+        # 4.对token进行认证，如果通过了则给request.user和request.auth赋值，否则返回None
+        try:
+            token = auth_tuple[1].decode()
+            user_object = models.UserInfo.objects.get(token=token)
+            return (user_object, token)
+        except Exception as e:
+            return None
+
+class UserAuthentication(BaseAuthentication):
+    keyword = "token"
+
+    def authenticate(self, request):
+        auth_tuple = get_authorization_header(request).split()
+
+        if not auth_tuple:
+            raise exceptions.AuthenticationFailed('认证失败')
+
+        if len(auth_tuple) != 2:
+            raise exceptions.AuthenticationFailed('认证失败')
+
+        if auth_tuple[0].lower() != self.keyword.lower().encode():
+            raise exceptions.AuthenticationFailed('认证失败')
+        try:
+            token = auth_tuple[1].decode()
+            user_object = models.UserInfo.objects.get(token=token)
+            return (user_object, token)
+        except Exception as e:
+            raise exceptions.AuthenticationFailed('认证失败')
 ```
+
+### 什么是 RESTful API
+
+* API与用户的通信协议，总是使用HTTPs协议。
+* 域名 
+    * https://api.example.com                         尽量将API部署在专用域名（会存在跨域问题）
+    * https://example.org/api/                        API很简单
+* 版本
+    * URL，如：https://api.example.com/v1/
+    * 请求头                                                  跨域时，引发发送多次请求
+* 路径，视网络上任何东西都是资源，均使用名词表示（可复数）
+    * https://api.example.com/v1/zoos
+    * https://api.example.com/v1/animals
+    * https://api.example.com/v1/employees
+* method
+    * GET      ：从服务器取出资源（一项或多项）
+    * POST    ：在服务器新建一个资源
+    * PUT      ：在服务器更新资源（客户端提供改变后的完整资源）
+    * PATCH  ：在服务器更新资源（客户端提供改变的属性）
+    * DELETE ：从服务器删除资源
+* 过滤，通过在url上传参的形式传递搜索条件
+    * https://api.example.com/v1/zoos?limit=10：指定返回记录的数量
+    * https://api.example.com/v1/zoos?offset=10：指定返回记录的开始位置
+    * https://api.example.com/v1/zoos?page=2&per_page=100：指定第几页，以及每页的记录数
+    * https://api.example.com/v1/zoos?sortby=name&order=asc：指定返回结果按照哪个属性排序，以及排序顺序
+    * https://api.example.com/v1/zoos?animal_type_id=1：指定筛选条件
+* 状态码
+
+```python
+200 OK - [GET]：服务器成功返回用户请求的数据，该操作是幂等的（Idempotent）。
+201 CREATED - [POST/PUT/PATCH]：用户新建或修改数据成功。
+202 Accepted - [*]：表示一个请求已经进入后台排队（异步任务）
+204 NO CONTENT - [DELETE]：用户删除数据成功。
+400 INVALID REQUEST - [POST/PUT/PATCH]：用户发出的请求有错误，服务器没有进行新建或修改数据的操作，该操作是幂等的。
+401 Unauthorized - [*]：表示用户没有权限（令牌、用户名、密码错误）。
+403 Forbidden - [*] 表示用户得到授权（与401错误相对），但是访问是被禁止的。
+404 NOT FOUND - [*]：用户发出的请求针对的是不存在的记录，服务器没有进行操作，该操作是幂等的。
+406 Not Acceptable - [GET]：用户请求的格式不可得（比如用户请求JSON格式，但是只有XML格式）。
+410 Gone -[GET]：用户请求的资源被永久删除，且不会再得到的。
+422 Unprocesable entity - [POST/PUT/PATCH] 当创建一个对象时，发生一个验证错误。
+500 INTERNAL SERVER ERROR - [*]：服务器发生错误，用户将无法判断发出的请求是否成功。
+
+#更多看这里：http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+```
+
+
+### django drf中序列化时外键有哪几种方式获取外键字段
+
+PrimaryKeyRelatedField,默认行为，即显示外键对象的主键，通常是它的id
+StringRelatedField: 会调用外键对象的__str__方法
+```python
+class BookSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField()  # 使用模型的 __str__ 方法
+    
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'author']
+
+```
+
+Nested Representation
+```python
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'age']
+
+class BookSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer()  # 嵌套序列化器
+    
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'author']
+```
+
+source:
+```python
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    # 指定外键显示的字段来源
+    category = serializers.CharField(source='category.name')
+    tag = TagSerializer(many=True)
+
+    class Meta:
+        model = Article
+        fields = "__all__"
+```
+
+```python
+class ArticleSerializer(serializers.ModelSerializer):
+    # 只能获取到id
+    category = serializers.CharField(source='category.name')
+    tag = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Article
+        fields = "__all__"
+
+    def get_tag(self, obj):
+        return obj.tag.values('id', 'title')
+```
+
+
+
+
 
 ### django 的orm 中如何查询 id 不等于5 的元素？
 ```
@@ -265,25 +458,7 @@ values 字典列表,ValuesQuerySet查询集
 values_list 返回元祖列表,字段值
 <QuerySet [(2, '作者2', 24), (3, '作者3', 35)]>
 ```
-### 如何使用django orm 批量创建数据？
 
-```
-def bulk_create(self, objs, batch_size=None):
-    # 批量插入
-    # batch_size表示一次插入的个数
-    objs = [
-        models.DDD(name='r11'),
-        models.DDD(name='r22')
-    ]
-    models.DDD.objects.bulk_create(objs, 10)
-    
-objs_list = []
-for i in range(100):
-    obj = People('name%s'%i,18)  #models里面的People表
-    objs_list.append(obj)  #添加对象到列表
-
-People.objects.bulk_create(objs_list,100)  #更新操作
-```
 ### django 的Form 和ModeForm 的作用？
 ```
  - 作用：
