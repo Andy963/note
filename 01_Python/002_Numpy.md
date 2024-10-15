@@ -76,4 +76,50 @@ np.random.randint(0,100,size=(3,5))
 ```
 
 
+### where 
 
+返回满足条件元素的索引
+
+```python
+arr = np.array([1, 3, 5, 7, 9, 2, 4, 6])
+
+# 使用 np.where 找到大于 5 的元素的索引
+indices = np.where(arr > 5)
+
+print("大于 5 的元素的索引:", indices[0])
+print("大于 5 的元素:", arr[indices])
+
+大于 5 的元素的索引: [3 4 7]
+大于 5 的元素: [7 9 6]
+```
+
+条件替换
+
+```python
+arr = np.array([1, 3, 5, 7, 9, 2, 4, 6])  
+  
+# 使用 np.where 条件替换  
+# 大于 5 的元素替换为 1，其他元素替换为 0  
+result = np.where(arr > 5, 1, 0)  
+  
+print("原数组:", arr)  
+print("条件替换后的结果:", result)
+
+原数组: [1 3 5 7 9 2 4 6]
+条件替换后的结果: [0 0 0 1 1 0 0 1]
+```
+
+生成新数组
+
+```python
+arr = np.array([-1, 2, -3, 4, -5, 6])  
+  
+# 将负数替换为0，正数保留  
+result = np.where(arr < 0, 0, arr)  
+  
+print("原数组:", arr)  
+print("将负数替换为0后的结果:", result)
+
+原数组: [-1  2 -3  4 -5  6]
+将负数替换为0后的结果: [0 2 0 4 0 6]
+```

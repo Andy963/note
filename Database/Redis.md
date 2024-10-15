@@ -1,4 +1,3 @@
-## redis
 
 redis使用场景
 
@@ -11,79 +10,35 @@ redis使用场景
 * 好友关系，微博
 * 发布和订阅功能，用心用来做聊天软件
 
-### redis 编译安装
-连接redis
-```shell
-redis-cli -h -p
-```
-设置日志级别
-```redis
-127.0.0.1:6379> config set loglevel warning
-OK
-127.0.0.1:6379> config get loglevel
-1) "loglevel"
-2) "warning"
-```
-选择数据库
-redis默认有16个数据库从0开始，默认连接后自动选择0号数据库，用select命令更换数据库.事实上这个序号只相当于命名空间的作用，无法自定义名字，无法做到真正隔离，也无法为不同库设置不同密码，flush_all会清空所有库的内容。
-```redis
-127.0.0.1:6379> select 0
-OK
-127.0.0.1:6379> select 1
-OK
-127.0.0.1:6379[1]>
-```
-
-#### 一些通用命令
-```redis
-#当前redis中所有的key:
-keys *
-#删除
-del key
-#incr 增加 无法指定增加多少，当键不存在时默认0，第一次incr返回1
-127.0.0.1:6379> set age 18
-OK
-# incrby命令指定增加多少
-127.0.0.1:6379> incr andy
-(integer) 1
-127.0.0.1:6379> incrby andy 10
-(integer) 11
-#incrbyfloat增加浮点数
-127.0.0.1:6379> incrbyfloat andy 1.12
-"12.12"
-
-127.0.0.1:6379> incr age
-(integer) 19
-127.0.0.1:6379> decr age
-(integer) 18
-#判断是否存在
-127.0.0.1:6379> exists person
-(integer) 1
-#不存在的返回值
-127.0.0.1:6379> get noexists
-(nil)
-#查看数据类型
-127.0.0.1:6379> type school
-list
-```
-SORT #命令可以对列表类型、集合类型和有序集合类型键进行排序
-
-#### 过期
+### 过期
 expire key timeout # 单位为秒， 为已经添加到redis中的数据设置超时时间.也可以在添加数据时设置超时时间
-```redis
+
 EXPIRE key seconds # 设置多少秒后过期
+
+```sh
+EXPIRE mykey 60  # mykey 在 60 秒后过期
+```
+
+EXPIREAT # 使用Unix时间作为过期时间
+
+```sh
+EXPIREAT mykey 1672531199  # mykey 在指定的时间戳时刻过期
+```
+
+ SETEX key seconds value 命令在设置键的同时指定过期时间
+```shell
+SETEX mykey 60 "myvalue"  # 设置 mykey 的值为 "myvalue"，并在 60 秒后过期
+```
+
 TTL # 查看还有多少秒
 PERSIST key #设置为不过期
-EXPIREAT # 使用Unix时间作为过期时间
 PEXPIREAT # 与Expireat的区别是单位是毫秒
-
-```
-
 
 ### 字符串
 
 #### set
-```redis
+
+```sh
 #set key value EX timeout
 127.0.0.1:6379> set name andy ex 10
 OK
@@ -100,7 +55,8 @@ OK
 
 #### append 
 append向尾部追加值 
-```redis
+
+```shell
 127.0.0.1:6379> set welcome hello
 OK
 127.0.0.1:6379> append welcome ' world'
@@ -110,13 +66,15 @@ OK
 ```
 #### strlen
 strlen获取字符串长度
-```redis
+
+```shell
 127.0.0.1:6379> strlen welcome
 (integer) 10
 ```
 #### mget/mset
 mget,mset 获取 设置多个值
-```redis
+
+```shell
 127.0.0.1:6379> mset name andy age 20
 OK
 127.0.0.1:6379> mget name age
@@ -125,7 +83,7 @@ OK
 ```
 #### setbit/getbit
 setbit getbi位操作
-```redis
+```shell
 127.0.0.1:6379> set foo bar
 OK
 127.0.0.1:6379> getbit foo 0
@@ -137,7 +95,7 @@ OK
 ```
 #### bitop
 bitop 位运算
-```redis
+```shell
 127.0.0.1:6379> set foo1 bar
 OK
 127.0.0.1:6379> set foo2 aar
@@ -149,7 +107,8 @@ OK
 ```
 #### bitpos
 bitpos 获取 某个位的位置
-```redis
+
+```shell
 127.0.0.1:6379> bitpos foo 1
 (integer) 1
 ```
@@ -252,6 +211,7 @@ count = 0: 移除所有value
 ```
 
 ### 集合
+标签系统，共同好友 ，推荐系统，权限系统
 #### sadd
 添加元素 `sadd set value1 value2`
 ```redis
@@ -349,6 +309,8 @@ localhost:6379> sdiff school2 school1
 ```
 
 ### 有序集合
+
+排行榜，消息推送，定时任务调度
 
 #### zadd
 添加元素 注意值在键的前面

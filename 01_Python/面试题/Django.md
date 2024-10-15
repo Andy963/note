@@ -671,9 +671,9 @@ process_response()
 ```
 
 ### uwsgi、uWSGI和WSGI的区别
-[[概念#uwsgi]]
-[[概念#uWSGI]] 
-[[概念#WSGI (Web Server Gateway Interface)]]
+[[01_Python/面试题/概念#uwsgi]]
+[[01_Python/面试题/概念#uWSGI]] 
+[[01_Python/面试题/概念#WSGI (Web Server Gateway Interface)]]
 
 ```
  WSGI是一种通信协议规范。uWSGI是实现了这个WSGI协议的Web服务器。uwsgi是uWSGI服务器实现的自有传输协议。
@@ -1038,7 +1038,7 @@ cursor.fetchall()
 
 
 ### 谈一谈你对ORM的理解
-[[概念#ORM]]
+[[01_Python/面试题/概念#ORM]]
 
 ```
 **ORM**是“对象-关系-映射”的简称。

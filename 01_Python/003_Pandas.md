@@ -343,6 +343,49 @@ dy.to_excel('./东院1026.xlsx')
 ```
 
 
+#### set_index
+
+```python
+#将time作为行索引
+df.set_index(df['time'])
+	time	salary
+time		
+2020-06-01	2020-06-01	10000
+2020-06-02	2020-06-02	11000
+2020-06-04	2020-06-04	11100
+
+# 将它作用到原数据上：inplace=True
+df.set_index(df['time'],inplace=True)
+df
+	time	salary
+time		
+2020-06-01	2020-06-01	10000
+2020-06-02	2020-06-02	11000
+2020-06-04	2020-06-04	11100
+```
+关于index的一点补充:
+set_index中第一个参数为字段名，如果直接写的字段名如：time,此时drop参数才有效，默认行为是drop=True,此时指定time为索引，即删除了time这一列，将它用来作为索引。而如果是像上面那样使用的
+df['time']这样指定，则drop失去作用。
+
+```python
+#
+df.set_index('time',inplace=True,drop=False)
+df
+	time	salary
+time		
+2020-06-01	2020-06-01	10000
+2020-06-02	2020-06-02	11000
+2020-06-04	2020-06-04	11100
+```
+### drop
+
+手动删除列：注意在drop方法中 axis=1时表示列，axis=0表示行
+
+```python
+df.drop(labels='time',axis=1)
+```
+
+
 ### 修改dataframe
 
 df.loc, df.iloc都可以修改
@@ -375,6 +418,127 @@ df1.loc[(df1['姓名'] == name) & (df1['性别'] == gender) & (df1['年龄'] == 
 ```
 
 ref:https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
+
+to_datetime
+
+将字符串转成时间序列：to_datetime
+设置索引：set_index
+```python
+dic = {
+    'time':['2020-06-01','2020-06-02','2020-06-04'],
+    'salary':[10000,11000,11100]
+}
+df = pd.DataFrame(data=dic)
+
+# to_datetime方法
+df['time'] = pd.to_datetime(df['time'])
+df.dtypes
+time      datetime64[ns]
+salary             int64
+dtype: object
+```
+
+### where 
+
+返回一个与原数据相同大小的新对象，满足条件的元素保持原值，不满足条件的元素将被替换为NaN。这个方法常常用于数据清洗、过滤和条件筛选
+
+```python
+# 创建示例 DataFrame  
+data = {  
+    'A': [1, 2, 3, 4, 5],  
+    'B': [5, 4, 3, 2, 1]  
+}  
+df = pd.DataFrame(data)  
+  
+# 使用 where 进行条件筛选  
+result = df.where(df > 2)  
+print(result)
+
+     A    B
+0  NaN  5.0
+1  NaN  4.0
+2  3.0  3.0
+3  4.0  NaN
+4  5.0  NaN
+```
+
+应用场景：
+
+数据清洗：异常值或不符合条件的数值过滤掉
+
+```python
+# 假设我们要保留所有大于0的数，其余置为NaN
+cleaned_data = df.where(df > 0)
+```
+
+条件替换: 比如将某列中的负值替换为0。
+
+```python
+df['A'] = df['A'].where(df['A'] > 0, 0)
+```
+
+生成过滤后的数据集: 通过条件筛选并得到一个新数据集
+
+```python
+filtered_data = df.where((df['A'] > 2) & (df['B'] < 4))
+```
+
+### apply
+可以沿着指定的轴（行或列）应用一个函数
+
+```python
+def func(x):  
+    return x + 5  
+data = {  
+    'A': [1, 2, 3, 4, 5],  
+    'B': [5, 4, 3, 2, 1]  
+}  
+df = pd.DataFrame(data)  
+df['A'].apply(func)
+
+0,6
+1,7
+2,8
+3,9
+4,10
+
+df.apply(lambda x: x.sum())  # 按列求和
+df.apply(lambda x: x + 1, axis=1)  # 对每行加1
+  
+```
+
+
+### map
+对 Series 进行元素级别的转换
+
+```python
+# 对 Series 进行元素级别的转换  
+def func(x):  
+    return x + 5  
+data = {  
+    'A': [1, 2, 3, 4, 5],  
+    'B': [5, 4, 3, 2, 1]  
+}  
+df = pd.DataFrame(data)  
+df.map(func)
+
+0,6,10
+1,7,9
+2,8,8
+3,9,7
+4,10,6
+
+df['A'].map(lambda x: x * 2)  # 对 Series A 中的每个元素乘以2
+```
+
+
+### applymap
+
+与map类似，deprecated
+
+```python
+df.applymap(lambda x: x * 2)  # 对 DataFrame 中的每个元素乘以2
+```
 
 ### concat 
 axis=0表示按行拼接，axis=1表示按列拼接

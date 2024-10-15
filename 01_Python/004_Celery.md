@@ -1,4 +1,4 @@
-## 01_celery
+## celery
 
 ```python
 own_schedule
@@ -16,6 +16,7 @@ own_schedule
 - fix conflict: `from __future__ import absolute_import `
 
 ### basic use
+
 ```python
 from celery import Celery
 
@@ -72,7 +73,9 @@ beat_scheduls = {
             },
 }
 ```
+
 #add schedule task
+
 ```python
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender,**kwargs):
@@ -161,6 +164,7 @@ app.autodiscover_tasks()
 ```
 
 ### app下创建task.py
+
 ```python
 #  写任务
 from celery import shared_task
@@ -195,6 +199,7 @@ celery worker -A djangoCeleryDemo -l info
 ```
 
 ### 编写视图函数
+
 >   delay直接执行
 >   apply_async（）则指定时间执行，其中的eta参数用来接收时间，一定要utc时间
 
@@ -248,6 +253,7 @@ def get_async_result(request):
 ```
 
 当在不同文件中存在同名task时，使用下面这种方式
+
 ```python
 result1=app1.tasks.get("s1.add").delay(1,2)
 result2=app2.tasks.get("s1.mul").delay(3,2)
@@ -258,6 +264,7 @@ result2=app2.tasks.get("s1.mul").delay(3,2)
 ## Flask中应用Celery
 
 ### 文件结构 
+
 ```python
 pro_flask_celery/
 ├── app.py
@@ -357,6 +364,7 @@ def hhhhhh(*args, **kwargs):
 ```
 
 ## 周期任务的创建
+
 ```python
 from celery.schedules import crontab
 
@@ -370,11 +378,3 @@ app.conf.beat_schedule = {
 }
 ```
 注意：其中的task一定要写 appName.moduleName.taskName,只写tasks.download_data会报错：unregistered 
-
-## 面试题
-
-### 什么是celery 
-一个异步的任务队列，主要用于分布式系统中处理任务调度和执行。支持任务的并发、定时任务、工作流。
-
-### celery 包含哪些组件
- 任务队列 （broker), 任务执行者(worker), 结果后端（result backend), 任务（Task), 任务生产者（producer)

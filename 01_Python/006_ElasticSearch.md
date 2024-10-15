@@ -6107,14 +6107,9 @@ discovery.zen.ping.unicast.hosts: ["10.0.0.1", "10.0.0.3:9300", "10.0.0.6[9300-9
 
 ## Python ElasticSearch 
 
-### 安装
-
-```shell
-pip install elasticsearch
-```
-
 ### 连接
-```
+
+```python
 from elasticsearch import Elasticsearch
 
 # es = Elasticsearch()    # 默认连接本地elasticsearch
@@ -6128,6 +6123,7 @@ es = Elasticsearch(
 ```
 
 ### 简单使用
+
 ```python
 from elasticsearch import Elasticsearch
 
@@ -6144,11 +6140,14 @@ print(es.get_source(index='a2', doc_type='doc', id=1))
 {'name': 'andy', 'age': 18}
 ```
 ### get
-使用get时，`index,doc_type,id`都得指定，否则 出错, 在版本7中，doc_type字段弃用了
+
+使用get时，`index,doc_type,id` 都得指定，否则 出错, 在版本7中，doc_type字段弃用了
+
 ```python
 print(es.get(index='a2', doc_type='doc', id=1))
 ```
 ### indices
+
 关于索引的操作，如open,close, get_mapping, get_setting等。
 
 es.indices.delete_alias，删除特定别名。
@@ -6172,6 +6171,7 @@ es.indices.segments，提供构建Lucene索引（分片级别）的低级别段�
 ```
 #当索引不存在时，会先创建索引，但要指定doc_type,否则 报错
 es.index(index='a2', doc_type='doc', id=1, body={'name': "andy", "age": 18})
+
 #id可以不指定，es会自动处理
 print(es.index(index='a2', doc_type='doc',  body={'name': "Amy", "age": 16}))
 print(es.search(index='a2', doc_type='doc', filter_path=['hits.hits._source']))
@@ -6180,8 +6180,10 @@ print(es.search(index='a2', doc_type='doc', filter_path=['hits.hits._source']))
 ```
 
 ### cluster
+
 关于集群的操作
 es.cluster.get_settings，获取集群设置
+
 ```
 print(es.cluster.get_settings())
 ```
@@ -6345,6 +6347,7 @@ print(es.create(index='a2', doc_type='doc', id='2', body={"name": '王五', "age
 ```
 ### delete
 删除指定的文档。比如删除文章id为4的文档，但不能删除索引，如果想要删除索引，还需要es.indices.delete来处理.删除不存在的数据会出错。
+
 ```python
 print(es.delete(index='a2', doc_type='doc', id='2'))
 ```
@@ -6354,6 +6357,7 @@ print(es.delete_by_query(index='a2', doc_type='doc', body={"query": {"match":{"a
 ```
 ### exists
 exists，查询elasticsearch中是否存在指定的文档，返回一个布尔值。
+
 ```python
 print(es.exists(index='a2', doc_type='doc', id='1'))
 #output
@@ -6361,11 +6365,13 @@ True
 ```
 ### info
 es.info，获取当前集群的基本信息。
+
 ```python
 print(es.info())
 ```
 ### ping
 es.ping，如果群集已启动，则返回True，否则返回False。
+
 ```python
 print(es.ping())
 ```

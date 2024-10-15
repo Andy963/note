@@ -24,12 +24,6 @@ trusted-host=
 
 ```
 
-自带venv的使用：
-
-```shell
-python -m venv "venv_name"
-```
-
 ## 运算符（operator）
 
 海象运算符：
@@ -160,7 +154,7 @@ In [4]: t3
 Out[4]: (12, 34, 5, 'ab', 'cd')
 ```
 
-### 删除元组
+### 删除整个元组
 
 因元组是不可变类型，所以无法删除元组中元素，但可以删除整个元组
 
@@ -191,6 +185,7 @@ NameError: name 't1' is not defined
 集合（set）是一个无序的不重复元素序列。可以使用大括号 { } 或者 set() 函数创建集合，创建一个空集合必须用 set() 而不是 { }，因为 { } 是用来创建一个空字典。
 
 ### 添加元素
+
 ```python
 s.add( x )
 s.update( x )
@@ -202,6 +197,7 @@ In [3]: s
 Out[3]: {'a', 'b'}
 ```
 ### 移除元素
+
 ```python
 s.remove( x ) # 如果 不存在，报错
 s.discard( x ) # 如果不存在，不报错
@@ -239,6 +235,7 @@ union 返回并集
 
 
 ## 字典（dict）
+
 字典是另一种可变容器模型，且可存储任意类型对象
 dict()
 ```python
@@ -278,112 +275,6 @@ setdefault(key,default=None) 将某个键设置默认值，如果不存在则会
 pop(key) 删除指定键对应的值，返回的为该值，必须指定key，删除后该对应的键也从字典中消失了
 popitem() 随机删除字典中的最后一对键值
 
-
-## 栈 Stack
-栈的一个常见应用就是浏览器的前进后退,每访问一个网页,这条记录就被放在一个栈中,当前页在最栈顶,最早访问的URL则放在栈底. 后退一次,取出一个,前进一次加入一个.
-
-```python
-
-from pythonds.basic import Stack
-
-def parChecker(symbolString):
-    s = Stack()
-    balanced = True
-    index = 0
-    while index < len(sysmbolString) and balanced:
-        symbol = symbolString[index]
-        # 左括号入栈
-        if symbol == "(":
-            s.push(symbol)
-        else:
-            # 如果是右括号，且栈是空的，则返回False
-            if s.isEmpty():
-                balanced = False
-            else:
-            # 是右括号，且栈不为空，那么栈顶一定是左括号，所以将栈顶元素出栈
-                s.pop()
-        index = index + 1
-   if balanced and s.isEmpty():
-       return True
-   else:
-       return False
-       
-```
-
-为实现对不同括号的匹配，我们修改上面的函数：
-
-```python
-
-from pythonds.basic import Stack
-
-
-def parChecker(symbolString):
-    s = Stack()
-    balanced = True
-    index = 0
-    while index < len(symbolString) and balanced:
-        symbol = symbolString[index]
-        if symbol == "(":
-            s.push(symbol)
-        else:
-            if s.isEmpty():
-                balanced = False
-            else:
-                s.pop()
-                if not match(symbol, s.peek()):
-                    balanced = False
-        index = index + 1
-
-
-    if balanced and s.isEmpty():
-        return True
-    else:
-        return False
-
-def match(open, close):
-    opens = "([{"
-    closes = ")]}"
-    return opens.index(open) == closes.index(close)
-```
-
-进制转换：
-
-```python
-
-from pythonds.basic import Stack
-
-def divideBy2(decNumber):
-    remstack = Stack()
-    
-    while decNumber > 0:
-        rem = decNumber % 2
-        remstack.push(rem)
-        decNumber = decNumber // 2
-    binString = ""
-    while not remstack.isEmpty():
-        binString = binString + str(remstack.pop())
-    return binString
-```
-
-当换成其它进制时，比如16进制，表示时有一点问题，那么就需要考虑加入其它字符串来表示，否则余数就有两位会出错
-
-```python
-
-from pythonds.basic import Stack
-
-def divideBy2(decNumber, base=2):
-    digits = "0123456789ABCDEF"
-    remstack = Stack()
-
-    while decNumber > 0:
-        rem = decNumber % base
-        remstack.push(rem)
-        decNumber = decNumber // base
-    binString = ""
-    while not remstack.isEmpty():
-        binString = binString +  digits[remstack.pop()]
-    return binString
-```
 
 
 ## 可迭代对象
@@ -976,7 +867,7 @@ print(obj.method()) # Output: 3
 ### 属性
 
 #### 受保护的属性:
-以单下划线（_）开头定义。
+以单下划线` _ `开头定义。
    ⦁ 表示该属性不应该被外部直接访问，主要用于内部使用，子类可以访问。
    ⦁ 这并不是强制性的保护，只是一种约定，告诉其他程序员这个属性是“受保护的”。
    
@@ -992,7 +883,8 @@ print(obj.method()) # Output: 3
    ⦁ 通常情况下，私有属性仅仅通过类的实例方法访问
 #### 只读属性
 
-通过使用 @property 装饰器来定义一个只读属性。可以通过重写setattr实现
+通过使用 @property 装饰器来定义一个只读属性。
+也可以通过重写setattr实现
    ⦁ 只读属性只能被获取，无法被设置。
 
 ```python
@@ -1014,19 +906,9 @@ print(p.age)
 
 ```
 
-#### 内置属性
-
-```python
-__dict__ # 类的属性
-__bases__ # 类的父类所构成的元组
-__doc__ # 文档
-__name__ # 类名
-__module__ # 定义所在的模块 
-```
-
 
 ### 方法
-在python中类有三种不同方法：实例方法，类方法，静态方法.这三种方法通过第一个参数的类型来进行区分，实例方法的第一个参数为为的实例对象，类方法的第一个参数为类对象，而静态方法不要求参数，与变通函数无异。
+在python中类有三种不同方法：实例方法，类方法，静态方法。这三种方法通过第一个参数的类型来进行区分，实例方法的第一个参数为为的实例对象，类方法的第一个参数为类对象，而静态方法不要求参数，与普通函数无异。
 静态方法,类方法,普通实例方法都是存储在类中,而不会存储在对象中
 
 #### 实例方法
@@ -1356,12 +1238,11 @@ __get__ <__main__.Person object at 0x7fca538e2ac8> <class '__main__.Person'>
 ```
 
 我们在设置值时进行了拦截，当值小于0，将被设置为0。
-这里有一点需要注意，因为age是对所有Person了实例共享的，在Age类中，我们不能将值绑定给self,如果绑定给self,那么所有的实例都在修改同一份age,而通过内存地址我们可以看到Instance表示 是p实例，我们应该将age绑定给p,这样每个实例对象有自己的age
+这里有一点需要注意，因为age是对所有Person了实例共享的，在Age类中，我们不能将值绑定给self,如果绑定给self,那么所有的实例都在修改同一份age,而通过内存地址我们可以看到Instance表示是p实例，我们应该将age绑定给p,这样每个实例对象有自己的age
 
 一种常见的用法是，我们通过描述器将属性作为保护属性存储在类的内部，而将普通变量暴露给外部：
 
 ```python
-
 class Age:
 
     def __set__(self, instance, value):
@@ -1411,8 +1292,8 @@ __set__ <__main__.Person object at 0x7f1673ce2ac8> 30
   只执行第一步导入时的第三步
 
 **从哪个位置导入**
+ 
 
-```from chat gpt
 当Python代码导入模块时，会发生以下步骤：
 
 1.  搜索模块：首先，Python会在sys.path变量中定义的目录中搜索要导入的模块。sys.path变量是一个包含要搜索的目录列表的字符串列表。如果找到了匹配的模块，Python就会停止搜索并继续执行下一步。如果找不到匹配的模块，Python会引发一个ImportError。
@@ -1427,7 +1308,7 @@ __set__ <__main__.Person object at 0x7f1673ce2ac8> 30
     
 
 需要注意的是，当模块被导入时，它的代码会被执行。这意味着模块中的全局变量、函数、类等都会在导入时定义，而不是在第一次访问时才定义。因此，在编写模块时，需要注意不要编写会产生副作用的代码，例如修改全局状态或执行耗时的操作。
-```
+
 
 **从哪个位置导入**
 - 内置模块
@@ -1460,7 +1341,6 @@ def main():
 ### 延迟导入
 q.py
 ```python
-
 def bar():
     print('bar in a.py')
 
@@ -1527,54 +1407,6 @@ print(lib2.name)
 
 包内导入，在python3中，默认是绝对导入，当我们使用`.`导入时，是按照包的路径来导的，在外部的test.py中导入lib1,lib2，并使用其中的变量。此时无法使用相对导入，但lib1,lib2是在Mod1包内，可以使用相对导入，在lib2中我们使用相对导入，mod1.lib, mod1.lib2, 在lib2中使用相对导入即从“点”查找，即从lib2,找到mod1,而mod1中是能找到lib1的，所以能正常导入，**但是** 如果我们直接运行lib1.py则会报错，因为直接运行的话，当前`__name__ == '__main__'` 而它没有`.`路径，所以无法找到，同样的原理，如果我们想在lib1,或者lib2中导入外层的test同级的文件，则无法导入，因为mod只到了mod1,再上一层没有mod，（不能简单的将相对导入理解为路径的上一层 ）
 
-### 反射导入模块
-
-反射可以用来获取类的方法，也可以用来导入模块，并从模块中导入方法。
-
-```python
-import importlib
-
-PLUGIN_DICT = {
-    "board": "lib.plugins.board.Board",
-    "disk": "lib.plugins.disk.Disk",
-    "memory": "lib.plugins.memory.Memory",
-    "network":"lib.plugins.network.Network",
-    "cpu":"lib.plugins.cpu.Cpu",
-}
-
-def get_server_info(hostname, ssh_func):
-    """
-    :param hostname: 要远程操作的主机名
-    :param ssh_func: 执行远程操作的方法
-    :return: 执行命令后得到的信息
-    """
-
-    info_dict = {}
-    for key, path in PLUGIN_DICT.items():
-        module_path, class_name = path.rsplit('.', maxsplit=1)
-        # 根据字符串的形式去导入模块 “lib.plugins.board"
-        module = importlib.import_module(module_path)
-        # 去模块找到类
-        try:
-            cls = getattr(module, class_name)
-        except Exception:
-            raise ImportError('模块获取失败')
-        # 对类型实例化
-        obj = cls()
-        # 执行对象的process方法
-        result = obj.process(hostname, ssh_func)
-        info_dict[key] = result
-
-    return info_dict
-```
-```python
-In [1]: s = 'lib.plugin.board'
-
-In [2]: s.rsplit('.', maxsplit=1)
-Out[2]: ['lib.plugin', 'board']
-```
-
-我们将所有的模块都放在lib.plugin包下，这样module_path = lib.plugin, class_name=board, 这样通过importlib.import_module就获取到了对象。接着去模块中找类：getattr(module, class_name). 得到类，通过加括号的方式实例化类对象，此时执行类对象的处理方法。
 
 ## 错误与异常
 
@@ -1598,6 +1430,7 @@ BaseException:
 
 ### 解决方案
 #### 方案一：try except
+
 ```python
 try:
     pass
@@ -1612,6 +1445,7 @@ finally:
 ```
 
 #### 方案二：with 
+
 with语句
 ```python 
 with open('f','r',encoding='utf-8') as fp:
@@ -1626,7 +1460,9 @@ class Test:
 ```
 
 #### 方案三：contextlib
+
 contextlib
+
 ```python
 import contextlib
 
@@ -1639,6 +1475,7 @@ def test():
 with test() as t:
 	print(3)
 ```
+
 在yield之前的相当于在`__enter__`执行， yield之后 的则在`__exit__`执行， 使用时的`print(3)`则在yeild处执行
 
 处理错误
@@ -1754,10 +1591,10 @@ if __name__ == '__main__':
 **subprocess**
 
 ```python
-   import subprocess
+import subprocess
 
-   result = subprocess.run(['ls', '-l'], capture_output=True, text=True)
-   print(result.stdout)
+result = subprocess.run(['ls', '-l'], capture_output=True, text=True)
+print(result.stdout)
    
 ```
 
@@ -2147,13 +1984,11 @@ if __name__ == '__main__':
 **进程和线程的区别**
 ```
 进程是最小的内存分配单位
-
 线程是操作系统调度的最小单位
 
 线程被CPU执行了
 
 进程内至少含有一个线程
-
 进程中可以开启多个线程　
 
 开启一个线程所需要的时间要远小于开启一个进程　
@@ -2226,7 +2061,9 @@ if __name__ == '__main__':
     print(t.is_alive())  #所以t这个线程肯定是执行结束了，结果为False
     print(t2.is_alive()) #有可能是True，有可能是False，看子线程和主线程谁执行的快
 ```
+
 **结果**
+
 ```
 第一次：
 太白 say hello
@@ -2286,9 +2123,9 @@ if __name__ == '__main__':
 
 线程之间的通信我们列表行不行呢，当然行，那么队列和列表有什么区别呢？
 
-​	queue队列 ：使用import queue，用法与进程Queue一样
+​queue队列 ：使用import queue，用法与进程Queue一样
 
-​	queue is especially useful in threaded programming when information must be exchanged safely between multiple threads.
+​queue is especially useful in threaded programming when information must be exchanged safely between multiple threads.
 
 **先进先出**
 ```python
@@ -2489,11 +2326,6 @@ if __name__ == "__main__":
 #### gevent模块
 Gevent 是一个第三方库，可以轻松通过gevent实现并发同步或异步编程，在gevent中用到的主要模式是**Greenlet**, 它是以C扩展模块形式接入Python的轻量级协程。 Greenlet全部运行在主程序操作系统进程的内部，但它们被协作式地调度。
 
-**安装**
-
-```python
-pip3 install gevent
-```
 **常用方法**
 
 ```python
@@ -2550,7 +2382,8 @@ egon eat 2
 **看示例**
 
 ```python
-from gevent import monkey;monkey.patch_all() #必须写在最上面，这句话后面的所有阻塞全部能够识别了
+from gevent import monkey;
+monkey.patch_all() #必须写在最上面，这句话后面的所有阻塞全部能够识别了
 
 import gevent  #直接导入即可
 import time
