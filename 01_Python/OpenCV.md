@@ -31,7 +31,32 @@ cv2.destroyAllWindows()
 ```
 
 
-  
+### 图像平滑
+
+```python
+cat = cv2.imread('cat.jpg')
+
+# 均值滤波
+blur = cv2.blur(cat,(3,3))
+cv_show(blur)
+
+# 方框
+# 可以选择归一化，容易越界, normalize = False 时，只要越界了，就取255
+box = cv2.boxFilter(cat,-1,(3,3),normalize=False)
+cv_show(box)
+
+# 高斯滤波
+gaussian = cv2.GaussianBlur(cat,(3,3),0)
+cv_show(gaussian)
+
+# 中值滤波
+median = cv2.medianBlur(cat,3)
+cv_show(median)
+
+# 双边滤波
+bilateral = cv2.bilateralFilter(cat,9,75,75)
+cv_show(bilateral)
+```
 
 ### 腐蚀操作
 
@@ -164,4 +189,114 @@ cv_show(sobelxy)
 sobelxy = cv2.Sobel(img, cv2.CV_64F,1,1,ksize=3)  
 sobelxy = cv2.convertScaleAbs(sobelxy)  
 cv_show(sobelxy)
+```
+
+### Canny 边缘检测
+
+1. 高斯滤波器，平滑图像，去除噪声
+2. 计算梯度强度和方向
+3. 使用非极大值抑制,消除边缘检测带来的杂散响应
+4. 应用双阈值检测确定真实的和潜在的边缘
+5. 抑制孤立的弱边缘，完成边缘检测
+
+
+### 金字塔制造方法
+
+高斯金字塔（Gaussian Pyramid）：
+通过对原始图像进行逐层模糊和下采样（通常是以2的倍数减少图像的尺寸），生成一系列低分辨率版本的图像。每一层都比上一层更加模糊且尺寸更小
+
+```python
+img = cv2.imread('cat.jpg')
+
+up = cv2.pyrUp(img)
+down = cv2.pyrDown(img)
+
+up_down = cv2.pyrDown(up)
+cv_show(up_down) # 每次都损失了部分数据会变模糊
+```
+
+拉普拉斯金字塔（Laplacian Pyramid）：
+
+通过从高斯金字塔的每一层生成差异图像，得到的金字塔。 提取了图像的细节和边缘信息，从而能够在图像重构和图像增强等任务中提供帮助
+
+```python
+img = cv2.imread('cat.jpg')
+down = cv2.pyrDown(img)
+down_up = cv2.pyrUp(down,dstsize=(img.shape[1], img.shape[0]))
+rs = img - down_up
+cv_show(rs)
+
+# laplacian = cv2.subtract(img, down_up)
+```
+
+### 轮廓检测
+
+findContours(img, mode, method)
+
+mode：轮廓检索模式
+·RETR_EXTERNAL：只检索最外面的轮廓；
+·RETR_LIST：检索所有的轮廓，并将其保存到一条链表当中；
+·RETR_CCOMP：检索所有的轮廓，并将他们组织为两层：顶层是各部分的外部边界，第二层是空洞的边界；
+·RETR_TREE：检索所有的轮廓，并重构嵌套轮廓的整个层次；
+
+method：轮廓逼近方法
+·CHAIN_APPROX_NONE：以Freeman链码的方式输出轮廓，所有其他方法输出多边形（顶点的序列）。
+·CHAIN_APPROX_SIMPLE：压缩水平的、垂直的和斜的部分，也就是，函数只保留他们的终点部分。
+
+```python
+img = cv2.imread('cat.jpg')
+# 转灰度图
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+# 二值处理
+ret, threshold = cv2.threshold(gray, 127,255, cv2.THRESH_BINARY)
+
+cv_show(threshold)
+
+contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+```
+
+轮廓绘制：
+
+```python
+# 注意会直接修改原始图片所以copy一下
+img_copy = img.copy()
+# -1 表示 全部的轮廓
+# (0,0,255) 表示 bgr 中的r
+# 2 表示宽度
+res = cv2.drawContours(img_copy, contours, -1, (0,0,255),2)
+cv_show(res)
+```
+
+轮廓特征:
+
+面积：
+```python
+cnt = contours[0]
+cv2.contourArea(cnt)
+```
+
+周长：
+
+```python
+# 周长
+cv2.arcLength(cnt,True) # true表示 “闭合” 的轮廓
+```
+
+#### 边界矩形
+
+```python
+cnt = contours[1]
+x,y,w,h = cv2.boundingRect(cnt)
+img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+cv_show(img)
+```
+
+#### 外接圆
+
+```python
+(x,y), radius = cv2.minEnclosingCircle(cnt)
+center = (int(x),int(y))
+radius = int(radius)
+cr = cv2.circle(img,center,radius,(0,255,9),2)
+cv_show(cr)
 ```
