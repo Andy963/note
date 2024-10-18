@@ -300,3 +300,27 @@ radius = int(radius)
 cr = cv2.circle(img,center,radius,(0,255,9),2)
 cv_show(cr)
 ```
+
+### 模板匹配
+
+TM_SQDIFF：计算平方不同，计算出来的值越小，越相关
+TMCCORR：计算相关性，计算出来的值越大，越相关
+TM_CCOEFF：计算相关系数，计算出来的值越大，越相关
+TM_SQDIFF_NORMED：计算归一化平方不同，计算出来的值越接近O，越相关
+TM_CCORR_NORMED：计算归一化相关性，计算出来的值越接近1，越相关
+TM_CCOEFF_NORMED：计算归一化相关系数，计算出来的值越接近1，越相关
+
+```python
+img = cv2.imread('lina.jpg',0)
+#face = cv2.imread('face.jpg',0)
+
+template = cv2.imread('face.jpg',0)
+res = cv2.matchTemplate(img, template, 1)
+min_val,max_val,min_loc,max_loc = cv2.minMaxLoc(res)
+
+# 在匹配位置画矩形
+top_left = min_loc  # 对于 TM_SQDIFF_NORMED 方法
+bottom_right = (top_left[0] + w, top_left[1] + h)
+# 在原图上标注出来
+cv2.rectangle(img, top_left,bottom_right, 255, 2)
+```
