@@ -324,3 +324,42 @@ bottom_right = (top_left[0] + w, top_left[1] + h)
 # 在原图上标注出来
 cv2.rectangle(img, top_left,bottom_right, 255, 2)
 ```
+
+### 直方图
+cv2.calcHist:
+images:原图像图像格式为uint8或float32。当传入函数时应用中括号[]括来例如[img]
+·channels:同样用中括号括来它会告函数我们统幅图像的直方图。如果入图像是灰度图它的值就是[0]如果是彩色图像的传入的参数可以是` [0] [1] [2] `它们分别
+对应着BGR。
+·mask:掩模图像。统整幅图像的直方图就把它为None。但是如果你想统图像某一分的直方图的你就制作一个掩模图像并使用它。
+·histSize:BIN的数目。也应用中括号括来
+·ranges:像素值范围常为[0,256]
+
+```python
+img = cv2.imread('cat.jpg',0)
+his = cv2.calcHist([img],[0],None, [256],[0,256])
+his.shape
+
+plt.hist(img.ravel(),256);
+plt.show()
+```
+
+#### 均衡化
+
+```python
+img = cv2.imread('cat.jpg', 0)
+plt.hist(img.ravel(), 256)
+plt.show()
+# 均衡化后的直方图
+equ = cv2.equalizeHist(img)
+plt.hist(equ.ravel(),256)
+plt.show()
+
+
+# 自适应走廊图均衡化 应用到原图上
+clahe = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))
+res_clahe = clahe.apply(img)
+res = np.hstack((img,res_clahe))
+cv_show(res)
+```
+
+### 傅里叶变换
