@@ -207,7 +207,7 @@ df.shape
 对行/列进行索引，对元素进行索引
 当设定了显式索引，就不能用隐式索引
 
-#### 索引
+#### 获取索引
 
 ```python
 import pandas as pd
@@ -257,7 +257,7 @@ df.loc['a'] 这里面是取索引为 'a'的行，取的一是一行数据，而�
 | s\_7 | 2024-01-04 |
 | s\_1 | 2024-01-10 |
 
-而对于iloc，df.iloc[0] 与上面的效果相同，因为i是取数字索引，而这里的数字索引0与上面的loc相同,那么为什么会有两个呢？ 因为数据的索引不一定是数值类型，也可能是其它非数值类型，而iloc只能使用整型。
+而对于iloc，df.iloc[0] 与上面的效果相同，因为i是取数字位置，而这里的数字0与上面的loc相同,那么为什么会有两个呢？ 因为数据的索引不一定是数值类型，也可能是其它非数值类型，而iloc只能使用整型。
 
 ```python
 df.loc['a']  # 显式索引
@@ -363,9 +363,9 @@ time
 2020-06-02	2020-06-02	11000
 2020-06-04	2020-06-04	11100
 ```
+
 关于index的一点补充:
-set_index中第一个参数为字段名，如果直接写的字段名如：time,此时drop参数才有效，默认行为是drop=True,此时指定time为索引，即删除了time这一列，将它用来作为索引。而如果是像上面那样使用的
-df['time']这样指定，则drop失去作用。
+set_index中第一个参数为字段名，如果直接写的字段名如：time,此时drop参数才有效，默认行为是drop=True,此时指定time为索引，即删除了time这一列，将它用来作为索引。而如果是像上面那样使用的 df['time'] 这样指定，则drop失去作用。
 
 ```python
 #
@@ -377,16 +377,9 @@ time
 2020-06-02	2020-06-02	11000
 2020-06-04	2020-06-04	11100
 ```
-### drop
-
-手动删除列：注意在drop方法中 axis=1时表示列，axis=0表示行
-
-```python
-df.drop(labels='time',axis=1)
-```
 
 
-### 修改dataframe
+### 条件修改
 
 df.loc, df.iloc都可以修改
 
@@ -438,6 +431,14 @@ salary             int64
 dtype: object
 ```
 
+### drop
+
+手动删除列：注意在drop方法中 axis=1时表示列，axis=0表示行
+
+```python
+df.drop(labels='time',axis=1)
+```
+
 ### where 
 
 返回一个与原数据相同大小的新对象，满足条件的元素保持原值，不满足条件的元素将被替换为NaN。这个方法常常用于数据清洗、过滤和条件筛选
@@ -450,7 +451,8 @@ data = {
 }  
 df = pd.DataFrame(data)  
   
-# 使用 where 进行条件筛选  
+# 使用 where 进行条件筛选 
+# 会将不符合的置为NaN
 result = df.where(df > 2)  
 print(result)
 
@@ -592,4 +594,451 @@ result = pd.merge(df1, df2, on='key')
   key   A   B
 0  K0  A0  B0
 1  K1  A1  B1
+```
+
+### 数据清洗
+
+#### 过滤
+
+```python
+import pandas as pd
+df = pd.read_csv('data.csv')
+# 过滤出V1这列中值大于3的
+# df[df['V1']>3]
+
+# where 返回的是与原有的dataframe相同形状的dataframe, 不符合条件的会被替换成NaN,可以通过dropna()方法达到相似效果
+new_df = df.where(df['V1']>3).dropna()
+```
+
+#### 填充缺失值
+
+用均值填充缺失值：
+
+```python
+df['V1'].fillna(df['V1'].mean(), inplace=True)
+df['V2'].fillna(df['V2'].mean(), inplace=True)
+```
+#### 插值
+
+线性插值：
+
+```python
+df['V1'].interpolate(method='linear', inplace=True)
+df['V2'].interpolate(method='linear', inplace=True)
+```
+
+### 处理重复数据
+
+```python
+import pandas as pd
+
+data = {
+    'OrderID': [101, 102, 103, 104, 101, 102, 105],
+    'CustomerID': ['C001', 'C002', 'C003', 'C004', 'C001', 'C002', 'C005'],
+    'Amount': [250, 150, 200, 300, 250, 150, 400],
+    'OrderDate': ['2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-01', '2023-01-02', '2023-01-05']
+}
+
+orders = pd.DataFrame(data)
+
+   OrderID CustomerID  Amount   OrderDate
+0      101       C001     250  2023-01-01
+1      102       C002     150  2023-01-02
+2      103       C003     200  2023-01-03
+3      104       C004     300  2023-01-04
+4      101       C001     250  2023-01-01
+5      102       C002     150  2023-01-02
+6      105       C005     400  2023-01-05
+```
+
+#### 查找重复数据
+
+```python
+duplicates = orders.duplicated()
+print(duplicates)
+
+0    False
+1    False
+2    False
+3    False
+4     True
+5     True
+6    False
+dtype: bool
+```
+
+#### 删除重复的值
+
+```python
+cleaned_orders = orders.drop_duplicates()
+print(cleaned_orders)
+
+   OrderID CustomerID  Amount   OrderDate
+0      101       C001     250  2023-01-01
+1      102       C002     150  2023-01-02
+2      103       C003     200  2023-01-03
+3      104       C004     300  2023-01-04
+6      105       C005     400  2023-01-05
+```
+
+#### 根据特定列删除重复值
+
+```python
+cleaned_orders_subset = orders.drop_duplicates(subset=['OrderID'])
+# cleaned_orders_last = orders.drop_duplicates(subset=['OrderID'], keep='last') 保留最后一条记录
+print(cleaned_orders_subset)
+
+  OrderID CustomerID  Amount   OrderDate
+0      101       C001     250  2023-01-01
+1      102       C002     150  2023-01-02
+2      103       C003     200  2023-01-03
+3      104       C004     300  2023-01-04
+6      105       C005     400  2023-01-05
+```
+
+### 处理异常值
+
+```python
+import pandas as pd
+import numpy as np
+
+# 创建模拟销售数据
+sales_data = {
+    'ProductID': ['P001', 'P002', 'P003', 'P004', 'P005'],
+    'Sales': [150, 1600, 170, 200, 15000]  # 15000为潜在异常值
+}
+
+df = pd.DataFrame(sales_data)
+print(df)
+
+  ProductID  Sales
+0      P001    150
+1      P002   1600
+2      P003    170
+3      P004    200
+4      P005  15000
+```
+
+#### 识别异常值
+
+使用四分位数（quartiles）来识别异常值
+
+```python
+Q1 = df['Sales'].quantile(0.25)
+Q3 = df['Sales'].quantile(0.75)
+IQR = Q3 - Q1
+
+# 定义异常值的上下边界
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+print(f"Q1: {Q1}, Q3: {Q3}, IQR: {IQR}, Lower bound: {lower_bound}, Upper bound: {upper_bound}")
+
+Q1: 170.0, Q3: 1600.0, IQR: 1430.0, Lower bound: -1975.0, Upper bound: 3745.0
+```
+
+#### 筛选出异常值
+
+```python
+outliers = df[(df['Sales'] < lower_bound) | (df['Sales'] > upper_bound)]
+print("异常值:")
+print(outliers)
+异常值:
+  ProductID  Sales
+4      P005  15000
+```
+
+#### 处理异常值
+
+```python
+df.loc[df['Sales'] > upper_bound, 'Sales'] = upper_bound
+print("处理后的销售数据:")
+print(df)
+
+处理后的销售数据:
+  ProductID  Sales
+0      P001    150
+1      P002   1600
+2      P003    170
+3      P004    200
+4      P005   3745
+```
+
+### 标准化 & 归一化
+
+```python
+customer_data = {
+    'CustomerID': ['C001', 'C002', 'C003', 'C004', 'C005'],
+    'Age': [25, 45, 35, 50, 23],
+    'Income': [50000, 100000, 75000, 120000, 45000]
+}
+
+df_customers = pd.DataFrame(customer_data)
+print(df_customers)
+
+  CustomerID  Age  Income
+0       C001   25   50000
+1       C002   45  100000
+2       C003   35   75000
+3       C004   50  120000
+4       C005   23   45000
+```
+
+#### 标准化
+
+标准化是通过减去均值并除以标准差来将数据转化为均值为 0、标准差为 1 的分布
+
+```python
+from scipy import stats
+
+df_customers['Age_Z'] = stats.zscore(df_customers['Age'])
+df_customers['Income_Z'] = stats.zscore(df_customers['Income'])
+
+print("标准化后的数据:")
+print(df_customers)
+
+标准化后的数据:
+  CustomerID  Age  Income     Age_Z  Income_Z
+0       C001   25   50000 -0.995228 -0.974245
+1       C002   45  100000  0.882561  0.765478
+2       C003   35   75000 -0.056334 -0.104383
+3       C004   50  120000  1.352008  1.461367
+4       C005   23   45000 -1.183007 -1.148217
+```
+
+#### 归一化（Min-Max Scaling）
+
+```python
+# 归一化函数
+def normalize(col):
+    return (col - col.min()) / (col.max() - col.min())
+
+df_customers['Age_Norm'] = normalize(df_customers['Age'])
+df_customers['Income_Norm'] = normalize(df_customers['Income'])
+
+print("归一化后的数据:")
+print(df_customers[['CustomerID', 'Age_Norm', 'Income_Norm']])
+
+归一化后的数据:
+  CustomerID  Age_Norm  Income_Norm
+0       C001  0.074074     0.066667
+1       C002  0.814815     0.733333
+2       C003  0.444444     0.400000
+3       C004  1.000000     1.000000
+4       C005  0.000000     0.000000
+```
+
+### 应用实例
+#### 检测重复值或数据格式的正确性
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+
+# 读取数据文件
+data = pd.read_csv('email.csv')
+
+# 检查重复值
+duplicates = data[data.duplicated()]
+print("重复值检测:")
+print(duplicates)
+
+# 检查邮箱格式
+def is_valid_email(email):
+    # 使用正则表达式检查邮箱格式
+    regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(regex, email) is not None
+
+data['Email Valid'] = data['Email'].apply(is_valid_email)
+invalid_emails = data[~data['Email Valid']]
+print("\n邮箱格式不正确:")
+print(invalid_emails[['Name', 'Email']])
+
+# 可视化结果
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# 绘制重复值数量统计图
+duplicate_counts = data.duplicated().value_counts()
+duplicate_counts.plot(kind='bar', ax=ax, color=['orange', 'lightgreen'])
+ax.set_title('重复值统计')
+ax.set_xticklabels(['无重复', '有重复'], rotation=0)
+ax.set_ylabel('数量')
+
+plt.show()
+```
+
+
+#### 自动驾驶车辆数据检测报告
+
+```python
+import pandas as pd
+
+# 创建检查函数
+def check_quality(data):
+    report = {
+        "Total_Vehicles": len(data),
+        "Speed_Issues": [],
+        "Radar_Distance_Issues": [],
+        "Camera_Quality_Issues": []
+    }
+    
+    for index, row in data.iterrows():
+        if row['Speed'] < 0 or row['Speed'] > 120:
+            report["Speed_Issues"].append(row['Vehicle_ID'])
+
+        if row['Radar_Distance'] <= 50:
+            report["Radar_Distance_Issues"].append(row['Vehicle_ID'])
+
+        if row['Camera_Quality'] < 0.75:
+            report["Camera_Quality_Issues"].append(row['Vehicle_ID'])
+    
+    return report
+
+# 读取数据文件
+# 车速：应在0到120之间。
+# 雷达距离：建议值大于50米。
+# 摄像头图像质量：应在0到1之间，且尽量高于0.75。
+data = pd.read_csv('vehicle.csv')
+
+# 生成质量检查报告
+quality_report = check_quality(data)
+
+# 输出质检报告
+def print_report(report):
+    print("==== 质检报告 ====")
+    print(f"检测车辆总数: {report['Total_Vehicles']}")
+    print(f"有车速问题的车辆 ID: {report['Speed_Issues'] if report['Speed_Issues'] else '无'}")
+    print(f"雷达距离问题车辆 ID: {report['Radar_Distance_Issues'] if report['Radar_Distance_Issues'] else '无'}")
+    print(f"摄像头图像质量问题车辆 ID: {report['Camera_Quality_Issues'] if report['Camera_Quality_Issues'] else '无'}")
+    print("===================")
+
+# 打印报告
+print_report(quality_report)
+
+==== 质检报告 ====
+检测车辆总数: 10
+有车速问题的车辆 ID: 无
+雷达距离问题车辆 ID: [5.0, 7.0, 8.0, 9.0]
+摄像头图像质量问题车辆 ID: [3.0, 5.0, 8.0, 9.0]
+===================
+```
+
+
+## 数据可视化
+
+```python
+import pandas as pd
+
+# 示例数据
+data = {
+    "CustomerID": [1, 2, 3, 4, 5],
+    "Age": [23, 45, 34, 50, 18],
+    "Income": [50000, 100000, 75000, 120000, 45000],
+    "Purchased": [1, 1, 0, 1, 0]  # 1表示购买, 0表示未购买
+}
+
+df_customers = pd.DataFrame(data)
+
+||CustomerID|Age|Income|Purchased|
+|---|---|---|---|---|
+|0|1|23|50000|1|
+|1|2|45|100000|1|
+|2|3|34|75000|0|
+|3|4|50|120000|1|
+|4|5|18|45000|0|
+```
+### matplotlib：
+
+#### 柱状图
+
+```python
+# 对年龄进行分组，创建年龄段
+bins = [0, 18, 30, 40, 50, 100]
+labels = ['0-18', '19-30', '31-40', '41-50', '51+']
+df_customers['Age Group'] = pd.cut(df_customers['Age'], bins=bins, labels=labels)
+
+# 计算每个年龄段的平均收入
+average_income_by_age_group = df_customers.groupby('Age Group')['Income'].mean()
+
+# 绘制柱状图
+plt.figure(figsize=(10, 6))
+average_income_by_age_group.plot(kind='bar', color='skyblue')
+
+plt.title('Average Income by Age Group')
+plt.xlabel('Age Group')
+plt.ylabel('Average Income')
+plt.xticks(rotation=45)
+plt.grid(axis='y')
+plt.show()
+```
+
+
+#### 绘制折线图
+
+```python
+import matplotlib.pyplot as plt
+
+# 对客户ID排序
+df_customers_sorted = df_customers.sort_values(by='CustomerID')
+
+# 绘制折线图
+plt.figure(figsize=(10, 6))
+plt.plot(df_customers_sorted['Age'], df_customers_sorted['Income'], marker='o', linestyle='-', color='purple')
+
+plt.title('Income vs Age')
+plt.xlabel('Age')
+plt.ylabel('Income')
+plt.grid()
+plt.xticks(df_customers_sorted['Age'])  # 显示每个年龄的x轴标签
+plt.show()
+```
+#### 散点图
+```python
+import matplotlib.pyplot as plt
+
+# 创建散点图
+plt.figure(figsize=(10, 6)) #设置图形的大小为10x6英寸
+
+# df_customers['Age'] 和 df_customers['Income'] 用作x轴和y轴的数据。
+# c=df_customers['Purchased']: 根据"Purchased"列中的值为每个点着色。这里的值是0或1，代表是否购买。
+# cmap='bwr': 指定颜色地图为'bwr'（蓝色-白色-红色），用于根据信息的不同值着色。
+# alpha=0.7: 设置点的透明度为0.7，使得重叠的点可以部分显示。
+plt.scatter(df_customers['Age'], df_customers['Income'], 
+            c=df_customers['Purchased'], cmap='bwr', alpha=0.7)
+plt.title('Age vs Income') #图形的标题为“年龄 vs 收入”。
+plt.xlabel('Age') # x轴的标签为“年龄”
+plt.ylabel('Income') # y轴的标签为“收入”。
+plt.colorbar(label='Purchased (1=Yes, 0=No)') # 添加颜色条，作为图例，说明颜色对应的含义。在这里，1表示购买，0表示未购买。
+plt.grid() # 启用网格，以帮助视觉上更好地定位数据点。
+plt.show()
+```
+
+### seaborn:
+
+```python
+import seaborn as sns
+
+# 创建带回归线的散点图
+plt.figure(figsize=(10, 6)) # 设置图形的大小为10x6英寸
+
+# data=df_customers: 指定用于绘图的数据源，即我们创建的DataFrame。
+# x='Age' 和 y='Income': 确定x轴和y轴分别为“年龄”和“收入”。
+# hue='Purchased': 根据“Purchased”列的值为点染色，这里不同的颜色代表不同的购买行为。
+# palette='bwr': 使用与Matplotlib相同的'bwr'颜色映射。
+# s=100: 设置散点的大小为100，这是点的面积。
+# alpha=0.7: 设置点的透明度为0.7。
+sns.scatterplot(data=df_customers, x='Age', y='Income', hue='Purchased', palette='bwr', s=100, alpha=0.7)
+
+# data=df_customers: 数据源为相同的DataFrame。
+# x='Age' 和 y='Income': 确定回归线使用的变量。
+# scatter=False: 不绘制散点，只绘制回归线。
+# color='blue': 指定回归线的颜色为蓝色。
+sns.regplot(data=df_customers, x='Age', y='Income', scatter=False, color='blue')
+plt.title('Age vs Income with Regression Line') # 标题为“带回归线的年龄 vs 收入”。
+plt.xlabel('Age') # x轴的标签为“年龄”
+plt.ylabel('Income') # y轴的标签为“收入“
+plt.grid() # 启用网格
+plt.show()
+
 ```
