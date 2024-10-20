@@ -6,6 +6,7 @@ vx_recycle_bin/*
 .idea
 .obsidian
 .trash
-
+__pycache__
+.pytest_cache
 # Ignore Smart Connections folder because embeddings file is large and updated frequently
 .smart-connections
