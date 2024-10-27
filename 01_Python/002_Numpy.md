@@ -28,31 +28,103 @@ array([[0, 1, 2],
        [3, 4, 5],
        [6, 7, 8]])
 ```
-### zeros,ones
-shape定义数组的形状，行，列。
-zeros表示用0来填充元素，同样的还有ones
-```python
-np.zeros(shape=(3,4))
-array([[0., 0., 0., 0.],
-       [0., 0., 0., 0.],
-       [0., 0., 0., 0.]])
 
-np.ones(shape=(3,4))
-array([[1., 1., 1.],
-       [1., 1., 1.],
-       [1., 1., 1.],
-       [1., 1., 1.]])
+### ndim
+
+```python
+a = np.array([1,2,3,4])
+b = np.array([[1,2],[3,4]])
+print("a的维度：",a.ndim, "b的维度:",b.ndim)
+
 ```
 
-### linspace，arange
-linspace(from,to,num) 返回一个指定范围内的一维等差数列,它可以指定元素个数，而arange则指定步长
+### shape
+
+```python
+a = np.array([1,2,3])
+b = np.array([[1,2],[4,5]])
+print("a的shape:",a.shape, "b的shape",b.shape)
+
+a的shape: (3,) b的shape (2, 2)
+```
+
+
+### reshape
+如果数量不够是会报错的
+
+```python
+a = np.arange(20)
+print("a的shape:",a.shape)
+b = a.reshape((4,5))
+print("b的shape是:",b.shape, "a的shape:",a.shape)
+
+a的shape: (20,)
+b的shape是: (4, 5) a的shape: (20,)
+```
+
+
+### resize 
+改变数组形状
+
+```python
+a = np.array([[2,3],[1,3]])
+a = np.resize(a,(2,3))
+a
+
+# 从开始位置重复 即：2，3，1，3，2，3
+array([[2, 3, 1],
+       [3, 2, 3]])
+```
+
+
+reshape 是返回的副本，而resize则在原地修改
+reshape 新开关不匹配时会报错，而resize则会调整
+
+### astype
+
+修改数据类型
+
+```python
+a = np.array([1.1, 1.2])
+print("a dtype", a.dtype)
+print("astype float32:", a.astype("float32").dtype)
+print("原数据类型",a.dtype)
+# 修改原数据类型
+a = a.astype('float32')
+print('修改后数据类型',a.dtype)
+
+a dtype float64
+astype float32: float32
+原数据类型 float64
+修改后数据类型 float32
+```
+
+### arange
+
+```python
+np.arange(0,100,9)
+array([ 0,  9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99])
+```
+
+### linspace
+linspace(from,to,num) 返回一个指定范围内的一维等差数列,它可以指定元素个数,但不能像arange 那样指定步长
 
 ```python
 np.linspace(1,100,num=10)
 array([  1.,  12.,  23.,  34.,  45.,  56.,  67.,  78.,  89., 100.])
 
-np.arange(0,100,9)
-array([ 0,  9, 18, 27, 36, 45, 54, 63, 72, 81, 90, 99])
+
+```
+
+### logspace
+
+np.logspace(start,stop,num=50,endpoint=True, base=10,dtype=None)
+
+```python
+# 2的0到9次方间生成10个数
+a = np.logspace(0,9,10,base=2)
+a
+array([  1.,   2.,   4.,   8.,  16.,  32.,  64., 128., 256., 512.])
 ```
 
 ### random
@@ -75,6 +147,22 @@ np.random.seed(10) # 固定随机种子
 np.random.randint(0,100,size=(3,5))
 ```
 
+
+### zeros, ones
+shape定义数组的形状，行，列。
+zeros表示用0来填充元素，同样的还有ones
+```python
+np.zeros(shape=(3,4))
+array([[0., 0., 0., 0.],
+       [0., 0., 0., 0.],
+       [0., 0., 0., 0.]])
+
+np.ones(shape=(3,4))
+array([[1., 1., 1.],
+       [1., 1., 1.],
+       [1., 1., 1.],
+       [1., 1., 1.]])
+```
 
 ### where 
 
@@ -123,3 +211,77 @@ print("将负数替换为0后的结果:", result)
 原数组: [-1  2 -3  4 -5  6]
 将负数替换为0后的结果: [0 2 0 4 0 6]
 ```
+
+
+### 切片和索引
+
+ndarray 可以通过索引或者切片来访问和修改，与python中list 切片操作一样。
+但数组切片是原始数组视图，任何修改都会修改原始数据。如果不想修改需要使用copy.
+
+
+### 广播机制
+
+让所有输入数组都向其中形状最长的数组看齐，形状中不足的部分都通过在前面加1补齐。
+输出数组的形状是输入数组形状的各个维度上的最大值。
+如果输入数组的某个维度和输出数组的对应维度的长度相同或者其长度为1时，这个数组能够用来计算，否则出错。
+当输入数组的某个维度的长度为1时，沿着此维度运算时都用此维度上的第一组值。
+
+```python
+a = np.array([1,2,3,4])
+b = np.array([4,5,6,7])
+c = a * b  # 对应位置相乘
+print(c)
+
+[ 4 10 18 28]
+```
+
+如果两个形状不同的数组，numpy设计了一种广播机制，对开关较小的数组，在横向或者纵向上进行一定次数的重复，使其与形状较大的数组拥有相同的维度。
+
+
+```python
+c = np.array([[0,0,0],[10,10,10],[20,20,20],[30,30,30]])
+d = np.array([1,2,3])
+print(c + d)
+
+[[ 1  2  3]
+ [11 12 13]
+ [21 22 23]
+ [31 32 33]]
+
+```
+
+上面的例子将较小的d数组在行上进行了重复，然后进行的的计算。
+
+```python
+e = np.array([2,3])
+f = np.array([1,])
+print(e+f)
+
+[3 4]
+```
+
+因为其中一个数值为1，故可以进行运算。
+
+### 平均值 mean
+
+当指定axis 时，则将对应的坐标轴进行累加然后平均，得到的是一给数组
+
+
+### 中位数 median
+
+按顺序排列的一组，取居于中间位置的数
+
+### 标准差 std
+
+平均值分散程度。 各数值与平均数的差平方再求算术平方根
+
+
+### 方差 var
+
+### 加权平均 average
+
+将各数值乘以相应的权数，然后求和，再除以总的单位数
+
+numpy.average(a, axis=None, weights=None, returned=False)
+
+### 最大值 max

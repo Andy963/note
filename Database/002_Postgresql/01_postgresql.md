@@ -102,3 +102,26 @@ create table student_bak (like student);
 create table tbl_case_visit2 as (select * from tbl_case_visit limit 0)
 -- postgresql 中后面必须使用括号括起来，在mysql中则不用
 ```
+
+### 事务
+在pg中任何语句默认是以隐式的事务执行的，但也可以显式的添加事务，可以通过：
+BEGIN; COMMIT;
+BEGIN WORK; COMMIT WOKR;
+BEGIN TRANSCATION; COMMIT TRANSCATION; 
+
+```sql
+-- start a transaction
+BEGIN;
+-- insert a new row into the accounts table
+INSERT INTO accounts(name,balance)VALUES('Alice',10000);
+-- commit the change (or roll it back later)
+COMMIT;
+
+```
+
+同样的，回滚可以是：
+ROLLBACK;
+ROLLBACK WORK;
+ROLLBACK TRANSACTION;
+
+ref: https://neon.tech/postgresql/postgresql-tutorial/postgresql-transaction

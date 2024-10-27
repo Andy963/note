@@ -62,6 +62,7 @@ while line := f.readLine():
 应用：
 
 判断一个数是否是2的整数次方
+
 ```python
 def is_power_of_two(n):
     return n != 0 and (n & (n-1) == 0)
@@ -136,50 +137,6 @@ print(ls * 3)
 
 注意，列表也有clear方法，可以将整个列表清空（与集合相同）
 
-## 元组（tuple）
-
-元组是不可变类型，另外，当元组中只有一个元素时，就在元素后面添加逗号，否则括号会被当作运算符使用。
-
-### 修改元组
-
-元组可以相加，相乘
-
-```python
-In [1]: t1 = (12,34,5)
-
-In [2]: t2 = ('ab','cd')
-
-In [3]: t3=t1+t2
-
-In [4]: t3
-Out[4]: (12, 34, 5, 'ab', 'cd')
-```
-
-### 删除整个元组
-
-因元组是不可变类型，所以无法删除元组中元素，但可以删除整个元组
-
-```python
-In [5]: del t1[0]
----------------------------------------------------------------------------
-TypeError                                 Traceback (most recent call last)
-<ipython-input-5-8940bcde932e> in <module>
-----> 1 del t1[0]
-
-TypeError: 'tuple' object doesn't support item deletion
-
-In [6]: del t1
-
-In [7]: t1
----------------------------------------------------------------------------
-NameError                                 Traceback (most recent call last)
-<ipython-input-7-5db19043943a> in <module>
-----> 1 t1
-
-NameError: name 't1' is not defined
-```
-
-元组也是序列，所以可以通过下标访问元素，截取，与序列方法一致。
 
 
 ## 集合（set）
@@ -194,7 +151,8 @@ my_set = set([1, 2, 3, 4])
 ### 添加元素
 
 add 添加一个元素，如果该元素已经存在于集合中，则集合不会发生变化。
-update 可以添加多个元素，
+update 可以添加多个元素
+
 ```python
 s.add( x )
 s.update( x )
@@ -278,6 +236,7 @@ Out[19]: {'a': [1], 'b': [1]}
 In [20]: d.fromkeys(['a','b'],1)
 Out[20]: {'a': 1, 'b': 1}
 ```
+
 get(key,default=None),从字典中获取key对应的值，如果不存在，则返回默认值
 update(dict) 将dict更新到字典中
 setdefault(key,default=None) 将某个键设置默认值，如果不存在则会添加
@@ -389,6 +348,7 @@ for x in myiter:
 ```
 
 ### 生成器
+
 使用了yield的函数被称为生成器。即生成器是使用函数语法定义的迭代器
 
 跟普通函数不同的是，生成器是一个返回迭代器的函数，只能用于迭代操作，更简单点理解生成器就是一个特殊的迭代器。
@@ -1958,14 +1918,14 @@ if __name__ == '__main__':
 concurrent.futures模块提供了一个更高级的接口，可以方便地管理线程池
    
 ```python
-   from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
-   def task(n):
-       print(f"Task {n} running")
+def task(n):
+   print(f"Task {n} running")
 
-   with ThreadPoolExecutor(max_workers=5) as executor:
-       for i in range(5):
-           executor.submit(task, i)
+with ThreadPoolExecutor(max_workers=5) as executor:
+   for i in range(5):
+	   executor.submit(task, i)
    
 ```
 
@@ -1994,6 +1954,7 @@ if __name__ == '__main__':
 ```
 
 **进程和线程的区别**
+
 ```
 进程是最小的内存分配单位
 线程是操作系统调度的最小单位
@@ -2054,6 +2015,7 @@ Chengd---python thread is done...
 join方法
 
 用来等待子线程运行结束。
+
 ```python
 import time
 from threading import Thread
@@ -2379,6 +2341,7 @@ g2.join()
 #或者gevent.joinall([g1,g2])
 print('主')
 ```
+
 **结果**
 egon eat 1
 egon play 1
@@ -2446,6 +2409,7 @@ print('run time is %s' %(stop_time-start_time))
 ```
 
 **示例2**
+
 通过gevent实现单线程下的socket并发（from gevent import monkey;monkey.patch_all()一定要放到导入socket模块之前，否则gevent无法识别socket的阻塞）
 
 一个网络请求里面经过多个时间延迟time

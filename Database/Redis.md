@@ -214,20 +214,20 @@ count = 0: 移除所有value
 标签系统，共同好友 ，推荐系统，权限系统
 #### sadd
 添加元素 `sadd set value1 value2`
-```redis
+```shell
 localhost:6379> sadd school1 peking tsing
 (integer) 2
 ```
 #### smembers
 查看元素 `smembers set`
-```redis
+```shell
 localhost:6379> smembers school1
 1) "tsing"
 2) "peking"
 ```
 #### srem
 移除元素 `srem set memeber`
-```redis
+```shell
 localhost:6379> srem school1 tsing
 (integer) 1
 localhost:6379> smembers school1
@@ -235,12 +235,12 @@ localhost:6379> smembers school1
 ```
 #### scard
 查看集合中元素个数 scard
-```redis
+```shell
 localhost:6379> scard school1
 (integer) 1
 ```
 #### sinter/sdiff/sunion
-```redis
+```shell
 localhost:6379> smembers school1
 1) "yangtze"
 2) "tsing"
@@ -252,12 +252,12 @@ localhost:6379> smembers school2
 ```
 
 获取交集`sinter set1 set2`
-```redis
+```shell
 localhost:6379> sinter school1 school2
 1) "yangtze"
 ```
 获取并集 `sunion set1 set2`
-```redis
+```shell
 localhost:6379> sunion school1 school2
 1) "yangtze"
 2) "wuhan"
@@ -268,7 +268,7 @@ localhost:6379> sunion school1 school2
 获取差集`sdiff set1 set2`
 注意前后顺序不同，结果可能不同
 
-```redis
+```shell
 localhost:6379> sdiff school1 school2
 1) "tsing"
 2) "peking"
@@ -280,7 +280,7 @@ localhost:6379> sdiff school2 school1
 
 #### sdiffstore/ sunionstore/ sinterstore
 获取交并存储运算结果
-```redis
+```shell
 127.0.0.1:6379> sadd s1 a b c
 (integer) 3
 127.0.0.1:6379> sadd s2 b c d
@@ -292,7 +292,7 @@ localhost:6379> sdiff school2 school1
 ```
 #### srandmember key
 随机获取一个值 
-```redis
+```shell
 127.0.0.1:6379> smembers s_diff
 1) "a"
 127.0.0.1:6379> srandmember s1

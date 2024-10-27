@@ -375,3 +375,25 @@ cv_show(res)
 opencv中主要就是cv2.dft(）和cv2.idft()，输入图像需要先转换成np.float32格式。
 得到的结果中频率为0的部分会在左上角，通常要转换到中心位置，可以通过shift变换来实现。
 cv2.dft()返回的结果是双通道的（实部，虚部），通常还需要转换成图像格式才能展示（0,255）
+
+
+### 角点检测
+
+cv2.cornerHarris()  
+img: 数据类型为float32的图像  
+blockSize : 检测窗口的大小  
+ksize: Sobel 求导中使用的窗口的大小  
+k: Harris 角点检测方程的自由参数 [0.04 0.06]
+
+```python
+#%%
+import cv2
+import numpy as np
+
+img = cv2.imread('chessboard.jpg')
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# gray = np.float32(gray)
+dst = cv2.cornerHarris(gray, 2, 3, 0.04)
+img[dst>0.01*dst.max()] = [0,0,255]  
+cv_show(img)
+```

@@ -49,7 +49,7 @@ dtype: int64
 
 索引与切片操作：
 
-```
+```python
 s[-1]
 3
 s[1:] # 切片操作
@@ -145,7 +145,7 @@ dtype: float64
 ```
 
 ## DataFrame
-DataFrame是一个表格型数据，将Series从一维扩展到多维，有行索引，也有列索引
+DataFrame是一个表格型数据，将Series从一维扩展到二维，有行索引，也有列索引
 行索引：index
 列索引：columns
 值：values
@@ -156,7 +156,8 @@ numpy，字典两种创建方式
 ```python
 
 data = [('Andy',18),('Lisa', 19),('Bob',27)]  
-df = pd.DataFrame(data=data, columns = ['Name', 'Age'])
+df = pd.DataFrame(data=data, colum
+				  ns = ['Name', 'Age'])
   Name Age
 0,Andy,18
 1,Lisa,19
@@ -220,6 +221,7 @@ col_index = df.columns.get_indexer_for(['随访时间'])[0]
 ```
 
 #### 取列
+
 直接通过括号取的不是行，而是列：
 
 ```python
@@ -260,11 +262,11 @@ df.loc['a'] 这里面是取索引为 'a'的行，取的一是一行数据，而�
 而对于iloc，df.iloc[0] 与上面的效果相同，因为i是取数字位置，而这里的数字0与上面的loc相同,那么为什么会有两个呢？ 因为数据的索引不一定是数值类型，也可能是其它非数值类型，而iloc只能使用整型。
 
 ```python
-df.loc['a']  # 显式索引
+df.loc['a']  # 显式索引,获取a这一行
 name    andy
 age       20
 Name: a, dtype: object
-df.iloc[0]  # 隐式索引
+df.iloc[0]  # 隐式索引，获取的也是第一行
 name    andy
 age       20
 Name: a, dtype: object
@@ -293,7 +295,7 @@ df.iloc[0,1]  # 使用iloc时行列都得使用隐式索引
 20
 ```
 
-取多个元素：记住逗号左边为行，右边为列
+取多个元素：记住 **逗号左边为行，右边为列**
 
 ```python
 df.loc[['a','b'],['name']]
@@ -320,13 +322,14 @@ df.loc[:,'name':'age']  # 注意是开区间
 	name	age
 a	andy	20
 b	zhou	30
+
 df.iloc[:,0:1]
 	name
 a	andy
 b	zhou
 ```
 
-匹配到相等的修改：
+匹配到相等的数据并进行修改：
 
 ```python
 import pandas as pd  
@@ -336,7 +339,7 @@ dy = pd.read_excel('./东院.xlsx')
   
 for i in range(len(dybl)):  
     row = dybl.iloc[i]  
-    id = row[0] # 如果有玩名，这里可以通过列名取数据如：row['检查号'] 
+    id = row[0] # 如果有列名，这里可以通过列名取数据如：row['检查号'] 
     dy.loc[dy['检查号'] == id, ['病理']] = row[6] # 匹配到相等，并赋值到'病理' 这一列
   
 dy.to_excel('./东院1026.xlsx')
@@ -365,7 +368,7 @@ time
 ```
 
 关于index的一点补充:
-set_index中第一个参数为字段名，如果直接写的字段名如：time,此时drop参数才有效，默认行为是drop=True,此时指定time为索引，即删除了time这一列，将它用来作为索引。而如果是像上面那样使用的 df['time'] 这样指定，则drop失去作用。
+set_index中第一个参数为字段名，如果直接写的字段名如：time, 此时drop参数才有效，默认行为是drop=True,此时指定time为索引，即删除了time这一列，将它用来作为索引。而如果是像上面那样使用的 df['time'] 这样指定，则drop失去作用。
 
 ```python
 #
@@ -412,10 +415,11 @@ df1.loc[(df1['姓名'] == name) & (df1['性别'] == gender) & (df1['年龄'] == 
 
 ref:https://stackoverflow.com/questions/36921951/truth-value-of-a-series-is-ambiguous-use-a-empty-a-bool-a-item-a-any-o
 
-to_datetime
+#### to_datetime
 
 将字符串转成时间序列：to_datetime
-设置索引：set_index
+
+
 ```python
 dic = {
     'time':['2020-06-01','2020-06-02','2020-06-04'],
@@ -476,7 +480,7 @@ cleaned_data = df.where(df > 0)
 条件替换: 比如将某列中的负值替换为0。
 
 ```python
-df['A'] = df['A'].where(df['A'] > 0, 0)
+df['A'] = df['A'].where(df['A'] < 0, 0)
 ```
 
 生成过滤后的数据集: 通过条件筛选并得到一个新数据集
@@ -486,6 +490,7 @@ filtered_data = df.where((df['A'] > 2) & (df['B'] < 4))
 ```
 
 ### apply
+
 可以沿着指定的轴（行或列）应用一个函数
 
 ```python
@@ -533,14 +538,6 @@ df.map(func)
 df['A'].map(lambda x: x * 2)  # 对 Series A 中的每个元素乘以2
 ```
 
-
-### applymap
-
-与map类似，deprecated
-
-```python
-df.applymap(lambda x: x * 2)  # 对 DataFrame 中的每个元素乘以2
-```
 
 ### concat 
 axis=0表示按行拼接，axis=1表示按列拼接
@@ -628,6 +625,8 @@ df['V2'].interpolate(method='linear', inplace=True)
 ```
 
 ### 处理重复数据
+
+数据准备：
 
 ```python
 import pandas as pd
