@@ -397,3 +397,62 @@ dst = cv2.cornerHarris(gray, 2, 3, 0.04)
 img[dst>0.01*dst.max()] = [0,0,255]  
 cv_show(img)
 ```
+
+
+### sift 函数
+
+
+得到特征点(关键点)：
+
+```python
+img = cv2.imread('cat.jpg')  
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)  
+sift = cv2.SIFT_create()  
+kp = sift.detect(gray,None)  
+k_img = cv2.drawKeypoints(gray,kp,img)  
+cv_show(k_img)
+```
+
+计算特征：
+
+```python
+kp, des = sift.compute(gray, kp)
+```
+
+### 特征匹配方法
+
+brute-force 蛮力匹配
+```python
+sift = cv2.SIFT_create() 
+kp1, des1 = sift.detectAndCompute(img1,None)
+kp2, des2 = sift.detectAndCompute(img2,None)
+```
+
+crossCHeck： 表示 两个特征点要互相匹，例如A中的第i个特征点与B中的第j个特征点最近，并且B中的第j个特征点到A中的第i个特征点也是。
+
+NORM_L2: 归一化数组的欧几里德距离，如果其他特征计算方法需要考虑不同的匹配计算方式
+
+```python
+bf = cv2.BFMatcher(corssCheck=True)
+```
+
+1:1 匹配
+
+```python
+matches = bf.match(des1,des2)
+# 匹配后按照距离进行排序
+matches = sorted(matches, key=lambda x: x.distance)
+img3 = cv.drawMatches(img1,kp1,img2,kp2,matches[:10],None,flags=2)
+```
+
+k对最佳匹配
+
+```python
+bf = cv2.BFMatcher()
+matches = bf.knnMatch(des1,des2, k=2)
+
+good = []
+for m,n in matches:
+	if m.distance < 0.75 * n.distance:
+		good.append([m])
+```
