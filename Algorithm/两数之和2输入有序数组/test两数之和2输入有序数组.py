@@ -4,6 +4,7 @@
 # @FileName : test两数之和2输入有序数组.py # noqa
 # Created by: Andy963
 
+# ref https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/submissions/208081069/
 def solve(numbers:list, target:int) -> list:
     left, right = 0, len(numbers) - 1
     while left < right:
