@@ -24,36 +24,19 @@ trusted-host=
 
 ```
 
+## 不存在会导致报错的场景：
+
+```python
+a = [1,2]
+a.index(3) # err
+
+b = {1,2}
+b.remove(3) # error
+
+random.choice([])
+```
 ## 运算符（operator）
 
-海象运算符：
-```python
-
-my_list = [1,2,3]
-
-# 这里说的能避免两次操作：
-if len(my_list) > 3:
-	print(f"Error {len(my_list)} is too long")
-
-# 这里可以减少一条语句
-count = len(my_list)
-if count > 3:
-   print(f"Error, {count} is too many items")
-
-# 当转换为海象运算符时...
-if (count := len(my_list)) > 3:
-   print(f"Error, {count} is too many items")
-
-line = f.readLine()
-while line:
-   print(line)
-   line = f.readLine()
-
-# 转换为海象运算符时
-while line := f.readLine():
-   print(line)
-```
-学了go之后 发现这不是一样的吗？就是简化了赋值操作而已，之前还不是很理解这个所谓的海象运算符
 
 ### 位运算符
 
@@ -68,6 +51,12 @@ def is_power_of_two(n):
     return n != 0 and (n & (n-1) == 0)
 ```
 
+判断奇偶性：
+
+```python 
+x ^ 1 # 奇减偶增
+```
+
 在后台设计权限管理，一种思路是通过位运算。之前写flask 项目有使用这种方式，还是比较好理解的。
 
 ### 运算符优先级
@@ -78,7 +67,7 @@ def is_power_of_two(n):
 
 ### 数学函数
 
-ceil: 返回数字的上入整数，即上向取整. 如 math.ceil(4.1) = 5 与之对应的，floor向下取整
+ceil: 返回数字的上入整数，即向上取整. 如 math.ceil(4.1) = 5 与之对应的，floor向下取整
 exp(x): 返回e的x次幂
 log(x,base): 返回以base为底的x的对数，以10为底还有log10(x)
 modf(x): 返回x的整数部分与小数部分，整数部分也以浮点数表示
@@ -95,7 +84,6 @@ sqrt(x): 返回x的平方根
 格式化操作符辅助指令:
 ![](https://raw.githubusercontent.com/Andy963/notePic/main/1605537606_20201116223958736_20108.png)
 
-python三引号允许一个字符串跨多行，字符串中可以包含换行符、制表符以及其他特殊字符
 
 ### f-string
 f-string 是 python3.6 之后版本添加的，称之为字面量格式化字符串，是新的格式化字符串的语法
@@ -122,21 +110,6 @@ Out[2]: 'hello andy'
 
 find(str, b, e) 查检str是否包含在目标字符串中，返回在则返回索引，如果不在则返回-1,与index类似，但如果元素不在目标字符串中，index函数会报错。并且还有对应的rfind,rindex从右边开始。
 ljust(width, fillchar), 左对齐并使用fillchar填充到指定宽度，与之对应的有rjust
-
-## 列表（list）
-列表都可以进行的操作包括索引，切片，加，乘，检查成员。
-
-需要注意乘法运算时，是在列表内部对元素进行重复(元组也是如此)
-
-```python
-ls = ["a", "b"]  
-print(ls * 3)
-
-# ['a', 'b', 'a', 'b', 'a', 'b']
-```
-
-注意，列表也有clear方法，可以将整个列表清空（与集合相同）
-
 
 
 ## 集合（set）
@@ -347,6 +320,115 @@ for x in myiter:
     print(x)
 ```
 
+### 迭代器模式
+
+基本结构：
+
+```python
+from abc import ABC, abstractmethod
+
+# 迭代器抽象接口
+class Iterator(ABC):
+    @abstractmethod
+    def has_next(self):
+        pass
+
+    @abstractmethod
+    def next(self):
+        pass
+
+# 聚合对象抽象接口
+class Aggregate(ABC):
+    @abstractmethod
+    def create_iterator(self):
+        pass
+```
+
+使用示例：
+
+```python
+class Book:
+    def __init__(self, name):
+        self.name = name
+
+class BookShelf:
+    def __init__(self):
+        self._books = []
+
+    def add_book(self, book):
+        self._books.append(book)
+
+    def get_book_count(self):
+        return len(self._books)
+
+    def get_book_at(self, index):
+        return self._books[index]
+
+    def create_iterator(self):
+        return BookShelfIterator(self)
+
+class BookShelfIterator:
+    def __init__(self, book_shelf):
+        self._book_shelf = book_shelf
+        self._index = 0
+
+    def has_next(self):
+        return self._index < self._book_shelf.get_book_count()
+
+    def next(self):
+        if not self.has_next():
+            raise StopIteration()
+        book = self._book_shelf.get_book_at(self._index)
+        self._index += 1
+        return book
+
+# 使用示例
+def client_code():
+    book_shelf = BookShelf()
+    book_shelf.add_book(Book("Python设计模式"))
+    book_shelf.add_book(Book("算法导论"))
+    book_shelf.add_book(Book("机器学习"))
+
+    iterator = book_shelf.create_iterator()
+
+    while iterator.has_next():
+        book = iterator.next()
+        print(book.name)
+
+client_code()
+```
+
+多种遍历方式：
+
+```python
+class ReverseIterator:
+    def __init__(self, data):
+        self.data = data
+        self.index = len(data)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index > 0:
+            self.index -= 1
+            return self.data[self.index]
+        raise StopIteration
+
+# 正向和反向迭代
+data = [1, 2, 3, 4, 5]
+forward_iter = iter(data)
+reverse_iter = ReverseIterator(data)
+
+print("正向遍历:")
+for item in forward_iter:
+    print(item)
+
+print("\n反向遍历:")
+for item in reverse_iter:
+    print(item)
+```
+
 ### 生成器
 
 使用了yield的函数被称为生成器。即生成器是使用函数语法定义的迭代器
@@ -412,7 +494,7 @@ def gen(name):
         print(f'{name} start to eat {food}')
 
 dog = gen('alex')
-next(dog)
+next(dog) # 预激，让协程准备好接收第一个值
 # 还可以给上一个yield发送值
 dog.send('骨头')
 dog.send('狗粮')
@@ -425,7 +507,7 @@ alex start to eat 香肠
 """
 ```
 
-首先，next会将程序执行到yield，但上面next并不会打印出什么，(把yield理解为return,即即程序执行到yield返回了，没有赋值，但保留了状态，等待下一次从赋值开始)。随后的send将值传入，而程序从上次的状态接着执行，即赋值操作：food='骨头', 所以我们看到的是："alex start to eat 骨头"
+首先，next会将程序执行到yield，但上面next并不会打印出什么，(它仅仅完成预激，把yield理解为return,即即程序执行到yield返回了，没有赋值，但保留了状态，等待下一次从赋值开始)。随后的send将值传入，而程序从上次的状态接着执行，即赋值操作：food='骨头', 所以我们看到的是："alex start to eat 骨头"
 
 **send() vs next()**
 
@@ -442,6 +524,30 @@ alex start to eat 香肠
 不同：
 1.  第一次取yield的值时只能用next，如果非要用send,必须要send(none) 因为没有yield语句来接收这个值
 
+预激的两种方式：
+
+```python
+# 方法1：手动预激
+def manual_prime():
+    coro = coroutine()
+    next(coro)  # 预激
+    return coro
+
+# 方法2：装饰器自动预激
+def coroutine(func):
+    def wrapper(*args, **kwargs):
+        gen = func(*args, **kwargs)
+        next(gen)  # 自动预激
+        return gen
+    return wrapper
+
+@coroutine
+def my_coroutine():
+    while True:
+        x = yield
+        print(x)
+```
+
 ### yield from
 
 当使用 ` yield from <expr>` 时，它会将所提供的表达式视为一个子迭代器。 这个子迭代器产生的所有值都直接被传递给当前生成器方法的调用者。 通过 send() 传入的任何值以及通过 throw() 传入的任何异常如果有适当的方法则会被传给下层迭代器。 如果不是这种情况，那么 send() 将引发 AttributeError 或 TypeError，而 throw() 将立即引发所传入的异常。
@@ -456,6 +562,37 @@ print(f.__next__())
 ```
 
 这种情况下，会直接返回整个列表，但如果使用`yield from` 就会返回列表中单个元素。
+
+
+基本用法：
+
+```python
+def gen1():
+    yield 1
+    yield 2
+    yield 3
+
+def gen2():
+    yield from gen1()  # 展开gen1中的所有元素
+
+for item in gen2():
+    print(item)  # 输出 1 2 3
+```
+
+处理嵌套结构：
+
+```python
+def flatten(nested_list):
+    for item in nested_list:
+        if isinstance(item, list):
+            yield from flatten(item)
+        else:
+            yield item
+
+# 示例
+nested = [1, [2, 3, [4, 5]], 6]
+print(list(flatten(nested)))  # 输出 [1, 2, 3, 4, 5, 6]
+```
 
 
 推导式
