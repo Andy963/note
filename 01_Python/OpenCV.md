@@ -27,6 +27,8 @@ img
 cv2.imshow('image',img)  
 # 等待时间，毫秒级，0表示任意键终止  
 cv2.waitKey(1000)  
+# destroy the specific window
+cv2.destroyWindow('image')
 cv2.destroyAllWindows() 
 ```
 
@@ -57,6 +59,30 @@ cv_show(median)
 bilateral = cv2.bilateralFilter(cat,9,75,75)
 cv_show(bilateral)
 ```
+
+### 画线,矩形,圆,文字
+
+```python
+import numpy as np
+import cv2
+
+img = np.zeros((512,512,3),np.uint8)
+# draw a blue line with 5px
+# cv2.line(img,(0,0),(511,511),(255,0,0),5)
+# rectangle
+# cv2.rectangle(img, (300,0),(500,100),(0,255,0),3)
+# -1 means the circle is filled, 2 means the circle thickness is 2px, 0 means the circle is empty
+# cv2.circle(img, (447,63), 63, (0,0,255), -1)
+# put text on the image
+font=cv2.FONT_HERSHEY_SIMPLEX
+# img, text, org(bottom, left), fontFace, fontScale, color, thikcness
+cv2.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2)
+cv2.imshow('line', img)
+cv2.waitKey(1000)
+cv2.destroyAllWindows()
+
+```
+
 
 ### 腐蚀操作
 

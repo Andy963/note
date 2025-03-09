@@ -5,7 +5,7 @@
  * Last Modified Date: 2022.08.15
  * Last Modified By  : Andy
  */
-
+package main
 
 func permute(nums []int) [][]int {
     var result [][]int

@@ -5,7 +5,6 @@
  * Last Modified Date: 2022.08.08
  * Last Modified By  : Andy
  */
-;
 
 func twoSum(nums []int, target int) []int{
 	for i, x := range nums{
