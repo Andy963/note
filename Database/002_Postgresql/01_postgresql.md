@@ -125,3 +125,96 @@ ROLLBACK WORK;
 ROLLBACK TRANSACTION;
 
 ref: https://neon.tech/postgresql/postgresql-tutorial/postgresql-transaction
+
+### 创建数据库表的三原则
+
+在设计和创建数据库表时，需要遵循以下三大原则，以确保数据的完整性、性能和可维护性：
+
+#### 1. **原子性原则（字段不可再分）**
+- **含义**：
+  - 每个字段的数据应该是不可再分的最小单位。
+  - 一个字段只存储一个属性值，避免将多个值存储在同一个字段中。
+- **目的**：
+  - 保证数据的规范化，避免数据冗余。
+  - 提高查询效率，便于数据的筛选和统计。
+- **示例**：
+  - 错误设计：
+    ```sql
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        address VARCHAR(255) -- 地址字段包含省、市、区等信息
+    );
+    ```
+  - 正确设计：
+    ```sql
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        province VARCHAR(50),
+        city VARCHAR(50),
+        district VARCHAR(50) -- 将地址拆分为多个字段
+    );
+    ```
+
+#### 2. **唯一性原则（主键唯一标识）**
+- **含义**：
+  - 每张表必须有一个主键，用于唯一标识每一行数据。
+  - 主键可以是单个字段，也可以是多个字段的组合（复合主键）。
+- **目的**：
+  - 保证数据的唯一性，避免重复数据。
+  - 提高数据查询的效率。
+- **示例**：
+  - 错误设计：
+    ```sql
+    CREATE TABLE orders (
+        order_id INT,
+        user_id INT,
+        product_id INT -- 缺少主键
+    );
+    ```
+  - 正确设计：
+    ```sql
+    CREATE TABLE orders (
+        order_id SERIAL PRIMARY KEY, -- 添加主键
+        user_id INT,
+        product_id INT
+    );
+    ```
+
+#### 3. **规范化原则（减少冗余，避免异常）**
+- **含义**：
+  - 遵循数据库的规范化设计（如第一范式、第二范式、第三范式）。
+  - 将重复数据拆分到不同的表中，通过外键关联。
+- **目的**：
+  - 减少数据冗余，避免插入、更新、删除异常。
+  - 提高数据的可维护性。
+- **示例**：
+  - 错误设计：
+    ```sql
+    CREATE TABLE employees (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        department_name VARCHAR(100) -- 部门名称重复存储
+    );
+    ```
+  - 正确设计：
+    ```sql
+    CREATE TABLE employees (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        department_id INT -- 使用外键关联部门表
+    );
+
+    CREATE TABLE departments (
+        id SERIAL PRIMARY KEY,
+        department_name VARCHAR(100)
+    );
+    ```
+
+#### 总结
+- **原子性原则**：字段不可再分，保证数据的最小粒度。
+- **唯一性原则**：主键唯一标识，避免重复数据。
+- **规范化原则**：减少冗余，避免数据异常。
+
+通过遵循以上三大原则，可以设计出高效、规范且易维护的数据库表结构。
