@@ -222,67 +222,6 @@ popitem() 随机删除字典中的最后一对键值
 
 从代码角度来说，对象内部实现了__iter__()方法或者实现了__getitem__()的方法,主要包括:列表、元组、字典、集合字符串和open()打开的文件
 
-enumerate的一个优点：
-
-```python
-fruits = ['apple', 'banana', 'cherry']
-
-for index, fruit in enumerate(fruits):
-    if fruit == 'banana':
-        fruits.remove(fruit)
-
-print(fruits)
-
-# 下面的边迭代边删除会超出边界
-fruits = ['apple', 'banana', 'cherry']
-
-for i in range(len(fruits)):
-    if fruits[i] == 'banana':
-        fruits.remove(fruit)
-
-1. 使用 enumerate() 的方法：
-
-enumerate() 函数在 Python 中创建了一个迭代器对象。这个迭代器在循环开始时就生成了，它包含了原始列表中所有元素的引用（不是副本）。
-
-当循环开始时，迭代器指向第一个元素。每次迭代，它就移动到下一个元素。即使原始列表被修改了，迭代器仍然保持着对原始元素的引用。
-
-具体过程如下：
-⦁ 迭代器指向 'apple'，不删除，移到下一个
-⦁ 迭代器指向 'banana'，删除它，移到下一个
-⦁ 迭代器指向 'cherry'，不删除，循环结束
-
-所以，即使 'banana' 被删除，迭代器仍然能够找到并指向 'cherry'，因为它持有的是对原始元素的引用，而不是列表索引。
-
-2. 从后向前遍历：
-fruits = ['apple', 'banana', 'cherry']
-
-for i in range(len(fruits) - 1, -1, -1):
-    if fruits[i] == 'banana':
-        fruits.remove(fruits[i])
-
-print(fruits)
-
-从后向前遍历不会出现索引越界，因为我们是从最大索引开始，逐渐减小到0。即使删除了元素，也不会影响到我们还没有处理的元素的索引。
-
-具体过程如下：
-⦁ i = 2，检查 'cherry'，不删除
-⦁ i = 1，检查 'banana'，删除它
-⦁ i = 0，检查 'apple'，不删除
-
-即使在删除 'banana' 后列表长度变为2，这也不会影响到索引0的访问，因为我们已经处理完了所有大于0的索引。
-
-底层原理：
-⦁ 在 Python 中，列表是动态数组实现的。当我们删除一个元素时，后面的所有元素都会向前移动一位。
-⦁ 从前向后遍历时，如果删除了当前元素，后面的元素会前移，导致下一次迭代时跳过了一个元素。
-⦁ 从后向前遍历时，即使删除了当前元素，它也不会影响到我们还没有处理的元素的位置。
-
-或者使用列表推导式：
-fruits = ['apple', 'banana', 'cherry']
-fruits = [fruit for fruit in fruits if fruit != 'banana']
-print(fruits)
-
-```
-
 ### 迭代器
 
 迭代器是一个实现了迭代器协议的对象。在 Python 中,迭代器协议包括两个方法:
@@ -631,7 +570,7 @@ ref:https://blog.csdn.net/HUSTHY/article/details/106882669
 
 ## 函数
 
-定义在函数内部的函数，该函数引用外部作用域而不是全局作用域的变量，该函数称为闭包函数。该函数可以在其定义环境外执行。
+闭包函数：定义在函数内部的函数，该函数引用外部作用域而不是全局作用域的变量，该函数称为闭包函数。该函数可以在其定义环境外执行。
 闭包函数私有化了变量,完成了数据的封装,类似于面向对象. 闭包因为保存了变量,如果大量使用,对内存是有消耗的.
 
  高阶函数：
@@ -2601,6 +2540,117 @@ while True:
 
     client.send(msg.encode('utf-8'))
     msg=client.recv(1024)
+```
+
+
+
+# --------------------------------------
+# Python基础补充内容
+
+## 常用内置函数
+Python 提供了许多常用内置函数，常见的有：
+- `map(func, iterable)`: 对可迭代对象的每个元素应用函数。
+- `filter(func, iterable)`: 过滤可迭代对象，返回使函数为 True 的元素。
+- `zip(*iterables)`: 将多个可迭代对象打包成元组。
+- `enumerate(iterable, start=0)`: 返回元素和其索引。
+- `sorted(iterable, key=None, reverse=False)`: 排序。
+- `len(obj)`: 获取长度。
+- `range(start, stop, step)`: 生成整数序列。
+- `sum(iterable)`: 求和。
+- `any(iterable)`, `all(iterable)`: 判断是否有/全部为真。
+示例：
+```python
+nums = [1, 2, 3]
+print(list(map(lambda x: x * 2, nums)))  # [2, 4, 6]
+print(list(filter(lambda x: x > 1, nums)))  # [2, 3]
+print(list(zip(['a', 'b'], [1, 2])))  # [('a', 1), ('b', 2)]
+for idx, val in enumerate(nums):
+    print(idx, val)
+```
+
+## 列表推导式和生成器表达式
+列表推导式用于快速生成列表：
+```python
+squares = [x * x for x in range(10)]
+```
+生成器表达式用于生成迭代器，节省内存：
+```python
+gen = (x * x for x in range(10))
+for val in gen:
+    print(val)
+```
+
+## 异常处理
+Python 使用 try/except/finally 进行异常处理：
+```python
+try:
+    x = 1 / 0
+except ZeroDivisionError as e:
+    print('除零错误:', e)
+finally:
+    print('总会执行')
+```
+最佳实践：只捕获需要的异常类型，合理使用 finally 清理资源。
+
+## 文件操作
+推荐使用 with 语句自动关闭文件：
+```python
+with open('test.txt', 'w', encoding='utf-8') as f:
+    f.write('Hello World')
+with open('test.txt', 'r', encoding='utf-8') as f:
+    content = f.read()
+```
+
+## 模块与包的导入和管理
+导入模块：
+```python
+import os
+import sys
+from datetime import datetime
+from collections import defaultdict
+```
+自定义模块需放在同一目录或包下，包需有 `__init__.py` 文件。
+
+## Python 标准库推荐
+常用标准库：
+- `os`：操作系统接口
+- `sys`：Python 解释器相关
+- `datetime`：日期和时间
+- `collections`：高级数据结构
+- `json`：JSON 处理
+- `re`：正则表达式
+- `math`：数学运算
+示例：
+```python
+import os, sys, datetime, collections
+```
+
+## 注释和文档字符串
+单行注释用 `#`，多行注释用三个引号。
+函数、类建议写 docstring：
+```python
+def add(a, b):
+    """返回 a 和 b 的和。
+    Args:
+        a (int): 第一个数
+        b (int): 第二个数
+    Returns:
+        int: 两数之和
+    """
+    return a + b
+```
+
+## 类型注解
+Python 3.5+ 支持类型注解：
+```python
+def add(a: int, b: int) -> int:
+    return a + b
+```
+可以使用 `typing` 模块定义复杂类型：
+```python
+from typing import List, Dict, Optional
+def process(data: List[int]) -> Optional[Dict[str, int]]:
+    ...
 ```
 
 
