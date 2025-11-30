@@ -5,6 +5,7 @@ Jupyter Notebook 快捷键：
 * tab 补全
 * 切换模式 y,m
 * 打开帮助文档shift + tab
+
 ## Series
 Series是一个类似一维数组的结构，有两部分组成：index,values
 Series创建由列表或者numpy数组创建，也可以由字典创建
@@ -72,36 +73,57 @@ array([1, 2, 3], dtype=int64)
 ```
 ### Series常用方法
 
-head,tail,unique,isnull,notnull,add,sub, mul,div
+head,tail,unique,isnull,notnull,add,sub,mul,div,describe,value_counts,sort_values,sort_index,reset_index,drop,replace,fillna,dropna
 
+#### 基础查看方法
 ```python
+s = pd.Series(data=[1,2,2,1,3,3,4], index=['a','b','c','d','e','f','g'])
+
 s.head(2)  # 显示前两条数据
-数学    1
-语文    2
+a    1
+b    2
 dtype: int64
 
 s.tail(2)  # 显示后两条数据
-语文    2
-英语    3
+f    3
+g    4
 dtype: int64
 
-s.unique（）  # 去重
-s =Series(data=[1,2,2,1])
-s.unique()
-array([1, 2], dtype=int64)
+s.unique()  # 去重，返回唯一值数组
+array([1, 2, 3, 4], dtype=int64)
 
-算术运算：add,sub,mul,div 
-运算规则：索引匹配的值进行算术运算，否则补空,注意最后的索引项相当于并集
-s1=Series(data=[1,2,3,4])
-s2=Series(data=[3,2,1])
+s.value_counts()  # 统计每个值的出现次数
+1    2
+2    2
+3    2
+4    1
+dtype: int64
+
+s.describe()  # 描述性统计信息
+count    7.000000
+mean     2.285714
+std      1.113106
+min      1.000000
+25%      1.500000
+50%      2.000000
+75%      3.000000
+max      4.000000
+dtype: float64
+
+#### 算术运算方法
+add,sub,mul,div 运算规则：索引匹配的值进行算术运算，否则补空,注意最后的索引项相当于并集
+```python
+s1 = pd.Series(data=[1,2,3,4])
+s2 = pd.Series(data=[3,2,1])
 s1.add(s2)
 0    4.0
 1    4.0
 2    4.0
 3    NaN
 dtype: float64
-s3=Series(data=[1,2,3,4],index=['a','b','c','d'])
-s4=Series(data=[1,2,3,4],index=['a','e','c','f'])
+
+s3 = pd.Series(data=[1,2,3,4], index=['a','b','c','d'])
+s4 = pd.Series(data=[1,2,3,4], index=['a','e','c','f'])
 
 s3.mul(s4)
 a    1.0
@@ -111,37 +133,288 @@ d    NaN
 e    NaN
 f    NaN
 dtype: float64
+```
 
-bool可以作为索引取值：True表示取，False表示舍
-s5 = Series(data=[1,2,3,4],index=['a','b','c','d'])
-s5[[True,False,True,False]]
+#### 缺失值处理方法
+```python
+s5 = pd.Series(data=[1,2,None,4], index=['a','b','c','d'])
+
+# 检查缺失值
+s5.isnull()  # 返回布尔值Series
+a    False
+b    False
+c     True
+d    False
+dtype: bool
+
+s5.notnull()  # 检查非空值
+a     True
+b     True
+c    False
+d     True
+dtype: bool
+
+# 填充缺失值
+s5.fillna(0)  # 用0填充缺失值
+a    1.0
+b    2.0
+c    0.0
+d    4.0
+dtype: float64
+
+s5.fillna(method='ffill')  # 前向填充（使用前一个有效值）
+s5.fillna(method='bfill')  # 后向填充（使用后一个有效值）
+
+# 删除缺失值
+s5.dropna()  # 删除包含NaN的行
+a    1.0
+b    2.0
+d    4.0
+dtype: float64
+```
+
+#### 索引操作方法
+```python
+s = pd.Series([1,2,3,4], index=['a','b','c','d'])
+
+# 重置索引
+s.reset_index()  # 将原索引变为列，创建新的数字索引
+  index  0
+0     a  1
+1     b  2
+2     c  3
+3     d  4
+
+s.reset_index(drop=True)  # 删除原索引，只保留数据
+0    1
+1    2
+2    3
+3    4
+dtype: int64
+
+# 排序
+s_unsorted = pd.Series([4,1,3,2], index=['d','a','c','b'])
+s_unsorted.sort_values()  # 按值排序
+a    1
+b    2
+c    3
+d    4
+dtype: int64
+
+s_unsorted.sort_index()  # 按索引排序
+a    1
+b    2
+c    3
+d    4
+dtype: int64
+```
+
+#### 数据替换和删除方法
+```python
+s = pd.Series([1,2,2,3,4], index=['a','b','c','d','e'])
+
+# 替换值
+s.replace(2, 99)  # 将所有2替换为99
+a     1
+b    99
+c    99
+d     3
+e     4
+dtype: int64
+
+s.replace({2: 99, 3: 88})  # 多个值替换
+a     1
+b    99
+c    99
+d    88
+e     4
+dtype: int64
+
+# 删除指定索引的元素
+s.drop('a')  # 删除索引为'a'的元素
+b    2
+c    2
+d    3
+e    4
+dtype: int64
+
+s.drop(['a', 'b'])  # 删除多个元素
+c    2
+d    3
+e    4
+dtype: int64
+```
+
+#### 条件筛选和布尔索引
+```python
+s = pd.Series(data=[1,2,3,4], index=['a','b','c','d'])
+
+# bool可以作为索引取值：True表示取，False表示舍
+s[[True,False,True,False]]
 a    1
 c    3
 dtype: int64
 
-# 获取bool值
-s5.isnull()
-a    False
-b    False
-c    False
-d    False
-dtype: bool
-将这组bool值作为索引，用来清洗数据
+# 条件筛选
+s[s > 2]  # 筛选大于2的值
+c    3
+d    4
+dtype: int64
 
-s5[s5.notnull()]
-s5=s3.mul(s4)
-s5
-a    1.0
-b    NaN
-c    9.0
-d    NaN
-e    NaN
-f    NaN
-dtype: float64
-s5[s5.notnull()]
-a    1.0
-c    9.0
-dtype: float64
+s[(s > 1) & (s < 4)]  # 多条件筛选
+b    2
+c    3
+dtype: int64
+```
+
+#### 字符串操作方法（str访问器）
+```python
+s_str = pd.Series(['apple', 'banana', 'Cherry', 'date'])
+
+# 字符串长度
+s_str.str.len()
+0    5
+1    6
+2    6
+3    4
+dtype: int64
+
+# 大小写转换
+s_str.str.upper()    # 转大写
+s_str.str.lower()    # 转小写
+s_str.str.title()    # 首字母大写
+
+# 字符串包含
+s_str.str.contains('a')  # 包含字母'a'的项
+0     True
+1     True
+2    False
+3     True
+dtype: bool
+
+# 字符串替换
+s_str.str.replace('a', 'X')
+0    Xpple
+1    bXnXnX
+2    Cherry
+3    dXte
+dtype: object
+
+# 字符串分割
+s_split = pd.Series(['a,b,c', 'd,e,f'])
+s_split.str.split(',')  # 返回列表
+0    [a, b, c]
+1    [d, e, f]
+dtype: object
+
+s_split.str.split(',', expand=True)  # 扩展为DataFrame
+   0  1  2
+0  a  b  c
+1  d  e  f
+```
+
+#### 数学和统计方法
+```python
+s = pd.Series([1, 2, 3, 4, 5, 6])
+
+# 基本统计
+s.sum()      # 求和：21
+s.mean()     # 平均值：3.5
+s.median()   # 中位数：3.5
+s.std()      # 标准差：1.87
+s.var()      # 方差：3.5
+s.min()      # 最小值：1
+s.max()      # 最大值：6
+s.count()    # 非空值计数：6
+
+# 累积统计
+s.cumsum()   # 累积和
+0     1
+1     3
+2     6
+3    10
+4    15
+5    21
+dtype: int64
+
+s.cumprod()  # 累积乘积
+s.cummax()   # 累积最大值
+s.cummin()   # 累积最小值
+
+# 分位数
+s.quantile(0.25)  # 25%分位数：2.25
+s.quantile(0.75)  # 75%分位数：4.75
+
+# 相关性（与其他Series）
+s2 = pd.Series([6, 5, 4, 3, 2, 1])
+s.corr(s2)   # 相关系数：-1.0（完全负相关）
+```
+
+#### 应用自定义函数
+```python
+s = pd.Series([1, 2, 3, 4, 5])
+
+# apply方法应用函数
+s.apply(lambda x: x**2)  # 平方
+0     1
+1     4
+2     9
+3    16
+4    25
+dtype: int64
+
+# map方法（类似apply，但更适用于字典映射）
+s.map({1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five'})
+0      one
+1      two
+2    three
+3     four
+4     five
+dtype: object
+
+# transform方法
+s.transform(lambda x: (x - x.mean()) / x.std())  # 标准化
+```
+
+#### 时间序列相关方法
+```python
+# 创建时间序列
+dates = pd.date_range('2023-01-01', periods=5, freq='D')
+ts = pd.Series([1, 2, 3, 4, 5], index=dates)
+
+ts.shift(1)      # 向后移动1个位置
+ts.shift(-1)     # 向前移动1个位置
+ts.resample('M').mean()  # 按月重采样并计算平均值
+ts.rolling(window=3).mean()  # 3期移动平均
+```
+
+#### 其他实用方法
+```python
+s = pd.Series([3, 1, 4, 1, 5, 9])
+
+# 查找值的位置
+s.idxmin()      # 最小值的索引：1
+s.idxmax()      # 最大值的索引：5
+
+# 随机抽样
+s.sample(3)     # 随机抽取3个值
+s.sample(frac=0.5)  # 随机抽取50%的值
+
+# 去重并保持顺序
+s.drop_duplicates()
+0    3
+1    1
+2    4
+4    5
+5    9
+dtype: int64
+
+# 检查是否单调递增/递减
+s.is_monotonic_increasing  # False
+s.is_monotonic_decreasing  # False
+
+# 内存使用情况
+s.memory_usage(deep=True)   # 查看内存占用
 ```
 
 ## DataFrame
